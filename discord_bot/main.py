@@ -9,3 +9,4 @@ class MyClient(Client):
     async def on_message(self, message: Message) -> None:
         if message.author == self.user:
             return
+        print(f'Message from {message.author}: {message.content}')
