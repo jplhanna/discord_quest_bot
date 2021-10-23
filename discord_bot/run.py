@@ -13,4 +13,4 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 discord_logger.addHandler(handler)
 
 client = MyClient()
-client.run(DISCORD_ACCOUNT_TOKEN, bot=False)
+client.run(DISCORD_ACCOUNT_TOKEN)

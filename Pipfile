@@ -7,6 +7,7 @@ name = "pypi"
 mypy = "*"
 pytest = "*"
 discord = "*"
+"discord.py-stubs" = "*"
 
 [dev-packages]
 
