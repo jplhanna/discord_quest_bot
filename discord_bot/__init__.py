@@ -1,1 +1,1 @@
-from discord_bot import main
+from discord_bot import client
