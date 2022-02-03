@@ -1,6 +1,7 @@
+from discord.ext import commands
 from discord.ext.commands import Context
 
-from discord_bot.bot import bot
+bot = commands.Bot(command_prefix='~')
 
 
 @bot.command(name='ping')

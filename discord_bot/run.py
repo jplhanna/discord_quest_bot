@@ -1,6 +1,6 @@
 import logging
 
-from discord_bot.client import MyClient
+from discord_bot.bot.commands import bot
 from discord_bot.constants import DISCORD_ACCOUNT_TOKEN
 from discord_bot.constants import DISCORD_LOG_FILENAME
 from discord_bot.constants import LOGGING_LEVEL
@@ -13,5 +13,4 @@ handler = logging.FileHandler(filename=DISCORD_LOG_FILENAME, encoding='utf-8', m
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 discord_logger.addHandler(handler)
 
-client = MyClient()
-client.run(DISCORD_ACCOUNT_TOKEN)
+bot.run(DISCORD_ACCOUNT_TOKEN)
