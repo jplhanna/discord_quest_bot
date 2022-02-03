@@ -8,8 +8,12 @@ mypy = "*"
 pytest = "*"
 discord = "*"
 "discord.py-stubs" = "*"
+sqlalchemy-stubs = "*"
 
 [dev-packages]
 
 [requires]
 python_version = "3.8"
+
+[packages.sqlalchemy]
+extras = [ "asyncio",]
