@@ -9,6 +9,7 @@ pytest = "*"
 discord = "*"
 "discord.py-stubs" = "*"
 sqlalchemy-stubs = "*"
+alembic = "*"
 
 [dev-packages]
 
