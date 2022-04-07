@@ -10,6 +10,10 @@ discord = "*"
 "discord.py-stubs" = "*"
 sqlalchemy-stubs = "*"
 alembic = "*"
+pre-commit = "*"
+pylint = "*"
+flake8 = "*"
+black = "*"
 
 [dev-packages]
 
