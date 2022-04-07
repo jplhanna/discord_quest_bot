@@ -15,4 +15,5 @@ class CoreModelMixin(BaseModel):
 
 
 class User(CoreModelMixin):
+    __tablename__ = 'user'
     discord_id = Column(Integer, unique=True)
