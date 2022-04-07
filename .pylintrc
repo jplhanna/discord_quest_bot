@@ -1,0 +1,23 @@
+[MASTER]
+max-line-length=120
+ignore=alembic
+
+[MESSAGES CONTROL]
+disable =
+    too-few-public-methods,
+  too-many-locals,
+  ; stop forcing methods to be static
+  no-self-use,
+  ; docstring
+  missing-class-docstring,
+  missing-function-docstring,
+  missing-module-docstring,
+  ; allow disabling Pylint locally
+  locally-disabled,
+  locally-enabled
+
+[TYPE CHECK]
+ignore-classes=SQLAlchemy
+
+[REPORTS]
+msg-template={path}:{line}: [{msg_id}, {obj}] {msg} ({symbol})
