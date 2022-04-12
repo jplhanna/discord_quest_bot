@@ -1,0 +1,36 @@
+version: "3.7"
+services:
+  backend:
+    container_name: backend-${IMAGE_TAG-latest}
+    image: discord_bot/backend:${IMAGE_TAG-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - "postgres"
+
+  postgres:
+    container_name: postgres-${IMAGE_TAG-latest}
+    hostname: "postgres"
+    image: postgres:14
+    command: "postgres -c listen_addresses='*'"
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: "localp"
+      POSTGRES_USER: "Discobot"
+      POSTGRES_DB: "discobot"
+      PGDATA: /var/lib/postgresql/data
+    networks:
+      - network
+    ports:
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+networks:
+  network:
+    name: ${IMAGE_TAG-latest}-network
+
+volumes:
+  db:
+    name: ${IMAGE_TAG-latest}-pgdata
