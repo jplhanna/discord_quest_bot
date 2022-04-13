@@ -14,11 +14,10 @@ pre-commit = "*"
 pylint = "*"
 flake8 = "*"
 black = "*"
+psycopg2 = "*"
+sqlalchemy = {extras = ["asyncio"], version = "*"}
 
 [dev-packages]
 
 [requires]
 python_version = "3.10"
-
-[packages.sqlalchemy]
-extras = [ "asyncio",]
