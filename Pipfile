@@ -16,6 +16,7 @@ flake8 = "*"
 black = "*"
 psycopg2 = "*"
 sqlalchemy = {extras = ["asyncio"], version = "*"}
+furl = "*"
 
 [dev-packages]
 
