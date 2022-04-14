@@ -17,6 +17,7 @@ black = "*"
 psycopg2 = "*"
 sqlalchemy = {extras = ["asyncio"], version = "*"}
 furl = "*"
+asyncpg = "*"
 
 [dev-packages]
 
