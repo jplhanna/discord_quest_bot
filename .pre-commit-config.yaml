@@ -16,7 +16,6 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: check-docstring-first
-      - id: double-quote-string-fixer
       - id: no-commit-to-branch
         args: [--branch, master, --branch, production]
 
