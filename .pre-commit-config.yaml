@@ -6,7 +6,6 @@ repos:
         entry: black
         language: system
         types: [python]
-        exclude: alembic
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.4.0
