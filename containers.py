@@ -1,8 +1,9 @@
-import logging
-from contextlib import AbstractContextManager
 from contextlib import contextmanager
+from logging import FileHandler
+from logging import Formatter
+from logging import getLogger
 from logging.config import fileConfig
-from typing import Callable
+from typing import Generator
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.containers import WiringConfiguration
@@ -17,7 +18,7 @@ from sqlalchemy.orm import sessionmaker
 
 from models import BaseModel
 
-logger = logging.getLogger(__name__)
+logger = getLogger(__name__)
 
 
 class Database:
@@ -37,7 +38,7 @@ class Database:
         BaseModel.metadata.create_all(self._async_engine)
 
     @contextmanager
-    def session(self) -> Callable[..., AbstractContextManager[Session]]:
+    def session(self) -> Generator[Session, None, None]:
         session: Session = self._session_factory()
         try:
             yield session
@@ -49,10 +50,21 @@ class Database:
             session.close()
 
 
+class DiscordLogger:
+    def __init__(self, logging_level: str, file_name: str) -> None:
+        self.discord_logger = getLogger("discord")
+        self.discord_logger.setLevel(logging_level)
+        self.handler = FileHandler(filename=file_name, encoding="utf-8", mode="w")
+        self.handler.setFormatter(
+            Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
+        )
+        self.discord_logger.addHandler(self.handler)
+
+
 class Container(DeclarativeContainer):
-    config = Configuration("configuration")
+    configuration = Configuration("configuration")
     logging = Resource(fileConfig, fname="logging.ini")
 
-    db_client = Singleton(Database, db_url=config.db.url)
+    db_client = Singleton(Database, db_url=configuration.db.url)
 
     bot_configuration = WiringConfiguration(modules=[".discord_bot.bot.commands"])
