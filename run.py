@@ -1,3 +1,5 @@
+from typing import cast
+
 from dependency_injector.providers import Configuration
 from dependency_injector.wiring import Provide
 from dependency_injector.wiring import inject
@@ -10,7 +12,7 @@ from containers import Container
 def start_server(config: Configuration = Provide[Container.configuration]) -> None:
     # Start bot
     print("Starting bot")
-    bot.run(config.get("DISCORD_ACCOUNT_TOKEN"))
+    bot.run(cast(str, config["discord"]["discord_account_token"]))
 
 
 if __name__ == "__main__":

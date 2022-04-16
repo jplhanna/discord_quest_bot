@@ -16,6 +16,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
+from config import config_dict
 from models import BaseModel
 
 logger = getLogger(__name__)
@@ -63,8 +64,9 @@ class DiscordLogger:
 
 class Container(DeclarativeContainer):
     configuration = Configuration("configuration")
+    configuration.from_dict(config_dict)
     logging = Resource(fileConfig, fname="logging.ini")
 
-    db_client = Singleton(Database, db_url=configuration.db.url)
+    db_client = Singleton(Database, db_url=configuration.db.async_database_uri)
 
     bot_configuration = WiringConfiguration(modules=[".discord_bot.bot.commands"])
