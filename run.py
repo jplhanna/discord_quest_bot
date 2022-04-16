@@ -1,27 +1,16 @@
-import logging
+from dependency_injector.providers import Configuration
+from dependency_injector.wiring import Provide
+from dependency_injector.wiring import inject
 
 from bot.commands import bot
-from constants import DISCORD_ACCOUNT_TOKEN
-from constants import DISCORD_LOG_FILENAME
-from constants import LOGGING_LEVEL
 from containers import Container
 
 
-def start_server() -> None:
-    # Define logging requirements
-    logging_level = logging.getLevelName(LOGGING_LEVEL)
-    logging.basicConfig(level=logging_level)
-    discord_logger = logging.getLogger("discord")
-    discord_logger.setLevel(logging_level)
-    handler = logging.FileHandler(
-        filename=DISCORD_LOG_FILENAME, encoding="utf-8", mode="w"
-    )
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-    )
-    discord_logger.addHandler(handler)
+@inject
+def start_server(config: Configuration = Provide[Container.configuration]) -> None:
     # Start bot
-    bot.run(DISCORD_ACCOUNT_TOKEN)
+    print("Starting bot")
+    bot.run(config.get("DISCORD_ACCOUNT_TOKEN"))
 
 
 if __name__ == "__main__":
