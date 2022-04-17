@@ -180,5 +180,5 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             session.delete(obj)
 
 
-class UserRepository(BaseRepository):
+class UserRepository(BaseRepository[User]):
     model = User
