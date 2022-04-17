@@ -56,16 +56,16 @@ class DiscordLogger:
         self.discord_logger = getLogger("discord")
         self.discord_logger.setLevel(logging_level)
         self.handler = FileHandler(filename=file_name, encoding="utf-8", mode="w")
-        self.handler.setFormatter(
-            Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-        )
+        self.handler.setFormatter(Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
         self.discord_logger.addHandler(self.handler)
 
 
 class Container(DeclarativeContainer):
     config = Configuration("configuration")
-    config.from_dict(config_dict)
+    config.from_dict(config_dict)  # type: ignore[arg-type] # The type is correct
     logging = Resource(fileConfig, fname="logging.ini")
+    discord_logging = Resource(DiscordLogger)
+    discord_logging.add_kwargs(logging_level=config.discord.log_level, file_name=config.discord.log_filename)
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
 
