@@ -6,6 +6,7 @@ from dataclasses import field
 from typing import Any
 from typing import Callable
 from typing import Dict
+from typing import Generic
 from typing import List
 from typing import Optional
 from typing import Type
@@ -17,6 +18,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql.elements import UnaryExpression
 
 from exceptions import OutOfSessionContext
+from models import User
 from typeshed import BaseModelType
 from typeshed import EntitiesType
 from typeshed import JoinListType
@@ -52,13 +54,13 @@ class JoinQueryHandler(QueryHandler):
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
-                    query = query.join(*join_on)  # type: ignore[no-untyped-call]
+                    query = query.join(*join_on)
                 elif isinstance(join_on, JoinStruct):
                     join_data = join_on.get_join_data()
                     join_func = join_on.get_join_func()
                     query = getattr(query, join_func)(*join_data)
                 else:
-                    query = query.join(join_on)  # type: ignore[no-untyped-call]
+                    query = query.join(join_on)
         return query
 
 
@@ -88,7 +90,7 @@ class QueryArgs:  # pylint: disable=R0902
 
 
 @dataclass  # type: ignore[misc] # Mypy having trouble with ABC and dataclass together
-class BaseRepository(ABC):
+class BaseRepository(ABC, Generic[BaseModelType]):
     session_factory: Callable[..., AbstractContextManager[Session]]
     session: Optional[Session] = field(default=None, init=False)
 
@@ -114,39 +116,69 @@ class BaseRepository(ABC):
         return query
 
     def get_all(self, query_args: Optional[QueryArgs]) -> List[BaseModelType]:
-        query = self.get_query(query_args)
+        with self.session_factory() as session:
+            self.session = session
+            query = self.get_query(query_args)
         res: List[BaseModelType] = query.all()
         return res
 
     def get_all_with_entities(self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]) -> List[tuple]:
-        query = self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-        res: List[tuple] = query.all()
-        return res
+        with self.session_factory() as session:
+            self.session = session
+            query = self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
+            res: List[tuple] = query.all()
+            return res
 
     def get_count(self, query_args: Optional[QueryArgs]) -> int:
-        query = self.get_query(query_args)
-        count: int = query.count()
-        return count
+        with self.session_factory() as session:
+            self.session = session
+            query = self.get_query(query_args)
+            count: int = query.count()
+            return count
 
     def get_scalar_with_entity(self, entity: EntitiesType, query_args: Optional[QueryArgs]) -> Any:
-        query = self.get_query_with_entities([entity], query_args)
-        res = query.scalar()  # type: ignore[no-untyped-call]
-        return res
+        with self.session_factory() as session:
+            self.session = session
+            query = self.get_query_with_entities([entity], query_args)
+            res = query.scalar()
+            return res
 
     def get_first(self, query_args: Optional[QueryArgs]) -> Optional[BaseModelType]:
-        query = self.get_query(query_args)
-        result: Optional[BaseModelType] = query.first()
-        return result
+        with self.session_factory() as session:
+            self.session = session
+            query = self.get_query(query_args)
+            result: Optional[BaseModelType] = query.first()
+            return result
 
     def get_one(self, query_args: Optional[QueryArgs]) -> BaseModelType:
-        query = self.get_query(query_args)
-        result: BaseModelType = query.one()
-        return result
+        with self.session_factory() as session:
+            self.session = session
+            query = self.get_query(query_args)
+            result: BaseModelType = query.one()
+            return result
 
     def get_first_with_entities(self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]) -> tuple:
-        query = self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-        result: tuple = query.first()  # type: ignore[assignment]
-        return result
+        with self.session_factory() as session:
+            self.session = session
+            query = self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
+            result: tuple = query.first()  # type: ignore[assignment]
+            return result
 
     def get_by_id(self, id_: int) -> Optional[BaseModelType]:
-        return self.get_query().get(id_)
+        with self.session_factory() as session:
+            self.session = session
+            return self.get_query().get(id_)
+
+    def create(self, **data: Any) -> BaseModelType:
+        with self.session_factory() as session:
+            obj = self.model(**data)
+            session.add(obj)
+            return obj
+
+    def delete(self, obj: BaseModelType) -> None:
+        with self.session_factory() as session:
+            session.delete(obj)
+
+
+class UserRepository(BaseRepository):
+    model = User

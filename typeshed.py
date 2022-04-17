@@ -70,4 +70,4 @@ JoinListType = Sequence[
 ]
 
 EntitiesType = Union[Column, Label, Type["BaseModel"]]
-BaseModelType = TypeVar("BaseModelType")  # pylint: disable=C0103
+BaseModelType = TypeVar("BaseModelType", bound="BaseModel")  # pylint: disable=C0103
