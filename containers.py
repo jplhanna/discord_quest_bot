@@ -63,10 +63,10 @@ class DiscordLogger:
 
 
 class Container(DeclarativeContainer):
-    configuration = Configuration("configuration")
-    configuration.from_dict(config_dict)
+    config = Configuration("configuration")
+    config.from_dict(config_dict)
     logging = Resource(fileConfig, fname="logging.ini")
 
-    db_client = Singleton(Database, db_url=configuration.db.async_database_uri)
+    db_client = Singleton(Database, db_url=config.db.async_database_uri)
 
     bot_configuration = WiringConfiguration(modules=[".discord_bot.bot.commands"])

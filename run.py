@@ -9,7 +9,7 @@ from containers import Container
 
 
 @inject
-def start_server(config: Configuration = Provide[Container.configuration]) -> None:
+def start_server(config: Configuration = Provide[Container.config]) -> None:
     # Start bot
     print("Starting bot")
     bot.run(cast(str, config["discord"]["discord_account_token"]))

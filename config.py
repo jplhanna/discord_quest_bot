@@ -22,7 +22,7 @@ ASYNC_DATABASE_URI = database_furl.url
 
 DISCORD_ACCOUNT_TOKEN = os.environ.get("DISCORD_ACCOUNT_TOKEN", "token")
 
-DISCORD_LOG_FILENAME = "logging/discord.log"
+DISCORD_LOG_FILENAME = "logs/discord.log"
 
 config_dict = {
     "db": {"database_uri": DATABASE_URI, "async_database_uri": ASYNC_DATABASE_URI},
