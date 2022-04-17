@@ -27,7 +27,7 @@ DISCORD_LOG_FILENAME = "logs/discord.log"
 config_dict = {
     "db": {"database_uri": DATABASE_URI, "async_database_uri": ASYNC_DATABASE_URI},
     "discord": {
-        "discord_account_token": DISCORD_ACCOUNT_TOKEN,
-        "discord_log_filename": DISCORD_LOG_FILENAME,
+        "account_token": DISCORD_ACCOUNT_TOKEN,
+        "log_filename": DISCORD_LOG_FILENAME,
     },
 }
