@@ -6,7 +6,6 @@ from logging.config import fileConfig
 from typing import Generator
 
 from dependency_injector.containers import DeclarativeContainer
-from dependency_injector.containers import WiringConfiguration
 from dependency_injector.providers import Configuration
 from dependency_injector.providers import Factory
 from dependency_injector.providers import Resource
@@ -72,7 +71,7 @@ class Container(DeclarativeContainer):
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
 
-    bot_configuration = WiringConfiguration(modules=[".discord_bot.bot.commands"])
+    # bot_configuration = WiringConfiguration(modules=[".bot"])
 
     user_repository = Factory(UserRepository, session_factory=db_client.provided.session)
     user_service = Factory(UserService, user_repository=user_repository)

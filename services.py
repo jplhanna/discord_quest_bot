@@ -2,9 +2,8 @@ from logging import Logger
 from logging import getLogger
 from typing import Optional
 
-from sqlalchemy.engine import Connection
-
 from models import User
+from repositories import QueryArgs
 from repositories import UserRepository
 
 
@@ -15,12 +14,6 @@ class BaseService:
         )
 
 
-class DataBaseService(BaseService):
-    def __init__(self, database: Connection):
-        super().__init__()
-        self.database = database
-
-
 class UserService(BaseService):
     def __init__(self, user_repository: UserRepository):
         super().__init__()
@@ -28,6 +21,9 @@ class UserService(BaseService):
 
     def get_user_by_id(self, user_id: int) -> Optional[User]:
         return self._repository.get_by_id(user_id)
+
+    def get_user_by_discord_id(self, discord_id: int) -> Optional[User]:
+        return self._repository.get_first(QueryArgs(filter_dict=dict(discord_id=discord_id)))
 
     def create_user(self, discord_id: int) -> User:
         return self._repository.create(discord_id=discord_id)

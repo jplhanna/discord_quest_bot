@@ -173,11 +173,13 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         with self.session_factory() as session:
             obj = self.model(**data)
             session.add(obj)
+            session.commit()
             return obj
 
     def delete(self, obj: BaseModelType) -> None:
         with self.session_factory() as session:
             session.delete(obj)
+            session.commit()
 
 
 class UserRepository(BaseRepository[User]):
