@@ -15,5 +15,5 @@ async def is_alive(ctx: Context) -> None:
 
 @bot.command(name="register")
 async def register_user(ctx: Context) -> None:
-    res = check_and_register_user(ctx)
+    res = await check_and_register_user(ctx)
     await ctx.send(res)

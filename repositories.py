@@ -13,8 +13,11 @@ from typing import Type
 from typing import Union
 
 from sqlalchemy import Column
-from sqlalchemy.orm import Query
+from sqlalchemy.ext.asyncio import AsyncResult
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import Select
 from sqlalchemy.sql.elements import UnaryExpression
 
 from exceptions import OutOfSessionContext
@@ -32,7 +35,7 @@ class QueryHandler:
     func_data: Any
     allow_empty_data: bool = field(default=False)
 
-    def update_query(self, query: Query) -> Query:
+    def update_query(self, query: Select) -> Select:
         if self.func_data or self.allow_empty_data and self.func_data is not None:
             query = getattr(query, self.func_str)(*self.func_data)
         return query
@@ -41,7 +44,7 @@ class QueryHandler:
 class DictQueryHandler(QueryHandler):
     func_data: Optional[dict]
 
-    def update_query(self, query: Query) -> Query:
+    def update_query(self, query: Select) -> Select:
         if self.func_data:
             query = getattr(query, self.func_str)(**self.func_data)
         return query
@@ -50,7 +53,7 @@ class DictQueryHandler(QueryHandler):
 class JoinQueryHandler(QueryHandler):
     func_data: Optional[JoinListType]
 
-    def update_query(self, query: Query) -> Query:
+    def update_query(self, query: Select) -> Select:
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
@@ -91,7 +94,7 @@ class QueryArgs:  # pylint: disable=R0902
 
 @dataclass  # type: ignore[misc] # Mypy having trouble with ABC and dataclass together
 class BaseRepository(ABC, Generic[BaseModelType]):
-    session_factory: Callable[..., AbstractContextManager[Session]]
+    session_factory: Callable[..., AbstractContextManager[AsyncSession]]
     session: Optional[Session] = field(default=None, init=False)
 
     @property
@@ -99,16 +102,17 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     def model(self) -> Type[BaseModelType]:
         pass
 
-    def get_query(self, query_args: Optional[QueryArgs] = None) -> Query:
+    async def get_query(self, query_args: Optional[QueryArgs] = None) -> AsyncResult:
         query_handlers = query_args.get_query_handlers() if query_args else []
         if not self.session:
             raise OutOfSessionContext()
-        query = self.session.query(self.model)
+        query: Select = select(self.model)
         for query_handler in query_handlers:
             query = query_handler.update_query(query)
-        return query
+        result: AsyncResult = await self.session.execute(query)
+        return result
 
-    def get_query_with_entities(self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]) -> Query:
+    def get_query_with_entities(self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]) -> Select:
         if not self.session:
             raise OutOfSessionContext()
         query = self.get_query(query_args)
@@ -143,11 +147,11 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             res = query.scalar()
             return res
 
-    def get_first(self, query_args: Optional[QueryArgs]) -> Optional[BaseModelType]:
+    async def get_first(self, query_args: Optional[QueryArgs]) -> Optional[BaseModelType]:
         with self.session_factory() as session:
             self.session = session
-            query = self.get_query(query_args)
-            result: Optional[BaseModelType] = query.first()
+            query: AsyncResult = await self.get_query(query_args)
+            result: Optional[BaseModelType] = await query.first()
             return result
 
     def get_one(self, query_args: Optional[QueryArgs]) -> BaseModelType:
@@ -161,17 +165,18 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         with self.session_factory() as session:
             self.session = session
             query = self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-            result: tuple = query.first()  # type: ignore[assignment]
+            result: tuple = query.first()
             return result
 
     def get_by_id(self, id_: int) -> Optional[BaseModelType]:
         with self.session_factory() as session:
             self.session = session
-            return self.get_query().get(id_)
+            res: Optional[BaseModelType] = self.get_query().get(id_)
+            return res
 
     def create(self, **data: Any) -> BaseModelType:
         with self.session_factory() as session:
-            obj = self.model(**data)
+            obj: BaseModelType = self.model(**data)
             session.add(obj)
             session.commit()
             return obj
