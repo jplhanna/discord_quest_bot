@@ -1,5 +1,4 @@
 from abc import ABC
-from abc import abstractmethod
 from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from dataclasses import field
@@ -21,20 +20,15 @@ from sqlalchemy.sql import Selectable
 from exceptions import OutOfSessionContext
 from helpers.sqlalchemy_helpers import QueryArgs
 from helpers.sqlalchemy_helpers import QueryHandler
-from models import User
 from typeshed import BaseModelType
 from typeshed import EntitiesType
 
 
-@dataclass  # type: ignore[misc] # Mypy having trouble with ABC and dataclass together
+@dataclass
 class BaseRepository(ABC, Generic[BaseModelType]):
     session_factory: Callable[..., AbstractAsyncContextManager[AsyncSession]]
+    model: Type[BaseModelType]
     session: Optional[Session] = field(default=None, init=False)
-
-    @property
-    @abstractmethod
-    def model(self) -> Type[BaseModelType]:
-        pass
 
     def _query(self, query_args: Optional[QueryArgs]) -> Selectable:
         query_handlers = query_args.get_query_handlers() if query_args else []
@@ -131,7 +125,3 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         async with self.session_factory() as session:
             await session.delete(obj)
             await session.commit()
-
-
-class UserRepository(BaseRepository[User]):
-    model = User
