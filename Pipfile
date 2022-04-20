@@ -6,10 +6,19 @@ name = "pypi"
 [packages]
 mypy = "*"
 pytest = "*"
+discord = "*"
+"discord.py-stubs" = "*"
+alembic = "*"
 pre-commit = "*"
 pylint = "*"
 flake8 = "*"
 black = "*"
+psycopg2 = "*"
+sqlalchemy = {extras = ["asyncio", "mypy"], version = "*"}
+furl = "*"
+asyncpg = "*"
+dependency-injector = ">=4, <5"
+sqlalchemy-stubs = "*"
 
 [dev-packages]
 

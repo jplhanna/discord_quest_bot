@@ -5,8 +5,8 @@ repos:
         name: black
         entry: black
         language: system
-        types: [python]
-        exclude: alembic
+        types: [ python ]
+        args: [ --line-length=120 ]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v3.4.0
@@ -17,9 +17,8 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: check-docstring-first
-      - id: double-quote-string-fixer
       - id: no-commit-to-branch
-        args: [--branch, master, --branch, production]
+        args: [ --branch, master, --branch, production ]
 
   - repo: local
     hooks:
@@ -27,7 +26,7 @@ repos:
         name: flake8
         entry: flake8
         language: system
-        types: [python]
+        types: [ python ]
         exclude: alembic
 
   - repo: local
@@ -36,7 +35,7 @@ repos:
         name: mypy
         entry: mypy
         language: system
-        types: [python]
+        types: [ python ]
         exclude: alembic|test_.*|conftest\.py
 
   - repo: local
@@ -45,5 +44,5 @@ repos:
         name: pylint
         entry: pylint
         language: system
-        types: [python]
+        types: [ python ]
         exclude: alembic
