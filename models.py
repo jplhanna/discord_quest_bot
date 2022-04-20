@@ -9,7 +9,7 @@ from sqlalchemy.ext.declarative import declarative_base
 BaseModel = declarative_base()
 
 
-class CoreModelMixin(BaseModel):  # type: ignore[valid-type, misc] # Mypy has a hard time understanding declarative_base
+class CoreModelMixin(BaseModel):
     __abstract__ = True
     id = Column(Integer, primary_key=True)
     datetime_created = Column(DateTime, nullable=False, default=datetime.utcnow)

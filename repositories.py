@@ -1,6 +1,6 @@
 from abc import ABC
 from abc import abstractmethod
-from contextlib import AbstractContextManager
+from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -14,11 +14,13 @@ from typing import Union
 
 from sqlalchemy import Column
 from sqlalchemy import func
-from sqlalchemy.engine.result import ChunkedIteratorResult
+from sqlalchemy.engine.result import ChunkedIteratorResult  # type: ignore[attr-defined]
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import FromClause
 from sqlalchemy.sql import Select
+from sqlalchemy.sql import Selectable
 from sqlalchemy.sql.elements import UnaryExpression
 
 from exceptions import OutOfSessionContext
@@ -36,7 +38,7 @@ class QueryHandler:
     func_data: Any
     allow_empty_data: bool = field(default=False)
 
-    def update_query(self, query: Select) -> Select:
+    def update_query(self, query: Selectable) -> Selectable:
         if self.func_data or self.allow_empty_data and self.func_data is not None:
             query = getattr(query, self.func_str)(*self.func_data)
         return query
@@ -45,7 +47,7 @@ class QueryHandler:
 class DictQueryHandler(QueryHandler):
     func_data: Optional[dict]
 
-    def update_query(self, query: Select) -> Select:
+    def update_query(self, query: Selectable) -> Selectable:
         if self.func_data:
             query = getattr(query, self.func_str)(**self.func_data)
         return query
@@ -54,7 +56,7 @@ class DictQueryHandler(QueryHandler):
 class JoinQueryHandler(QueryHandler):
     func_data: Optional[JoinListType]
 
-    def update_query(self, query: Select) -> Select:
+    def update_query(self, query: FromClause) -> Selectable:  # type: ignore[override]
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
@@ -95,7 +97,7 @@ class QueryArgs:  # pylint: disable=R0902
 
 @dataclass  # type: ignore[misc] # Mypy having trouble with ABC and dataclass together
 class BaseRepository(ABC, Generic[BaseModelType]):
-    session_factory: Callable[..., AbstractContextManager[AsyncSession]]
+    session_factory: Callable[..., AbstractAsyncContextManager[AsyncSession]]
     session: Optional[Session] = field(default=None, init=False)
 
     @property
@@ -103,11 +105,11 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     def model(self) -> Type[BaseModelType]:
         pass
 
-    def _query(self, query_args: Optional[QueryArgs]) -> Select:
+    def _query(self, query_args: Optional[QueryArgs]) -> Selectable:
         query_handlers = query_args.get_query_handlers() if query_args else []
         query: Select = select(self.model)
         for query_handler in query_handlers:
-            query = query_handler.update_query(query)
+            query = query_handler.update_query(query)  # type: ignore[assignment]
         return query
 
     async def get_query(self, query_args: Optional[QueryArgs] = None) -> ChunkedIteratorResult:
@@ -195,7 +197,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             return obj
 
     async def delete(self, obj: BaseModelType) -> None:
-        with self.session_factory() as session:
+        async with self.session_factory() as session:
             await session.delete(obj)
             await session.commit()
 
