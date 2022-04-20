@@ -12,7 +12,6 @@ from dependency_injector.providers import Resource
 from dependency_injector.providers import Singleton
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import Session
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
@@ -41,8 +40,8 @@ class Database:
         BaseModel.metadata.create_all(self._async_engine)
 
     @contextmanager
-    def session(self) -> Generator[Session, None, None]:
-        session: Session = self._session_factory()
+    def session(self) -> Generator[AsyncSession, None, None]:
+        session: AsyncSession = self._session_factory()
         try:
             yield session
         except Exception:
