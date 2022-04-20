@@ -3,8 +3,8 @@ from logging import getLogger
 from typing import Coroutine
 from typing import Optional
 
+from helpers.sqlalchemy_helpers import QueryArgs
 from models import User
-from repositories import QueryArgs
 from repositories import UserRepository
 
 
