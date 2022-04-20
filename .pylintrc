@@ -1,23 +1,27 @@
 [MASTER]
-max-line-length=120
-ignore=alembic
+max-line-length = 120
+ignore = alembic
 
 [MESSAGES CONTROL]
 disable =
     too-few-public-methods,
-  too-many-locals,
-  ; stop forcing methods to be static
-  no-self-use,
-  ; docstring
-  missing-class-docstring,
-  missing-function-docstring,
-  missing-module-docstring,
-  ; allow disabling Pylint locally
-  locally-disabled,
-  locally-enabled
+    too-many-locals,
+; stop forcing methods to be static
+    no-self-use,
+; docstring
+    missing-class-docstring,
+    missing-function-docstring,
+    missing-module-docstring,
+; allow disabling Pylint locally
+    locally-disabled,
+    locally-enabled
 
 [TYPE CHECK]
-ignore-classes=SQLAlchemy
+ignore-classes = SQLAlchemy
+ignored-modules =
+    dependency_injector.providers,
+    dependency_injector.containers
+
 
 [REPORTS]
-msg-template={path}:{line}: [{msg_id}, {obj}] {msg} ({symbol})
+msg-template = {path}:{line}: [{msg_id}, {obj}] {msg} ({symbol})
