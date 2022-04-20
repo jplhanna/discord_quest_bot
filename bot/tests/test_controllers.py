@@ -1,6 +1,22 @@
-class TestCheckAndRegisterUser:
-    def test_account_already_exists(self):
-        pass
+from unittest.mock import MagicMock
 
-    def test_account_does_not_already_exist(self):
-        pass
+from pytest import mark
+
+from bot.constants import ALREADY_REGISTERED_MESSAGE
+from bot.constants import NEW_USER_MESSAGE
+from bot.controllers import check_and_register_user
+
+wire_to = ["bot.controllers"]
+
+
+class TestCheckAndRegisterUser:
+    @mark.parametrize("user_exists, expected_result", [(True, ALREADY_REGISTERED_MESSAGE), (False, NEW_USER_MESSAGE)])
+    def test_account_already_exists(self, mock_container, user_exists, expected_result):
+        # Arrange
+        mocked_user_service = MagicMock(get_user_by_discord_id=MagicMock(return_value=user_exists))
+        mock_container.user_service.override(mocked_user_service)
+        mock_container.wire(wire_to)
+        # Act
+        res = check_and_register_user(MagicMock())
+        # Assert
+        assert res == expected_result
