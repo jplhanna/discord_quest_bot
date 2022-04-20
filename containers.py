@@ -4,6 +4,7 @@ from logging import Formatter
 from logging import getLogger
 from logging.config import fileConfig
 from typing import AsyncGenerator
+from typing import List
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Configuration
@@ -21,6 +22,8 @@ from repositories import UserRepository
 from services import UserService
 
 logger = getLogger(__name__)
+
+WIRE_TO: List[str] = []
 
 
 class Database:
@@ -69,8 +72,6 @@ class Container(DeclarativeContainer):
     discord_logging.add_kwargs(logging_level=config.discord.log_level, file_name=config.discord.log_filename)
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
-
-    # bot_configuration = WiringConfiguration(modules=[".bot"])
 
     user_repository = Factory(UserRepository, session_factory=db_client.provided.session)
     user_service = Factory(UserService, user_repository=user_repository)

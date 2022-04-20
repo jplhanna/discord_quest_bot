@@ -5,9 +5,9 @@ from logging import getLogger
 from dependency_injector.wiring import Provide
 from dependency_injector.wiring import inject
 
-from bot import controllers
 from bot.commands import bot
 from containers import Container
+from containers import WIRE_TO
 from typeshed import ConfigDict
 
 
@@ -26,5 +26,5 @@ def start_server(config: ConfigDict = Provide[Container.config]) -> None:
 if __name__ == "__main__":
     container = Container()
     container.init_resources()
-    container.wire(modules=[__name__, controllers])
+    container.wire(modules=[__name__, *WIRE_TO])
     start_server()
