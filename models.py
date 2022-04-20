@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
@@ -16,4 +17,4 @@ class CoreModelMixin(BaseModel):  # type: ignore[valid-type, misc] # Mypy has a 
 
 class User(CoreModelMixin):
     __tablename__ = "user"
-    discord_id = Column(Integer, unique=True)
+    discord_id = Column(BigInteger, unique=True)

@@ -1,9 +1,9 @@
-from contextlib import contextmanager
+from contextlib import asynccontextmanager
 from logging import FileHandler
 from logging import Formatter
 from logging import getLogger
 from logging.config import fileConfig
-from typing import Generator
+from typing import AsyncGenerator
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Configuration
@@ -39,17 +39,17 @@ class Database:
     def create_database(self) -> None:
         BaseModel.metadata.create_all(self._async_engine)
 
-    @contextmanager
-    def session(self) -> Generator[AsyncSession, None, None]:
+    @asynccontextmanager
+    async def session(self) -> AsyncGenerator[AsyncSession, None]:
         session: AsyncSession = self._session_factory()
         try:
             yield session
         except Exception:
             logger.exception("Session rollback because of exception")
-            session.rollback()
+            await session.rollback()
             raise
         finally:
-            session.close()
+            await session.close()
 
 
 class DiscordLogger:

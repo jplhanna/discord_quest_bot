@@ -13,7 +13,8 @@ from typing import Type
 from typing import Union
 
 from sqlalchemy import Column
-from sqlalchemy.ext.asyncio import AsyncResult
+from sqlalchemy import func
+from sqlalchemy.engine.result import ChunkedIteratorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
@@ -109,89 +110,94 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             query = query_handler.update_query(query)
         return query
 
-    async def get_query(self, query_args: Optional[QueryArgs] = None) -> AsyncResult:
+    async def get_query(self, query_args: Optional[QueryArgs] = None) -> ChunkedIteratorResult:
         if not self.session:
             raise OutOfSessionContext()
         query = self._query(query_args)
-        result: AsyncResult = await self.session.execute(query)
+        result: ChunkedIteratorResult = await self.session.execute(query)
         return result
 
     async def get_query_with_entities(
         self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
-    ) -> AsyncResult:
+    ) -> ChunkedIteratorResult:
         if not self.session:
             raise OutOfSessionContext()
         query = self._query(query_args)
         query = QueryHandler("with_entities", entities_list).update_query(query)
-        result: AsyncResult = await self.session.execute(query)
+        result: ChunkedIteratorResult = await self.session.execute(query)
         return result
 
-    def get_all(self, query_args: Optional[QueryArgs]) -> List[BaseModelType]:
-        with self.session_factory() as session:
+    async def get_all(self, query_args: Optional[QueryArgs]) -> List[BaseModelType]:
+        async with self.session_factory() as session:
             self.session = session
-            query = self.get_query(query_args)
-        res: List[BaseModelType] = query.all()
-        return res
-
-    def get_all_with_entities(self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]) -> List[tuple]:
-        with self.session_factory() as session:
-            self.session = session
-            query = self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-            res: List[tuple] = query.all()
+            query = await self.get_query(query_args)
+            res: List[BaseModelType] = query.scalars().all()
             return res
 
-    def get_count(self, query_args: Optional[QueryArgs]) -> int:
-        with self.session_factory() as session:
+    async def get_all_with_entities(
+        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
+    ) -> List[tuple]:
+        async with self.session_factory() as session:
             self.session = session
-            query = self.get_query(query_args)
-            count: int = query.count()
+            query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
+            res: List[tuple] = query.scalars().all()
+            return res
+
+    async def get_count(self, query_args: Optional[QueryArgs]) -> int:
+        async with self.session_factory() as session:
+            self.session = session
+            query = await self.get_query_with_entities(func.count("*"), query_args)
+            count: int = query.scalars().first()
             return count
 
-    def get_scalar_with_entity(self, entity: EntitiesType, query_args: Optional[QueryArgs]) -> Any:
-        with self.session_factory() as session:
+    async def get_scalar_with_entity(self, entity: EntitiesType, query_args: Optional[QueryArgs]) -> Any:
+        async with self.session_factory() as session:
             self.session = session
-            query = self.get_query_with_entities([entity], query_args)
-            res = query.scalar()
+            query = await self.get_query_with_entities([entity], query_args)
+            res = query.scalars().first()
             return res
 
     async def get_first(self, query_args: Optional[QueryArgs]) -> Optional[BaseModelType]:
-        with self.session_factory() as session:
+        async with self.session_factory() as session:
             self.session = session
-            query: AsyncResult = await self.get_query(query_args)
-            result: Optional[BaseModelType] = await query.first()
+            query: ChunkedIteratorResult = await self.get_query(query_args)
+            result: Optional[BaseModelType] = query.scalars().first()
             return result
 
-    def get_one(self, query_args: Optional[QueryArgs]) -> BaseModelType:
-        with self.session_factory() as session:
+    async def get_one(self, query_args: Optional[QueryArgs]) -> BaseModelType:
+        async with self.session_factory() as session:
             self.session = session
-            query = self.get_query(query_args)
-            result: BaseModelType = query.one()
+            query = await self.get_query(query_args)
+            result: BaseModelType = query.scalars().one()
             return result
 
-    def get_first_with_entities(self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]) -> tuple:
-        with self.session_factory() as session:
+    async def get_first_with_entities(
+        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
+    ) -> tuple:
+        async with self.session_factory() as session:
             self.session = session
-            query = self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-            result: tuple = query.first()
+            query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
+            result: tuple = query.scalars().first()
             return result
 
-    def get_by_id(self, id_: int) -> Optional[BaseModelType]:
-        with self.session_factory() as session:
+    async def get_by_id(self, id_: int) -> Optional[BaseModelType]:
+        async with self.session_factory() as session:
             self.session = session
-            res: Optional[BaseModelType] = self.get_query().get(id_)
+            query = await self.get_query()
+            res: Optional[BaseModelType] = query.scalars().get(id_)
             return res
 
-    def create(self, **data: Any) -> BaseModelType:
-        with self.session_factory() as session:
+    async def create(self, **data: Any) -> BaseModelType:
+        async with self.session_factory() as session:
             obj: BaseModelType = self.model(**data)
             session.add(obj)
-            session.commit()
+            await session.commit()
             return obj
 
-    def delete(self, obj: BaseModelType) -> None:
+    async def delete(self, obj: BaseModelType) -> None:
         with self.session_factory() as session:
-            session.delete(obj)
-            session.commit()
+            await session.delete(obj)
+            await session.commit()
 
 
 class UserRepository(BaseRepository[User]):
