@@ -102,22 +102,29 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     def model(self) -> Type[BaseModelType]:
         pass
 
-    async def get_query(self, query_args: Optional[QueryArgs] = None) -> AsyncResult:
+    def _query(self, query_args: Optional[QueryArgs]) -> Select:
         query_handlers = query_args.get_query_handlers() if query_args else []
-        if not self.session:
-            raise OutOfSessionContext()
         query: Select = select(self.model)
         for query_handler in query_handlers:
             query = query_handler.update_query(query)
+        return query
+
+    async def get_query(self, query_args: Optional[QueryArgs] = None) -> AsyncResult:
+        if not self.session:
+            raise OutOfSessionContext()
+        query = self._query(query_args)
         result: AsyncResult = await self.session.execute(query)
         return result
 
-    def get_query_with_entities(self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]) -> Select:
+    async def get_query_with_entities(
+        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
+    ) -> AsyncResult:
         if not self.session:
             raise OutOfSessionContext()
-        query = self.get_query(query_args)
+        query = self._query(query_args)
         query = QueryHandler("with_entities", entities_list).update_query(query)
-        return query
+        result: AsyncResult = await self.session.execute(query)
+        return result
 
     def get_all(self, query_args: Optional[QueryArgs]) -> List[BaseModelType]:
         with self.session_factory() as session:
