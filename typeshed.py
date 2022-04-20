@@ -13,6 +13,7 @@ from attr import dataclass
 from sqlalchemy import Column
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.orm.util import AliasedClass
+from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy.sql.elements import Label
@@ -61,8 +62,7 @@ class JoinStruct:
 
 JoinListType = Sequence[
     Union[
-        Type["BaseModel"],
-        RelationshipProperty,
+        FromClause,
         JoinStruct,
         Tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]],
         Tuple[CTE, SQLLogicType],
