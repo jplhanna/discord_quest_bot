@@ -20,6 +20,7 @@ asyncpg = "*"
 dependency-injector = ">=4, <5"
 sqlalchemy-stubs = "*"
 pytest-asyncio = "*"
+faker = "*"
 
 [dev-packages]
 
