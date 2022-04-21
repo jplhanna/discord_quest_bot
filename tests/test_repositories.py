@@ -46,7 +46,7 @@ class TestUserRepository:
             {"distinct_on_list": []},
             {"distinct_on_list": [User.id]},
             {"group_by_list": [User.id]},
-            {"grou_by_list": [User.id], "having_list": [User.id == 1]},
+            {"group_by_list": [User.id], "having_list": [User.id == 1]},
         ],
     )
     def test_query_builder_with_non_empty_values(self, mock_user_repository, query_args):
