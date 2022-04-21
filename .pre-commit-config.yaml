@@ -45,4 +45,4 @@ repos:
         entry: pylint
         language: system
         types: [ python ]
-        exclude: alembic
+        exclude: alembic|test_.*
