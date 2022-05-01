@@ -22,6 +22,8 @@ sqlalchemy-stubs = "*"
 pytest-asyncio = "*"
 faker = "*"
 coverage = "*"
+pytest-async-sqlalchemy = "*"
+asynctest = "*"
 
 [dev-packages]
 
