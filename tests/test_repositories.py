@@ -1,6 +1,6 @@
 import pytest
-from asynctest import MagicMock
 from pytest import mark
+from sqlalchemy import inspect
 
 from helpers.sqlalchemy_helpers import QueryArgs
 from models import User
@@ -70,9 +70,20 @@ class TestUserRepository:
 class TestBaseRepositoryIntegration:
     async def test_create_user(self, db_session, mock_user_repository, faker):
         # Arrange
-        mock_user_repository.session_factory = MagicMock(return_value=db_session)
+        mock_user_repository.session_factory.return_value = db_session
         discord_id = faker.unique.random_number(digits=18, fix_len=True)
         # Act
         user = await mock_user_repository.create(discord_id=discord_id)
         # Assert
         assert user.discord_id == discord_id
+
+    async def test_delete_user(self, db_session, mock_user_repository):
+        # Arrange
+        mock_user_repository.session_factory.return_value = db_session
+        user = User(discord_id=1234567890)
+        db_session.add(user)
+        await db_session.commit()
+        # Act
+        await mock_user_repository.delete(user)
+        # Assert
+        assert inspect(user).was_deleted

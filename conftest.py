@@ -3,9 +3,9 @@ from asyncio import new_event_loop
 from copy import copy
 from typing import Callable
 from typing import Generator
-from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 
+from asynctest import MagicMock as AsyncMagicMock
 from pytest import fixture
 
 from containers import Container
@@ -29,7 +29,7 @@ def mock_container() -> Generator[Container, None, None]:
 
 @fixture()
 def mock_user_repository() -> BaseRepository[User]:
-    return BaseRepository(AsyncMock(), User)
+    return BaseRepository(AsyncMagicMock(), User)
 
 
 @fixture(scope="session")
