@@ -32,6 +32,12 @@ def mock_user_repository() -> BaseRepository[User]:
     return BaseRepository(AsyncMagicMock(), User)
 
 
+@fixture
+def mock_user_with_db_repository(mock_user_repository, db_session):
+    mock_user_repository.session_factory.return_value = db_session
+    return mock_user_repository
+
+
 @fixture(scope="session")
 def container_for_testing() -> Generator[Container, None, None]:
     testing_container = copy(base_mock_container)
@@ -56,3 +62,13 @@ def _database_url() -> str:
 @fixture(scope="session")
 def init_database() -> Callable:
     return BaseModel.metadata.create_all
+
+
+@fixture()
+async def db_user(db_session):
+    user = User(discord_id=1234567890)
+    db_session.add(user)
+    await db_session.flush()
+    yield user
+    await db_session.delete(user)
+    await db_session.flush()
