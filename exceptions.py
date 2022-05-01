@@ -1,2 +1,6 @@
 class OutOfSessionContext(Exception):
     ...
+
+
+class NoIDProvided(Exception):
+    ...

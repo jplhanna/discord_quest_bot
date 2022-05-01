@@ -65,6 +65,10 @@ class QueryArgs:  # pylint: disable=R0902
     group_by_list: Optional[List[Column]] = None
     having_list: Optional[List[SQLLogicType]] = None
 
+    def __post_init__(self) -> None:
+        if not self.group_by_list and self.having_list:
+            raise Warning("Defining query with having clause but no group by clause")
+
     def get_query_handlers(self) -> List[QueryHandler]:
         query_handlers = [
             DictQueryHandler("filter_by", self.filter_dict),

@@ -19,6 +19,11 @@ furl = "*"
 asyncpg = "*"
 dependency-injector = ">=4, <5"
 sqlalchemy-stubs = "*"
+pytest-asyncio = "*"
+faker = "*"
+coverage = "*"
+pytest-async-sqlalchemy = "*"
+asynctest = "*"
 
 [dev-packages]
 
