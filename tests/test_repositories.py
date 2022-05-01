@@ -1,4 +1,5 @@
 import pytest
+from asynctest import MagicMock
 from pytest import mark
 
 from helpers.sqlalchemy_helpers import QueryArgs
@@ -62,3 +63,16 @@ class TestUserRepository:
         # Arrange & Act & Assert
         with pytest.raises(Warning, match="Defining query with having clause but no group by clause"):
             QueryArgs(having_list=[User.id == 1])
+
+
+@mark.integration
+@mark.asyncio
+class TestBaseRepositoryIntegration:
+    async def test_create_user(self, db_session, mock_user_repository, faker):
+        # Arrange
+        mock_user_repository.session_factory = MagicMock(return_value=db_session)
+        discord_id = faker.unique.random_number(digits=18, fix_len=True)
+        # Act
+        user = await mock_user_repository.create(discord_id=discord_id)
+        # Assert
+        assert user.discord_id == discord_id
