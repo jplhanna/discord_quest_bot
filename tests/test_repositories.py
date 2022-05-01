@@ -65,25 +65,65 @@ class TestUserRepository:
             QueryArgs(having_list=[User.id == 1])
 
 
+def get_user_data_for_query(usr):
+    return QueryArgs(filter_dict={"discord_id": usr.discord_id})
+
+
 @mark.integration
 @mark.asyncio
 class TestBaseRepositoryIntegration:
-    async def test_create_user(self, db_session, mock_user_repository, faker):
+    async def test_create_user(self, mock_user_with_db_repository, faker):
         # Arrange
-        mock_user_repository.session_factory.return_value = db_session
         discord_id = faker.unique.random_number(digits=18, fix_len=True)
         # Act
-        user = await mock_user_repository.create(discord_id=discord_id)
+        user = await mock_user_with_db_repository.create(discord_id=discord_id)
         # Assert
         assert user.discord_id == discord_id
 
-    async def test_delete_user(self, db_session, mock_user_repository):
-        # Arrange
-        mock_user_repository.session_factory.return_value = db_session
-        user = User(discord_id=1234567890)
-        db_session.add(user)
-        await db_session.commit()
+    async def test_delete_user(self, db_user, mock_user_with_db_repository):
         # Act
-        await mock_user_repository.delete(user)
+        await mock_user_with_db_repository.delete(db_user)
         # Assert
-        assert inspect(user).was_deleted
+        assert inspect(db_user).was_deleted
+
+    @mark.parametrize(
+        "method, get_data",
+        [
+            ("get_first", get_user_data_for_query),
+            ("get_one", get_user_data_for_query),
+            ("get_by_id", lambda usr: usr.id),
+        ],
+    )
+    async def test_get_single_item(self, db_user, mock_user_with_db_repository, method, get_data):
+        # Act
+        user_res = await getattr(mock_user_with_db_repository, method)(get_data(db_user))
+        # Assert
+        assert user_res == db_user
+
+    async def test_get_all(self, db_user, mock_user_with_db_repository):
+        # Act
+        user_res = await mock_user_with_db_repository.get_all(get_user_data_for_query(db_user))
+        # Assert
+        assert user_res == [db_user]
+
+    async def test_get_all_with_entities(self, db_user, mock_user_with_db_repository):
+        # Act
+        user_data = await mock_user_with_db_repository.get_all_with_entities(
+            [User.id], get_user_data_for_query(db_user)
+        )
+        # Assert
+        assert user_data == [db_user.id]
+
+    async def test_get_first_with_entities(self, db_user, mock_user_with_db_repository):
+        # Act
+        user_data = await mock_user_with_db_repository.get_first_with_entities(
+            [User.id], get_user_data_for_query(db_user)
+        )
+        # Assert
+        assert user_data == db_user.id
+
+    async def test_get_count(self, db_user, mock_user_with_db_repository):
+        # Act
+        count = await mock_user_with_db_repository.get_all_with_entities([User.id], get_user_data_for_query(db_user))
+        # Assert
+        assert count == 1
