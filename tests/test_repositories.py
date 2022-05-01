@@ -124,6 +124,6 @@ class TestBaseRepositoryIntegration:
 
     async def test_get_count(self, db_user, mock_user_with_db_repository):
         # Act
-        count = await mock_user_with_db_repository.get_all_with_entities([User.id], get_user_data_for_query(db_user))
+        count = await mock_user_with_db_repository.get_count(get_user_data_for_query(db_user))
         # Assert
         assert count == 1

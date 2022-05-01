@@ -72,7 +72,10 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     async def get_count(self, query_args: Optional[QueryArgs]) -> int:
         async with self.session_factory() as session:
             self.session = session
-            query = await self.get_query_with_entities(entities_list=[func.count("*")], query_args=query_args)
+            query = await self.get_query_with_entities(
+                entities_list=[func.count(self.model.id)],  # type: ignore[attr-defined] # issue with TypeVar bound
+                query_args=query_args,
+            )
             count: int = query.scalars().first()
             return count
 
