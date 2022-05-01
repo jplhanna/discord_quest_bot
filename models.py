@@ -14,6 +14,9 @@ class CoreModelMixin(BaseModel):
     id = Column(Integer, primary_key=True)
     datetime_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
+    def __repr__(self) -> str:
+        return f"ID: {self.id}"
+
 
 class User(CoreModelMixin):
     __tablename__ = "user"
