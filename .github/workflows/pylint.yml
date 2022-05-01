@@ -18,6 +18,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          export PYTHONPATH=$PWD
       - name: Analysing the code with pylint
         run: |
           pylint $PWD
