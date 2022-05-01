@@ -19,7 +19,6 @@ from sqlalchemy.sql import Selectable
 
 from exceptions import OutOfSessionContext
 from helpers.sqlalchemy_helpers import QueryArgs
-from helpers.sqlalchemy_helpers import QueryHandler
 from typeshed import BaseModelType
 from typeshed import EntitiesType
 
@@ -30,9 +29,10 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     model: Type[BaseModelType]
     session: Optional[Session] = field(default=None, init=False)
 
-    def _query(self, query_args: Optional[QueryArgs]) -> Selectable:
+    def _query(self, query_args: Optional[QueryArgs], to_select: List[EntitiesType] = None) -> Selectable:
         query_handlers = query_args.get_query_handlers() if query_args else []
-        query: Select = select(self.model)
+        to_select = to_select or [self.model]
+        query: Select = select(*to_select)
         for query_handler in query_handlers:
             query = query_handler.update_query(query)  # type: ignore[assignment]
         return query
@@ -49,8 +49,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     ) -> ChunkedIteratorResult:
         if not self.session:
             raise OutOfSessionContext()
-        query = self._query(query_args)
-        query = QueryHandler("with_entities", entities_list).update_query(query)
+        query = self._query(query_args, to_select=entities_list)
         result: ChunkedIteratorResult = await self.session.execute(query)
         return result
 
@@ -73,16 +72,9 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     async def get_count(self, query_args: Optional[QueryArgs]) -> int:
         async with self.session_factory() as session:
             self.session = session
-            query = await self.get_query_with_entities(func.count("*"), query_args)
+            query = await self.get_query_with_entities(entities_list=[func.count("*")], query_args=query_args)
             count: int = query.scalars().first()
             return count
-
-    async def get_scalar_with_entity(self, entity: EntitiesType, query_args: Optional[QueryArgs]) -> Any:
-        async with self.session_factory() as session:
-            self.session = session
-            query = await self.get_query_with_entities([entity], query_args)
-            res = query.scalars().first()
-            return res
 
     async def get_first(self, query_args: Optional[QueryArgs]) -> Optional[BaseModelType]:
         async with self.session_factory() as session:
@@ -110,8 +102,8 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     async def get_by_id(self, id_: int) -> Optional[BaseModelType]:
         async with self.session_factory() as session:
             self.session = session
-            query = await self.get_query()
-            res: Optional[BaseModelType] = query.scalars().get(id_)
+            query = await self.get_query(QueryArgs(filter_dict={"id": id_}))
+            res: Optional[BaseModelType] = query.scalars().one_or_none()
             return res
 
     async def create(self, **data: Any) -> BaseModelType:
