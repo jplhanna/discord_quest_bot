@@ -7,12 +7,15 @@ from typeshed import ConfigDict
 from typeshed import DBConfigDict
 from typeshed import DiscordConfigDict
 
+ASYNC_PSQL_SCHEME = "postgresql+asyncpg"
+
 DATABASE_NAME = os.environ.get("DATABASE_NAME")
 DATABASE_USER = os.environ.get("DATABASE_USER")
 DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD")
+PSQL_SCHEME = "postgresql"
 
 database_furl = furl(
-    scheme="postgresql",
+    scheme=PSQL_SCHEME,
     username=DATABASE_USER,
     password=DATABASE_PASSWORD,
     host="localhost",
@@ -21,7 +24,7 @@ database_furl = furl(
 
 DATABASE_URI = copy(database_furl.url)
 
-database_furl.set(scheme="postgresql+asyncpg")
+database_furl.set(scheme=ASYNC_PSQL_SCHEME)
 ASYNC_DATABASE_URI = database_furl.url
 
 DISCORD_ACCOUNT_TOKEN = os.environ.get("DISCORD_ACCOUNT_TOKEN", "token")

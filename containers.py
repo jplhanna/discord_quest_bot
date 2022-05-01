@@ -18,7 +18,8 @@ from sqlalchemy.orm import sessionmaker
 
 from config import config_dict
 from models import BaseModel
-from repositories import UserRepository
+from models import User
+from repositories import BaseRepository
 from services import UserService
 
 logger = getLogger(__name__)
@@ -73,5 +74,5 @@ class Container(DeclarativeContainer):
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
 
-    user_repository = Factory(UserRepository, session_factory=db_client.provided.session)
+    user_repository = Factory(BaseRepository, session_factory=db_client.provided.session, model=User)
     user_service = Factory(UserService, user_repository=user_repository)
