@@ -33,7 +33,7 @@ jobs:
           docker-compose up db-test
           export PYTHONPATH=$PWD
       - name: Lint with pylint
-        run: pylint $PWD
+        run: python -m pylint $PWD
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
