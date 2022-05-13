@@ -1,4 +1,6 @@
-**
-
-!Pipfile
-!Pipfile.lock
+.github
+.mypy_cache
+.pytest_cache
+alembic
+alembic.ini
+logs
