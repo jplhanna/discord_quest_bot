@@ -8,6 +8,7 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - "postgres"
+    command: python run.py
 
   postgres:
     container_name: postgres-${IMAGE_TAG-latest}
