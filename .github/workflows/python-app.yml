@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+env:
+  DATABASE_USER: db_bot
+  TEST_DATABASE_NAME: test_db
+
 jobs:
   build:
 
