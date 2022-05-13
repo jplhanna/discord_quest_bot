@@ -29,16 +29,20 @@ jobs:
       - name: Build Docker images
         run: docker-compose build
       - name: Setup test db
-        run: docker-compose up db-test
+        run: |
+          docker-compose up db-test
+          export PYTHONPATH=$PWD
+      - name: Lint with pylint
+        run: pylint $PWD
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
-          pipenv run flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The project standard line length is 120
-          pipenv run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
+          python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
       - name: Test with unit pytest
         run: |
-          pipenv run pytest -m "not integration" --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+          python -m pytest -m "not integration" --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
       - name: Test with integration pytest
         run: |
-          pipenv run pytest -m integration --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+          python -m pytest -m integration --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
