@@ -9,6 +9,7 @@ ENV PYTHONFAULTHANDLER 1
 ENV WORKON_HOME /local_server
 ENV PIPENV_PROFILE /Pipfile
 
+FROM base as python-deps
 
 RUN pip install pipenv
 RUN apt-get update && apt-get install -y --no-install-recommends gcc
@@ -17,5 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends gcc
 COPY Pipfile Pipfile.lock ./
 RUN pipenv install --system --deploy --ignore-pipfile
 
+FROM base as runtime
 # Install application into container
 COPY . .
