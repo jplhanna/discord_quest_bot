@@ -3,6 +3,11 @@ services:
   backend:
     container_name: backend-${IMAGE_TAG-latest}
     image: discord_bot/backend:${IMAGE_TAG-latest}
+    environment:
+      DISCORD_ACCOUNT_TOKEN: ${DISCORD_ACCOUNT_TOKEN}
+      DATABASE_NAME: ${DATABASE_PASSWORD}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - .:/app
     build:
