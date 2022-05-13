@@ -19,18 +19,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v3
-        with:
-          python-version: "3.10"
-          cache: "pipenv"
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pipenv
-          pipenv install flake8 pytest pytest-cov
-          pipenv install --deploy
-          export PYTHONPATH=$PWD
+      - name: Build Docker images
+        run: docker-compose build
+      - name: Setup test db
+        run: docker-compose up db-test
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
