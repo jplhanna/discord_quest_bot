@@ -3,6 +3,8 @@ services:
   backend:
     container_name: backend-${IMAGE_TAG-latest}
     image: discord_bot/backend:${IMAGE_TAG-latest}
+    volumes:
+      - .:/app
     build:
       context: .
       dockerfile: Dockerfile
