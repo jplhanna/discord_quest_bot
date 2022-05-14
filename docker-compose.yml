@@ -46,7 +46,8 @@ services:
       - "5433:5432"
 
   test-pipeline:
-    container_name: test-pipeline
+    container_name: test-pipeline-${IMAGE_TAG-latest}
+    image: discord_bot/test_pipeline:${IMAGE_TAG-latest}
     volumes:
       - .:/app
     build:
