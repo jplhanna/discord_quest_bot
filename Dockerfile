@@ -12,7 +12,3 @@ RUN pipenv install --system --deploy --ignore-pipfile
 
 # Install application into container
 ENV PYTHONPATH "{$PYTHONPATH}:/app/"
-
-
-FROM install-pipenv as test-install
-RUN pipenv install pytest-cov

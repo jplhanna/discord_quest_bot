@@ -25,6 +25,7 @@ coverage = "*"
 pytest-async-sqlalchemy = "*"
 asynctest = "*"
 pytest-randomly = "*"
+pytest-cov = "*"
 
 [dev-packages]
 
