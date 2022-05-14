@@ -27,7 +27,9 @@ jobs:
         with:
           python-version: '3.10'
       - name: Build Docker images
-        run: docker-compose build test-pipeline
+        run: |
+          docker-compose build test-pipeline
+          docker-compose run pipenv install pytest-cov
       - name: Lint with pylint
         run: docker-compose run test-pipeline pylint ../app
       - name: Lint with flake8

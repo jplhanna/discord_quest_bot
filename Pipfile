@@ -24,6 +24,7 @@ faker = "*"
 coverage = "*"
 pytest-async-sqlalchemy = "*"
 asynctest = "*"
+pytest-randomly = "*"
 
 [dev-packages]
 
