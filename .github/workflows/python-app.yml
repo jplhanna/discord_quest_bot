@@ -32,7 +32,7 @@ jobs:
         run: |
           docker-compose up db-test
       - name: Lint with pylint
-        run: python -m pylint $PWD
+        run: docker-compose run test-pipeline
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names

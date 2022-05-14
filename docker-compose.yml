@@ -44,6 +44,17 @@ services:
     ports:
       - "5433:5432"
 
+  test-pipeline:
+    container_name: test-pipeline
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - "db-test"
+    command:
+      - pylint
+      - $PWD
+
 networks:
   network:
     name: ${IMAGE_TAG-latest}-network
