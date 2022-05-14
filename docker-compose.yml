@@ -53,7 +53,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: install-pipenv
+      target: test-install
     depends_on:
       - "db-test"
 
