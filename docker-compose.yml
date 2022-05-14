@@ -13,6 +13,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: install-pipenv
     depends_on:
       - "postgres"
     command: python run.py
@@ -46,14 +47,14 @@ services:
 
   test-pipeline:
     container_name: test-pipeline
+    volumes:
+      - .:/app
     build:
       context: .
       dockerfile: Dockerfile
+      target: install-pipenv
     depends_on:
       - "db-test"
-    command:
-      - pylint
-      - $PWD
 
 networks:
   network:
