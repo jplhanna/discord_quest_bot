@@ -30,7 +30,7 @@ jobs:
       - name: Build Docker images
         run: |
           docker-compose build test-pipeline
-          docker-compose up test-db
+          docker-compose up -d test-db
       - name: Lint with pylint
         run: docker-compose run test-pipeline pylint ../app
       - name: Lint with flake8
