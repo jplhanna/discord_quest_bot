@@ -33,7 +33,7 @@ jobs:
           docker-compose up -d test-db
       - name: Lint with pylint
         if: always()
-        run: docker-compose run test-pipeline pylint ../app
+        run: docker-compose run test-pipeline pylint /src
       - name: Lint with flake8
         if: always()
         run: |
