@@ -4,20 +4,22 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-mypy = "*"
-pytest = "*"
 discord = "*"
 "discord.py-stubs" = "*"
 alembic = "*"
-pre-commit = "*"
-pylint = "*"
-flake8 = "*"
-black = "*"
 psycopg2 = "*"
-sqlalchemy = {extras = ["asyncio", "mypy"], version = "*"}
+sqlalchemy = { extras = ["asyncio", "mypy"], version = "*" }
 furl = "*"
 asyncpg = "*"
 dependency-injector = ">=4, <5"
+
+[dev-packages]
+mypy = "*"
+pytest = "*"
+pylint = "*"
+pre-commit = "*"
+flake8 = "*"
+black = "*"
 sqlalchemy-stubs = "*"
 pytest-asyncio = "*"
 faker = "*"
@@ -26,8 +28,6 @@ pytest-async-sqlalchemy = "*"
 asynctest = "*"
 pytest-randomly = "*"
 pytest-cov = "*"
-
-[dev-packages]
 
 [requires]
 python_version = "3.10"
