@@ -4,11 +4,11 @@ from unittest.mock import sentinel
 
 from pytest import mark
 
-from bot.constants import ALREADY_REGISTERED_MESSAGE
-from bot.constants import NEW_USER_MESSAGE
-from bot.controllers import check_and_register_user
+from src.bot.constants import ALREADY_REGISTERED_MESSAGE
+from src.bot.constants import NEW_USER_MESSAGE
+from src.bot.controllers import check_and_register_user
 
-wire_to = ["bot.controllers"]
+wire_to = ["src.bot.controllers"]
 
 
 class TestCheckAndRegisterUser:

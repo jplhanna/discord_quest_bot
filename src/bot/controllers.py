@@ -2,11 +2,11 @@ from dependency_injector.wiring import Provide
 from dependency_injector.wiring import inject
 from discord.ext.commands import Context
 
-from bot.constants import ALREADY_REGISTERED_MESSAGE
-from bot.constants import NEW_USER_MESSAGE
-from containers import Container
-from exceptions import NoIDProvided
-from services import UserService
+from src.bot.constants import ALREADY_REGISTERED_MESSAGE
+from src.bot.constants import NEW_USER_MESSAGE
+from src.containers import Container
+from src.exceptions import NoIDProvided
+from src.services import UserService
 
 
 @inject

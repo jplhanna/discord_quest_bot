@@ -2,8 +2,8 @@ import pytest
 from pytest import mark
 from sqlalchemy import inspect
 
-from helpers.sqlalchemy_helpers import QueryArgs
-from models import User
+from src.helpers.sqlalchemy_helpers import QueryArgs
+from src.models import User
 
 
 class TestUserRepository:

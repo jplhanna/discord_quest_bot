@@ -1,10 +1,10 @@
 import os
 
-from config import ASYNC_PSQL_SCHEME
-from config import database_furl
-from typeshed import ConfigDict
-from typeshed import DBConfigDict
-from typeshed import DiscordConfigDict
+from src.config import ASYNC_PSQL_SCHEME
+from src.config import database_furl
+from src.typeshed import ConfigDict
+from src.typeshed import DBConfigDict
+from src.typeshed import DiscordConfigDict
 
 TEST_DATABASE_NAME = os.environ.get("TEST_DATABASE_NAME")
 TEST_DATABASE_PORT = os.environ.get("TEST_DATABASE_PORT", "5433")
