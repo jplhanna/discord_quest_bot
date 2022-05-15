@@ -16,11 +16,11 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
-from config import config_dict
-from models import BaseModel
-from models import User
-from repositories import BaseRepository
-from services import UserService
+from src.config import config_dict
+from src.models import BaseModel
+from src.models import User
+from src.repositories import BaseRepository
+from src.services import UserService
 
 logger = getLogger(__name__)
 
