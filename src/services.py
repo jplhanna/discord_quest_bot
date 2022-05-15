@@ -2,9 +2,9 @@ from logging import Logger
 from logging import getLogger
 from typing import Optional
 
-from helpers.sqlalchemy_helpers import QueryArgs
-from models import User
-from repositories import BaseRepository
+from src.helpers.sqlalchemy_helpers import QueryArgs
+from src.models import User
+from src.repositories import BaseRepository
 
 
 class BaseService:

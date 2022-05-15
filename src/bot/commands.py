@@ -2,7 +2,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 from discord.ext.commands import has_permissions
 
-from bot.controllers import check_and_register_user
+from src.bot.controllers import check_and_register_user
 
 bot = commands.Bot(command_prefix="~")
 

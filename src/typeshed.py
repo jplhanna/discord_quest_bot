@@ -20,7 +20,7 @@ from sqlalchemy.sql.elements import Label
 from sqlalchemy.sql.selectable import CTE
 
 if TYPE_CHECKING:
-    from models import BaseModel  # noqa
+    from src.models import BaseModel  # noqa
 
 
 class DBConfigDict(TypedDict):

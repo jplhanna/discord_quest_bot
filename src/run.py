@@ -5,10 +5,10 @@ from logging import getLogger
 from dependency_injector.wiring import Provide
 from dependency_injector.wiring import inject
 
-from bot.commands import bot
-from containers import Container
-from containers import WIRE_TO
-from typeshed import ConfigDict
+from src.bot.commands import bot
+from src.containers import Container
+from src.containers import WIRE_TO
+from src.typeshed import ConfigDict
 
 
 @inject

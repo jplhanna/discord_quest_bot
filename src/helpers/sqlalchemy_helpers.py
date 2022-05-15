@@ -11,9 +11,9 @@ from sqlalchemy.sql import FromClause
 from sqlalchemy.sql import Selectable
 from sqlalchemy.sql.elements import UnaryExpression
 
-from typeshed import JoinListType
-from typeshed import JoinStruct
-from typeshed import SQLLogicType
+from src.typeshed import JoinListType
+from src.typeshed import JoinStruct
+from src.typeshed import SQLLogicType
 
 
 @dataclass

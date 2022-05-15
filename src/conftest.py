@@ -9,10 +9,10 @@ from asynctest import MagicMock as AsyncMagicMock
 from pytest import fixture
 from sqlalchemy import inspect
 
-from containers import Container
-from models import BaseModel
-from models import User
-from repositories import BaseRepository
+from src.containers import Container
+from src.models import BaseModel
+from src.models import User
+from src.repositories import BaseRepository
 from test_config import TEST_ASYNC_DATABASE_URI
 from test_config import test_config_dict
 

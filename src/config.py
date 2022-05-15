@@ -3,9 +3,9 @@ from copy import copy
 
 from furl import furl
 
-from typeshed import ConfigDict
-from typeshed import DBConfigDict
-from typeshed import DiscordConfigDict
+from src.typeshed import ConfigDict
+from src.typeshed import DBConfigDict
+from src.typeshed import DiscordConfigDict
 
 ASYNC_PSQL_SCHEME = "postgresql+asyncpg"
 
@@ -30,7 +30,7 @@ ASYNC_DATABASE_URI = database_furl.url
 
 DISCORD_ACCOUNT_TOKEN = os.environ.get("DISCORD_ACCOUNT_TOKEN", "token")
 
-DISCORD_LOG_FILENAME = "logs/discord.log"
+DISCORD_LOG_FILENAME = "../logs/discord.log"
 
 config_dict = ConfigDict(
     db=DBConfigDict(database_uri=DATABASE_URI, async_database_uri=ASYNC_DATABASE_URI),
