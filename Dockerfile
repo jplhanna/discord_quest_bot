@@ -12,3 +12,6 @@ RUN pipenv install --system --deploy --ignore-pipfile
 
 # Install application into container
 ENV PYTHONPATH "{$PYTHONPATH}:/app/"
+
+FROM install-pipenv as install-dev
+RUN pipenv install --system --deploy --ignore-pipfile -d
