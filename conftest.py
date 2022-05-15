@@ -7,6 +7,7 @@ from unittest.mock import MagicMock
 
 from asynctest import MagicMock as AsyncMagicMock
 from pytest import fixture
+from sqlalchemy import inspect
 
 from containers import Container
 from models import BaseModel
@@ -70,5 +71,6 @@ async def db_user(db_session):
     db_session.add(user)
     await db_session.flush()
     yield user
-    await db_session.delete(user)
-    await db_session.flush()
+    if not inspect(user).was_deleted:
+        await db_session.delete(user)
+        await db_session.flush()

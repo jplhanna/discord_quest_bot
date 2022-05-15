@@ -1,4 +1,4 @@
-"""empty message
+"""Update discord_id type
 
 Revision ID: dd5001604d65
 Revises: 60081ae43cc9
