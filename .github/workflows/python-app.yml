@@ -18,7 +18,7 @@ env:
   TEST_DATABASE_NAME: test_db
 
 jobs:
-  build:
+  test-pipeline:
 
     runs-on: ubuntu-latest
 
@@ -32,16 +32,20 @@ jobs:
           docker-compose build test-pipeline
           docker-compose up -d test-db
       - name: Lint with pylint
+        if: always()
         run: docker-compose run test-pipeline pylint ../app
       - name: Lint with flake8
+        if: always()
         run: |
           # stop the build if there are Python syntax errors or undefined names
           docker-compose run test-pipeline flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The project standard line length is 120
           docker-compose run test-pipeline flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
       - name: Test with unit pytest
+        if: always()
         run: |
           docker-compose run test-pipeline pytest -m "not integration" --cov-report=xml --cov=.
       - name: Test with integration pytest
+        if: always()
         run: |
           docker-compose run test-pipeline pytest -m integration --cov-report=xml --cov=. --cov-append
