@@ -8,6 +8,7 @@ services:
       DATABASE_NAME: ${DATABASE_PASSWORD}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_HOST: 'postgres'
     volumes:
       - .:/app
     build:
@@ -22,7 +23,7 @@ services:
     container_name: postgres-${IMAGE_TAG-latest}
     hostname: "postgres"
     image: postgres:14
-    command: "postgres -c listen_addresses='*'"
+    command: [ "postgres", "-c", "listen_addresses=*", "-c", "log_statement=all" ]
     restart: always
     environment:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -36,7 +37,7 @@ services:
     volumes:
       - db:/var/lib/postgresql/data
 
-  db-test:
+  test-db:
     image: postgres:14
     environment:
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -48,6 +49,12 @@ services:
   test-pipeline:
     container_name: test-pipeline-${IMAGE_TAG-latest}
     image: discord_bot/test_pipeline:${IMAGE_TAG-latest}
+    environment:
+      DATABASE_HOST: 'test-db'
+      TEST_DATABASE_NAME: ${TEST_DATABASE_NAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      TEST_DATABASE_PORT: '5432'
+      DATABASE_USER: ${DATABASE_USER}
     volumes:
       - .:/app
     build:
@@ -55,7 +62,7 @@ services:
       dockerfile: Dockerfile
       target: install-pipenv
     depends_on:
-      - "db-test"
+      - "test-db"
 
 networks:
   network:
