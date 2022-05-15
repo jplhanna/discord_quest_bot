@@ -13,8 +13,8 @@ from src.containers import Container
 from src.models import BaseModel
 from src.models import User
 from src.repositories import BaseRepository
-from test_config import TEST_ASYNC_DATABASE_URI
-from test_config import test_config_dict
+from src.test_config import TEST_ASYNC_DATABASE_URI
+from src.test_config import test_config_dict
 
 base_mock_container = Container(logging=MagicMock(), discord_logging=MagicMock())
 
