@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from dataclasses import field
 from typing import Literal
 from typing import Optional
@@ -9,7 +10,6 @@ from typing import TypeVar
 from typing import TypedDict
 from typing import Union
 
-from attr import dataclass
 from sqlalchemy import Column
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.orm.util import AliasedClass

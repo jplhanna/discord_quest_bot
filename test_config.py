@@ -7,9 +7,10 @@ from typeshed import DBConfigDict
 from typeshed import DiscordConfigDict
 
 TEST_DATABASE_NAME = os.environ.get("TEST_DATABASE_NAME")
+TEST_DATABASE_PORT = os.environ.get("TEST_DATABASE_PORT", "5433")
 
 test_db_furl = database_furl.copy()
-test_db_furl.set(path=TEST_DATABASE_NAME, port="5433")
+test_db_furl.set(path=TEST_DATABASE_NAME, port=TEST_DATABASE_PORT)
 
 TEST_DATABASE_URI = test_db_furl.url
 

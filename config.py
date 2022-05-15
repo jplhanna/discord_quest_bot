@@ -11,6 +11,7 @@ ASYNC_PSQL_SCHEME = "postgresql+asyncpg"
 
 DATABASE_NAME = os.environ.get("DATABASE_NAME")
 DATABASE_USER = os.environ.get("DATABASE_USER")
+DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
 DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD")
 PSQL_SCHEME = "postgresql"
 
@@ -18,7 +19,7 @@ database_furl = furl(
     scheme=PSQL_SCHEME,
     username=DATABASE_USER,
     password=DATABASE_PASSWORD,
-    host="localhost",
+    host=DATABASE_HOST,
     path=DATABASE_NAME,
 )
 

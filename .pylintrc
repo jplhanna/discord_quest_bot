@@ -1,6 +1,6 @@
 [MASTER]
 max-line-length = 120
-ignore = alembic
+ignore = alembic, tests, conftest.py
 
 [MESSAGES CONTROL]
 disable =
