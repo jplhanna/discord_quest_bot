@@ -14,6 +14,7 @@ permissions:
 
 env:
   DATABASE_USER: db_bot
+  DATABASE_PASSWORD: test_p
   TEST_DATABASE_NAME: test_db
 
 jobs:
@@ -43,4 +44,4 @@ jobs:
           docker-compose run test-pipeline pytest -m "not integration" --cov-report=xml --cov=.
       - name: Test with integration pytest
         run: |
-          docker-compose run test-pipeline pytest -m integration --cov-report=xml --cov=.
+          docker-compose run test-pipeline pytest -m integration --cov-report=xml --cov=. --cov-append
