@@ -27,7 +27,9 @@ jobs:
         with:
           python-version: '3.10'
       - name: Build Docker images
-        run: docker-compose build test-pipeline
+        run: |
+          docker-compose build test-pipeline
+          docker-compose up test-db
       - name: Lint with pylint
         run: docker-compose run test-pipeline pylint ../app
       - name: Lint with flake8
@@ -38,7 +40,7 @@ jobs:
           docker-compose run test-pipeline flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
       - name: Test with unit pytest
         run: |
-          docker-compose run test-pipeline pytest -m "not integration" --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+          docker-compose run test-pipeline pytest -m "not integration" --cov=com --cov-report=xml
       - name: Test with integration pytest
         run: |
-          docker-compose run test-pipeline pytest -m integration --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+          docker-compose run test-pipeline pytest -m integration --cov=com --cov-report=xml --cov-append
