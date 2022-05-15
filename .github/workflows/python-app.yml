@@ -40,7 +40,7 @@ jobs:
           docker-compose run test-pipeline flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
       - name: Test with unit pytest
         run: |
-          docker-compose run test-pipeline pytest -m "not integration" --cov=com --cov-report=xml
+          docker-compose run test-pipeline pytest -m "not integration" --cov-report=xml --cov=.
       - name: Test with integration pytest
         run: |
-          docker-compose run test-pipeline pytest -m integration --cov=com --cov-report=xml --cov-append
+          docker-compose run test-pipeline pytest -m integration --cov-report=xml --cov=.
