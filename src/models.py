@@ -4,12 +4,14 @@ from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
 
-BaseModel = declarative_base()
+from src.helpers.sqlalchemy_helpers import BaseModel
+from src.helpers.sqlalchemy_helpers import TableMeta
+from src.helpers.sqlalchemy_helpers import many_to_many_table
 
 
-class CoreModelMixin(BaseModel):
+class CoreModelMixin(BaseModel, metaclass=TableMeta):
     __abstract__ = True
     id = Column(Integer, primary_key=True)
     datetime_created = Column(DateTime, nullable=False, default=datetime.utcnow)
@@ -19,5 +21,15 @@ class CoreModelMixin(BaseModel):
 
 
 class User(CoreModelMixin):
-    __tablename__ = "user"
     discord_id = Column(BigInteger, unique=True)
+
+
+user_quest = many_to_many_table("User", "Quest")
+
+
+class Quest(CoreModelMixin):
+    # Columns
+    experience = Column(Integer, nullable=False)
+
+    # Relationships
+    user = relationship("User", secondary=user_quest, backref="quests")
