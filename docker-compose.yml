@@ -17,7 +17,7 @@ services:
       target: install-pipenv
     depends_on:
       - "postgres"
-    command: python run.py
+    command: python src/run.py
 
   postgres:
     container_name: postgres-${IMAGE_TAG-latest}
