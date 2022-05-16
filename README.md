@@ -1,13 +1,9 @@
 # Discord Quest bot
 
----
-
 A discord bot built in python. I am using this to test my skills.
 The current plan is to create a bot which tracks user tasks and reward you for completing tasks.
 
 All of these tasks and progress are tracked with a postgres db which maps discord users to db users.
-
----
 
 ## Setup
 
