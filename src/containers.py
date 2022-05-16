@@ -17,9 +17,11 @@ from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 from src.config import config_dict
-from src.models import BaseModel
+from src.helpers.sqlalchemy_helpers import BaseModel
+from src.models import Quest
 from src.models import User
 from src.repositories import BaseRepository
+from src.services import QuestService
 from src.services import UserService
 
 logger = getLogger(__name__)
@@ -75,4 +77,7 @@ class Container(DeclarativeContainer):
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
 
     user_repository = Factory(BaseRepository, session_factory=db_client.provided.session, model=User)
-    user_service = Factory(UserService, user_repository=user_repository)
+    user_service = Factory(UserService, repository=user_repository)
+
+    quest_repository = Factory(BaseRepository, session_factory=db_client.provided.session, model=Quest)
+    quest_service = Factory(QuestService, repository=quest_repository)

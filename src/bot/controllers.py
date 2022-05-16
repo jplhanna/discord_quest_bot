@@ -6,6 +6,7 @@ from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
 from src.containers import Container
 from src.exceptions import NoIDProvided
+from src.services import QuestService
 from src.services import UserService
 
 
@@ -18,3 +19,17 @@ async def check_and_register_user(ctx: Context, user_service: UserService = Prov
         return ALREADY_REGISTERED_MESSAGE
     await user_service.create_user(discord_id=discord_id)
     return NEW_USER_MESSAGE
+
+
+@inject
+async def add_quest_to_user(
+    ctx: Context,
+    quest_service: QuestService = Provide[Container.quest_service],
+    user_service: UserService = Provide[Container.user_service],
+) -> str:
+    user = await user_service.get_user_by_discord_id(ctx.author.id)
+    if not user:
+        return "Please register first"
+    # TODO need to read message before passing along
+    res = await quest_service.accept_quest_if_available(user, ctx.message.content)
+    return res
