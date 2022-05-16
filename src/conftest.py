@@ -10,7 +10,7 @@ from pytest import fixture
 from sqlalchemy import inspect
 
 from src.containers import Container
-from src.models import BaseModel
+from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.repositories import BaseRepository
 from src.test_config import TEST_ASYNC_DATABASE_URI
