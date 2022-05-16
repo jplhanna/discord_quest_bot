@@ -4,6 +4,7 @@ from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Integer
+from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
 from src.helpers.sqlalchemy_helpers import BaseModel
@@ -21,15 +22,20 @@ class CoreModelMixin(BaseModel, metaclass=TableMeta):
 
 
 class User(CoreModelMixin):
+    # Columns
     discord_id = Column(BigInteger, unique=True)
+
+    # Relationships
+    quests = relationship("Quest", secondary="user_quest", back_populates="user", uselist=True)
 
 
 class Quest(CoreModelMixin):
     # Columns
+    name = Column(String, nullable=False)
     experience = Column(Integer, nullable=False)
 
     # Relationships
-    user = relationship("User", secondary="user_quest", backref="quests")
+    user = relationship("User", secondary="user_quest", back_populates="quests", uselist=True)
 
 
 user_quest = many_to_many_table("User", "Quest")
