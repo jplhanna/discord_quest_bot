@@ -92,7 +92,7 @@ class QueryArgs:  # pylint: disable=R0902
 
 def many_to_many_table(first_table: str, second_table: str) -> Table:
     def get_column(table_name: str) -> Column:
-        return Column(f"{table_name.lower()}_id", ForeignKey(f"{table_name}.id"), primary_key=True)
+        return Column(f"{table_name.lower()}_id", ForeignKey(f"{table_name.lower()}.id"), primary_key=True)
 
     table = Table(
         f"{first_table.lower()}_{second_table.lower()}",

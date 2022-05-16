@@ -24,12 +24,12 @@ class User(CoreModelMixin):
     discord_id = Column(BigInteger, unique=True)
 
 
-user_quest = many_to_many_table("User", "Quest")
-
-
 class Quest(CoreModelMixin):
     # Columns
     experience = Column(Integer, nullable=False)
 
     # Relationships
-    user = relationship("User", secondary=user_quest, backref="quests")
+    user = relationship("User", secondary="user_quest", backref="quests")
+
+
+user_quest = many_to_many_table("User", "Quest")
