@@ -10,6 +10,7 @@ from typing import Union
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Table
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import Executable
@@ -112,3 +113,7 @@ class TableMeta(DeclarativeMeta):
     def __init__(cls, classname: str, *args: Any, **kwargs: Any) -> None:
         cls.__tablename__ = snake_case_table_name(classname)
         super(TableMeta, cls).__init__(classname, *args, **kwargs)
+
+
+def case_insensitive_str_compare(column: Column, value: str) -> SQLLogicType:
+    return func.lower(column) == value.lower()

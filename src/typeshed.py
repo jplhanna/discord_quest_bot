@@ -10,9 +10,11 @@ from typing import TypeVar
 from typing import TypedDict
 from typing import Union
 
+from sqlalchemy import Boolean
 from sqlalchemy import Column
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.orm.util import AliasedClass
+from sqlalchemy.sql import ColumnElement
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlalchemy.sql.elements import BooleanClauseList
@@ -22,6 +24,10 @@ from sqlalchemy.sql.selectable import CTE
 
 if TYPE_CHECKING:
     from src.helpers.sqlalchemy_helpers import BaseModel  # noqa
+
+    BooleanColumnElement = ColumnElement[Boolean]
+else:
+    BooleanColumnElement = ColumnElement
 
 
 class DBConfigDict(TypedDict):
@@ -40,7 +46,7 @@ class ConfigDict(TypedDict):
     discord: DiscordConfigDict
 
 
-SQLLogicType = Union[BinaryExpression, BooleanClauseList, bool]
+SQLLogicType = Union[BinaryExpression, BooleanClauseList, bool, BooleanColumnElement]
 JoinOnType = Union[Type["BaseModel"], AliasedClass, RelationshipProperty]
 
 
