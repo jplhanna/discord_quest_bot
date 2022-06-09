@@ -3,6 +3,7 @@ from logging import getLogger
 from typing import Optional
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
+from src.helpers.sqlalchemy_helpers import case_insensitive_str_compare
 from src.models import Quest
 from src.models import User
 from src.repositories import BaseRepository
@@ -33,7 +34,9 @@ class QuestService(BaseService):
     _repository: BaseRepository[Quest]
 
     async def accept_quest_if_available(self, user: User, quest_name: str) -> str:
-        quest = await self._repository.get_first(QueryArgs(filter_dict=dict(name=quest_name)))
+        quest = await self._repository.get_first(
+            QueryArgs(filter_list=[case_insensitive_str_compare(Quest.name, quest_name)])
+        )
         if not quest:
             return "This quest does not exist"
 
