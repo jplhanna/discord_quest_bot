@@ -4,6 +4,8 @@ from copy import copy
 from typing import Callable
 from typing import Generator
 from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import sentinel
 
 from asynctest import MagicMock as AsyncMagicMock
 from pytest import fixture
@@ -26,6 +28,12 @@ def mock_container() -> Generator[Container, None, None]:
     mocked_container.init_resources()
     yield mocked_container
     mocked_container.unwire()
+
+
+@fixture
+def mocked_user() -> User:
+    user = Mock(spec=User, discord_id=sentinel.discord_id)
+    return user
 
 
 @fixture()

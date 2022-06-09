@@ -15,8 +15,10 @@ wire_to = ["src.bot.controllers"]
 
 
 @fixture(params=[True, False])
-def mock_container_if_user_exists(mock_container, request):
-    mocked_user_service = AsyncMock(get_user_by_discord_id=AsyncMock(return_value=request.param))
+def mock_container_if_user_exists(mock_container, mocked_user, request):
+    mocked_user_service = AsyncMock(
+        get_user_by_discord_id=AsyncMock(return_value=mocked_user if request.param else None)
+    )
     mock_container.user_service.override(mocked_user_service)
     mock_container.wire(wire_to)
     yield mock_container, mocked_user_service, request.param
