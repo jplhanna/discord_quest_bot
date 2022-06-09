@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from sqlalchemy import BigInteger
 from sqlalchemy import Column
@@ -26,7 +27,7 @@ class User(CoreModelMixin):
     discord_id = Column(BigInteger, unique=True)
 
     # Relationships
-    quests = relationship("Quest", secondary="user_quest", back_populates="user", uselist=True)
+    quests: List["Quest"] = relationship("Quest", secondary="user_quest", back_populates="user", uselist=True)
 
 
 class Quest(CoreModelMixin):
@@ -35,7 +36,7 @@ class Quest(CoreModelMixin):
     experience = Column(Integer, nullable=False)
 
     # Relationships
-    user = relationship("User", secondary="user_quest", back_populates="quests", uselist=True)
+    user: List[User] = relationship("User", secondary="user_quest", back_populates="quests", uselist=True)
 
 
 user_quest = many_to_many_table("User", "Quest")

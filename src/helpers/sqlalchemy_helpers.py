@@ -12,8 +12,8 @@ from sqlalchemy import ForeignKey
 from sqlalchemy import Table
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
-from sqlalchemy.sql import Selectable
 from sqlalchemy.sql.elements import UnaryExpression
 
 from src.typeshed import JoinListType
@@ -29,7 +29,7 @@ class QueryHandler:
     func_data: Any
     allow_empty_data: bool = field(default=False)
 
-    def update_query(self, query: Selectable) -> Selectable:
+    def update_query(self, query: Executable) -> Executable:
         if self.func_data or self.allow_empty_data and self.func_data is not None:
             query = getattr(query, self.func_str)(*self.func_data)
         return query
@@ -38,7 +38,7 @@ class QueryHandler:
 class DictQueryHandler(QueryHandler):
     func_data: Optional[dict]
 
-    def update_query(self, query: Selectable) -> Selectable:
+    def update_query(self, query: Executable) -> Executable:
         if self.func_data:
             query = getattr(query, self.func_str)(**self.func_data)
         return query
@@ -47,7 +47,7 @@ class DictQueryHandler(QueryHandler):
 class JoinQueryHandler(QueryHandler):
     func_data: Optional[JoinListType]
 
-    def update_query(self, query: FromClause) -> Selectable:  # type: ignore[override]
+    def update_query(self, query: FromClause) -> Executable:  # type: ignore[override]
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
@@ -58,7 +58,7 @@ class JoinQueryHandler(QueryHandler):
                     query = getattr(query, join_func)(*join_data)
                 else:
                     query = query.join(join_on)
-        return query
+        return query  # type: ignore[return-value]
 
 
 @dataclass

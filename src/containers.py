@@ -1,3 +1,4 @@
+from asyncio import current_task
 from contextlib import asynccontextmanager
 from logging import FileHandler
 from logging import Formatter
@@ -11,8 +12,8 @@ from dependency_injector.providers import Factory
 from dependency_injector.providers import Resource
 from dependency_injector.providers import Singleton
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import async_scoped_session
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm import sessionmaker
 
 from src.config import config_dict
@@ -31,7 +32,7 @@ WIRE_TO: List[str] = []
 class Database:
     def __init__(self, db_url: str) -> None:
         self._async_engine = create_async_engine(db_url, echo=True)
-        self._session_factory = scoped_session(
+        self._session_factory = async_scoped_session(
             sessionmaker(
                 self._async_engine,
                 autocommit=False,
@@ -39,10 +40,12 @@ class Database:
                 expire_on_commit=False,
                 class_=AsyncSession,
             ),
+            scopefunc=current_task,
         )
 
-    def create_database(self) -> None:
-        BaseModel.metadata.create_all(self._async_engine)
+    async def create_database(self) -> None:
+        async with self.session() as session:
+            await session.run_sync(BaseModel.metadata.create_all)
 
     @asynccontextmanager
     async def session(self) -> AsyncGenerator[AsyncSession, None]:

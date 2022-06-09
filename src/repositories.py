@@ -8,14 +8,13 @@ from typing import Generic
 from typing import List
 from typing import Optional
 from typing import Type
+from typing import cast
 
 from sqlalchemy import func
-from sqlalchemy.engine.result import ChunkedIteratorResult  # type: ignore[attr-defined]
+from sqlalchemy.engine.result import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.orm import Session
-from sqlalchemy.sql import Select
-from sqlalchemy.sql import Selectable
+from sqlalchemy.sql import Executable
 
 from src.exceptions import OutOfSessionContext
 from src.helpers.sqlalchemy_helpers import QueryArgs
@@ -27,30 +26,30 @@ from src.typeshed import EntitiesType
 class BaseRepository(ABC, Generic[BaseModelType]):
     session_factory: Callable[..., AbstractAsyncContextManager[AsyncSession]]
     model: Type[BaseModelType]
-    session: Optional[Session] = field(default=None, init=False)
+    session: Optional[AsyncSession] = field(default=None, init=False)
 
-    def _query(self, query_args: Optional[QueryArgs], to_select: List[EntitiesType] = None) -> Selectable:
+    def _query(self, query_args: Optional[QueryArgs], to_select: List[EntitiesType] = None) -> Executable:
         query_handlers = query_args.get_query_handlers() if query_args else []
         to_select = to_select or [self.model]
-        query: Select = select(*to_select)
+        query: Executable = select(*to_select)
         for query_handler in query_handlers:
-            query = query_handler.update_query(query)  # type: ignore[assignment]
+            query = query_handler.update_query(query)
         return query
 
-    async def get_query(self, query_args: Optional[QueryArgs] = None) -> ChunkedIteratorResult:
+    async def get_query(self, query_args: Optional[QueryArgs] = None) -> Result:
         if not self.session:
             raise OutOfSessionContext()
         query = self._query(query_args)
-        result: ChunkedIteratorResult = await self.session.execute(query)
+        result: Result = await self.session.execute(query)
         return result
 
     async def get_query_with_entities(
         self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
-    ) -> ChunkedIteratorResult:
+    ) -> Result:
         if not self.session:
             raise OutOfSessionContext()
         query = self._query(query_args, to_select=entities_list)
-        result: ChunkedIteratorResult = await self.session.execute(query)
+        result: Result = await self.session.execute(query)
         return result
 
     async def get_all(self, query_args: Optional[QueryArgs]) -> List[BaseModelType]:
@@ -76,13 +75,13 @@ class BaseRepository(ABC, Generic[BaseModelType]):
                 entities_list=[func.count(self.model.id)],  # type: ignore[attr-defined] # issue with TypeVar bound
                 query_args=query_args,
             )
-            count: int = query.scalars().first()
+            count = cast(int, query.scalars().first())
             return count
 
     async def get_first(self, query_args: Optional[QueryArgs]) -> Optional[BaseModelType]:
         async with self.session_factory() as session:
             self.session = session
-            query: ChunkedIteratorResult = await self.get_query(query_args)
+            query: Result = await self.get_query(query_args)
             result: Optional[BaseModelType] = query.scalars().first()
             return result
 
@@ -95,11 +94,11 @@ class BaseRepository(ABC, Generic[BaseModelType]):
 
     async def get_first_with_entities(
         self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
-    ) -> tuple:
+    ) -> Optional[tuple]:
         async with self.session_factory() as session:
             self.session = session
             query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-            result: tuple = query.scalars().first()
+            result: Optional[tuple] = query.scalars().first()
             return result
 
     async def get_by_id(self, id_: int) -> Optional[BaseModelType]:
