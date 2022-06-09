@@ -5,12 +5,14 @@ services:
     image: discord_bot/backend:${IMAGE_TAG-latest}
     environment:
       DISCORD_ACCOUNT_TOKEN: ${DISCORD_ACCOUNT_TOKEN}
-      DATABASE_NAME: ${DATABASE_PASSWORD}
+      DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: 'postgres'
     volumes:
       - .:/app
+    networks:
+      - network
     build:
       context: .
       dockerfile: Dockerfile
@@ -34,6 +36,8 @@ services:
       - network
     ports:
       - "5432:5432"
+    expose:
+      - "5432"
     volumes:
       - db:/var/lib/postgresql/data
 
