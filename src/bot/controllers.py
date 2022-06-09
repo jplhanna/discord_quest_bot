@@ -4,6 +4,7 @@ from discord.ext.commands import Context
 
 from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
+from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.containers import Container
 from src.exceptions import NoIDProvided
 from src.services import QuestService
@@ -29,7 +30,7 @@ async def add_quest_to_user(
 ) -> str:
     user = await user_service.get_user_by_discord_id(ctx.author.id)
     if not user:
-        return "Please register first"
+        return REGISTER_FIRST_MESSAGE
     # TODO need to read message before passing along
     res = await quest_service.accept_quest_if_available(user, ctx.message.content)
     return res
