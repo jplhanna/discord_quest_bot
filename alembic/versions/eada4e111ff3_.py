@@ -1,13 +1,12 @@
-"""empty message
+"""Create quest tables
 
 Revision ID: eada4e111ff3
 Revises: dd5001604d65
 Create Date: 2022-05-15 21:29:44.873852
 
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "eada4e111ff3"
