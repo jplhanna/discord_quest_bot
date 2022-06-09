@@ -21,6 +21,7 @@ def upgrade():
         "quest",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("datetime_created", sa.DateTime(), nullable=False),
+        sa.Column("name", sa.String(), nullable=False),
         sa.Column("experience", sa.Integer(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
