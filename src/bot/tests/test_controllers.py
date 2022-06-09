@@ -38,8 +38,8 @@ class TestCheckAndRegisterUser:
         assert res == expected_result_mapping[user_exists]
 
 
+@mark.asyncio
 class TestAddQuestToUser:
-    @mark.asyncio
     async def test_if_registered(self, mock_container_if_user_exists):
         # Arrange
         mock_container, _, user_exists = mock_container_if_user_exists
@@ -48,7 +48,7 @@ class TestAddQuestToUser:
         mock_container.quest_service.override(mocked_quest_service)
         mock_container.wire(wire_to)
         # Act
-        res = await add_quest_to_user(ctx)
+        res = await add_quest_to_user(ctx, sentinel.quest_name)
         # Assert
         assert (res == REGISTER_FIRST_MESSAGE) is not user_exists
         assert mocked_quest_service.accept_quest_if_available.called is user_exists

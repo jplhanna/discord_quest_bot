@@ -25,12 +25,12 @@ async def check_and_register_user(ctx: Context, user_service: UserService = Prov
 @inject
 async def add_quest_to_user(
     ctx: Context,
+    quest_name: str,
     quest_service: QuestService = Provide[Container.quest_service],
     user_service: UserService = Provide[Container.user_service],
 ) -> str:
     user = await user_service.get_user_by_discord_id(ctx.author.id)
     if not user:
         return REGISTER_FIRST_MESSAGE
-    # TODO need to read message before passing along
-    res = await quest_service.accept_quest_if_available(user, ctx.message.content)
+    res = await quest_service.accept_quest_if_available(user, quest_name)
     return res
