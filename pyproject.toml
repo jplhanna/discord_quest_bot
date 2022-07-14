@@ -1,9 +1,13 @@
-[[source]]
-url = "https://pypi.python.org/simple"
-verify_ssl = true
-name = "pypi"
+[tool.poetry]
+name = "local-server"
+version = "0.1.0"
+description = "Discord bot for tracking and rewarding tasks"
+authors = ["jplhanna <jpl.hanna@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "local_server" }]
 
-[packages]
+[tool.poetry.dependencies]
+python = "^3.10"
 discord = "*"
 "discord.py-stubs" = "*"
 alembic = "*"
@@ -13,7 +17,8 @@ furl = "*"
 asyncpg = "*"
 dependency-injector = ">=4, <5"
 
-[dev-packages]
+
+[tool.poetry.group.dev.dependencies]
 mypy = "*"
 pytest = "*"
 pylint = "*"
@@ -29,5 +34,6 @@ asynctest = "*"
 pytest-randomly = "*"
 pytest-cov = "*"
 
-[requires]
-python_version = "3.10"
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

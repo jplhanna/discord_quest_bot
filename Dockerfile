@@ -3,15 +3,18 @@ MAINTAINER JP Hanna "jpl.hanna@gmail.com"
 WORKDIR /app/
 COPY . /app/
 
-FROM base as install-pipenv
-RUN pip install pipenv
+FROM base as install-poetry
+ENV POETRY_VIRTUALENVS_CREATE=false \
+    POETRY_VERSION=1.2.0b3
+RUN curl -sSL https://install.python-poetry.org | python3 -
 RUN apt-get update && apt-get install -y --no-install-recommends gcc
+ENV PATH "/root/.local/bin:$PATH"
 
 # Install python dependencies in /.venv
-RUN pipenv install --system --deploy --ignore-pipfile
+RUN poetry install --no-root --no-ansi --no-interaction --only=main
 
 # Install application into container
 ENV PYTHONPATH "{$PYTHONPATH}:/app/"
 
-FROM install-pipenv as install-dev
-RUN pipenv install --system --deploy --ignore-pipfile -d
+FROM install-poetry as install-dev
+RUN poetry install --no-root --no-ansi --no-interaction --only=dev
