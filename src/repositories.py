@@ -16,7 +16,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.sql import Executable
 
-from src.exceptions import OutOfSessionContext
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.typeshed import BaseModelType
 from src.typeshed import EntitiesType
@@ -26,7 +25,13 @@ from src.typeshed import EntitiesType
 class BaseRepository(ABC, Generic[BaseModelType]):
     session_factory: Callable[..., AbstractAsyncContextManager[AsyncSession]]
     model: Type[BaseModelType]
-    session: Optional[AsyncSession] = field(default=None, init=False)
+    _session_context: Optional[AbstractAsyncContextManager[AsyncSession]] = field(default=None, init=False)
+
+    @property
+    def session_context(self) -> AbstractAsyncContextManager[AsyncSession]:
+        if not self._session_context:
+            self._session_context = self.session_factory()
+        return self._session_context
 
     def _query(self, query_args: Optional[QueryArgs], to_select: List[EntitiesType] = None) -> Executable:
         query_handlers = query_args.get_query_handlers() if query_args else []
@@ -37,85 +42,69 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         return query
 
     async def get_query(self, query_args: Optional[QueryArgs] = None) -> Result:
-        if not self.session:
-            raise OutOfSessionContext()
-        query = self._query(query_args)
-        result: Result = await self.session.execute(query)
-        return result
+        async with self.session_context as session:
+            query = self._query(query_args)
+            result: Result = await session.execute(query)
+            return result
 
     async def get_query_with_entities(
         self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
     ) -> Result:
-        if not self.session:
-            raise OutOfSessionContext()
-        query = self._query(query_args, to_select=entities_list)
-        result: Result = await self.session.execute(query)
-        return result
+        async with self.session_context as session:
+            query = self._query(query_args, to_select=entities_list)
+            result: Result = await session.execute(query)
+            return result
 
     async def get_all(self, query_args: Optional[QueryArgs]) -> List[BaseModelType]:
-        async with self.session_factory() as session:
-            self.session = session
-            query = await self.get_query(query_args)
-            res: List[BaseModelType] = query.scalars().all()
-            return res
+        query = await self.get_query(query_args)
+        res: List[BaseModelType] = query.scalars().all()
+        return res
 
     async def get_all_with_entities(
         self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
     ) -> List[tuple]:
-        async with self.session_factory() as session:
-            self.session = session
-            query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-            res: List[tuple] = query.scalars().all()
-            return res
+        query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
+        res: List[tuple] = query.scalars().all()
+        return res
 
     async def get_count(self, query_args: Optional[QueryArgs]) -> int:
-        async with self.session_factory() as session:
-            self.session = session
-            query = await self.get_query_with_entities(
-                entities_list=[func.count(self.model.id)],  # type: ignore[attr-defined] # issue with TypeVar bound
-                query_args=query_args,
-            )
-            count = cast(int, query.scalars().first())
-            return count
+        query = await self.get_query_with_entities(
+            entities_list=[func.count(self.model.id)],  # type: ignore[attr-defined] # issue with TypeVar bound
+            query_args=query_args,
+        )
+        count = cast(int, query.scalars().first())
+        return count
 
     async def get_first(self, query_args: Optional[QueryArgs]) -> Optional[BaseModelType]:
-        async with self.session_factory() as session:
-            self.session = session
-            query: Result = await self.get_query(query_args)
-            result: Optional[BaseModelType] = query.scalars().first()
-            return result
+        query: Result = await self.get_query(query_args)
+        result: Optional[BaseModelType] = query.scalars().first()
+        return result
 
     async def get_one(self, query_args: Optional[QueryArgs]) -> BaseModelType:
-        async with self.session_factory() as session:
-            self.session = session
-            query = await self.get_query(query_args)
-            result: BaseModelType = query.scalars().one()
-            return result
+        query = await self.get_query(query_args)
+        result: BaseModelType = query.scalars().one()
+        return result
 
     async def get_first_with_entities(
         self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
     ) -> Optional[tuple]:
-        async with self.session_factory() as session:
-            self.session = session
-            query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-            result: Optional[tuple] = query.scalars().first()
-            return result
+        query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
+        result: Optional[tuple] = query.scalars().first()
+        return result
 
     async def get_by_id(self, id_: int) -> Optional[BaseModelType]:
-        async with self.session_factory() as session:
-            self.session = session
-            query = await self.get_query(QueryArgs(filter_dict={"id": id_}))
-            res: Optional[BaseModelType] = query.scalars().one_or_none()
-            return res
+        query = await self.get_query(QueryArgs(filter_dict={"id": id_}))
+        res: Optional[BaseModelType] = query.scalars().one_or_none()
+        return res
 
     async def create(self, **data: Any) -> BaseModelType:
-        async with self.session_factory() as session:
+        async with self.session_context as session:
             obj: BaseModelType = self.model(**data)
             session.add(obj)
             await session.commit()
             return obj
 
     async def delete(self, obj: BaseModelType) -> None:
-        async with self.session_factory() as session:
+        async with self.session_context as session:
             await session.delete(obj)
             await session.commit()
