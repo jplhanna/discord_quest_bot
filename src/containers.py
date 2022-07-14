@@ -1,5 +1,4 @@
 from asyncio import current_task
-from contextlib import asynccontextmanager
 from logging import FileHandler
 from logging import Formatter
 from logging import getLogger
@@ -44,10 +43,12 @@ class Database:
         )
 
     async def create_database(self) -> None:
-        async with self.session() as session:
-            await session.run_sync(BaseModel.metadata.create_all)
+        current_session = self.get_session()
+        await current_session.run_sync(BaseModel.metadata.create_all)
 
-    @asynccontextmanager
+    def get_session(self) -> AsyncSession:
+        return self._session_factory()
+
     async def session(self) -> AsyncGenerator[AsyncSession, None]:
         session: AsyncSession = self._session_factory()
         try:
@@ -78,8 +79,8 @@ class Container(DeclarativeContainer):
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
 
-    user_repository = Factory(BaseRepository, session_factory=db_client.provided.session, model=User)
+    user_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=User)
     user_service = Factory(UserService, repository=user_repository)
 
-    quest_repository = Factory(BaseRepository, session_factory=db_client.provided.session, model=Quest)
+    quest_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=Quest)
     quest_service = Factory(QuestService, repository=quest_repository)

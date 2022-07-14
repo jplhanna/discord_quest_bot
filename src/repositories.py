@@ -1,5 +1,4 @@
 from abc import ABC
-from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -23,15 +22,15 @@ from src.typeshed import EntitiesType
 
 @dataclass
 class BaseRepository(ABC, Generic[BaseModelType]):
-    session_factory: Callable[..., AbstractAsyncContextManager[AsyncSession]]
+    session_factory: Callable[..., AsyncSession]
     model: Type[BaseModelType]
-    _session_context: Optional[AbstractAsyncContextManager[AsyncSession]] = field(default=None, init=False)
+    _session: Optional[AsyncSession] = field(default=None, init=False)
 
     @property
-    def session_context(self) -> AbstractAsyncContextManager[AsyncSession]:
-        if not self._session_context:
-            self._session_context = self.session_factory()
-        return self._session_context
+    def session(self) -> AsyncSession:
+        if not self._session:
+            self._session = self.session_factory()
+        return self._session
 
     def _query(self, query_args: Optional[QueryArgs], to_select: List[EntitiesType] = None) -> Executable:
         query_handlers = query_args.get_query_handlers() if query_args else []
@@ -42,18 +41,16 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         return query
 
     async def get_query(self, query_args: Optional[QueryArgs] = None) -> Result:
-        async with self.session_context as session:
-            query = self._query(query_args)
-            result: Result = await session.execute(query)
-            return result
+        query = self._query(query_args)
+        result: Result = await self.session.execute(query)
+        return result
 
     async def get_query_with_entities(
         self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
     ) -> Result:
-        async with self.session_context as session:
-            query = self._query(query_args, to_select=entities_list)
-            result: Result = await session.execute(query)
-            return result
+        query = self._query(query_args, to_select=entities_list)
+        result: Result = await self.session.execute(query)
+        return result
 
     async def get_all(self, query_args: Optional[QueryArgs]) -> List[BaseModelType]:
         query = await self.get_query(query_args)
@@ -98,13 +95,11 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         return res
 
     async def create(self, **data: Any) -> BaseModelType:
-        async with self.session_context as session:
-            obj: BaseModelType = self.model(**data)
-            session.add(obj)
-            await session.commit()
-            return obj
+        obj: BaseModelType = self.model(**data)
+        self.session.add(obj)
+        await self.session.commit()
+        return obj
 
     async def delete(self, obj: BaseModelType) -> None:
-        async with self.session_context as session:
-            await session.delete(obj)
-            await session.commit()
+        await self.session.delete(obj)
+        await self.session.commit()
