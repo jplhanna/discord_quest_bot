@@ -4,19 +4,21 @@ from copy import copy
 from typing import Callable
 from typing import Generator
 from unittest.mock import MagicMock
+from unittest.mock import Mock
+from unittest.mock import sentinel
 
 from asynctest import MagicMock as AsyncMagicMock
 from pytest import fixture
 from sqlalchemy import inspect
 
 from src.containers import Container
-from src.models import BaseModel
+from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.repositories import BaseRepository
 from src.test_config import TEST_ASYNC_DATABASE_URI
 from src.test_config import test_config_dict
 
-base_mock_container = Container(logging=MagicMock(), discord_logging=MagicMock())
+base_mock_container = Container(discord_logging=MagicMock())
 
 
 @fixture
@@ -26,6 +28,12 @@ def mock_container() -> Generator[Container, None, None]:
     mocked_container.init_resources()
     yield mocked_container
     mocked_container.unwire()
+
+
+@fixture
+def mocked_user() -> User:
+    user = Mock(spec=User, discord_id=sentinel.discord_id)
+    return user
 
 
 @fixture()
