@@ -11,7 +11,7 @@ from typing import Type
 from typing import cast
 
 from sqlalchemy import func
-from sqlalchemy.engine.result import Result
+from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.sql import Executable
