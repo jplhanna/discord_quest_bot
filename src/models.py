@@ -27,7 +27,7 @@ class User(CoreModelMixin):
     discord_id = Column(BigInteger, unique=True)
 
     # Relationships
-    quests: List["Quest"] = relationship("Quest", secondary="user_quest", back_populates="user", uselist=True)
+    quests: List["Quest"] = relationship("Quest", secondary="user_quest", back_populates="users", uselist=True)
 
 
 class Quest(CoreModelMixin):
@@ -36,7 +36,7 @@ class Quest(CoreModelMixin):
     experience = Column(Integer, nullable=False)
 
     # Relationships
-    user: List[User] = relationship("User", secondary="user_quest", back_populates="quests", uselist=True)
+    users: List[User] = relationship("User", secondary="user_quest", back_populates="quests", uselist=True)
 
 
 user_quest = many_to_many_table("User", "Quest")

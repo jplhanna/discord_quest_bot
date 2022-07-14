@@ -2,6 +2,8 @@ from logging import Logger
 from logging import getLogger
 from typing import Optional
 
+from sqlalchemy.orm import selectinload
+
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.helpers.sqlalchemy_helpers import case_insensitive_str_compare
 from src.models import Quest
@@ -35,13 +37,15 @@ class QuestService(BaseService):
 
     async def accept_quest_if_available(self, user: User, quest_name: str) -> str:
         quest = await self._repository.get_first(
-            QueryArgs(filter_list=[case_insensitive_str_compare(Quest.name, quest_name)])
+            QueryArgs(
+                filter_list=[case_insensitive_str_compare(Quest.name, quest_name)],
+                eager_options=[selectinload(Quest.users)],
+            )
         )
         if not quest:
             return "This quest does not exist"
 
         # Is this right? Should I be pulling out the db into this layer?
-        async with self._repository.session_factory() as session:
-            user.quests.append(quest)
-            await session.commit()
+        quest.users.append(user)
+        await self._repository.session.commit()
         return f"You have accepted {quest_name}! Good luck adventurer"
