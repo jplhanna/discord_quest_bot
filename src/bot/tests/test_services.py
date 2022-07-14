@@ -4,9 +4,9 @@ from asynctest import CoroutineMock
 from asynctest import MagicMock as AsyncMagicMock
 from pytest import mark
 
-from src.bot.constants import GOOD_LUCK_ADVENTURER
-from src.bot.constants import QUEST_ALREADY_ACCEPTED
-from src.bot.constants import QUEST_DOES_NOT_EXIST
+from src.constants import GOOD_LUCK_ADVENTURER
+from src.constants import QUEST_ALREADY_ACCEPTED
+from src.constants import QUEST_DOES_NOT_EXIST
 from src.services import QuestService
 
 

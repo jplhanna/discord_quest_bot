@@ -4,9 +4,9 @@ from typing import Optional
 
 from sqlalchemy.orm import selectinload
 
-from src.bot.constants import GOOD_LUCK_ADVENTURER
-from src.bot.constants import QUEST_ALREADY_ACCEPTED
-from src.bot.constants import QUEST_DOES_NOT_EXIST
+from src.constants import GOOD_LUCK_ADVENTURER
+from src.constants import QUEST_ALREADY_ACCEPTED
+from src.constants import QUEST_DOES_NOT_EXIST
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.helpers.sqlalchemy_helpers import case_insensitive_str_compare
 from src.models import Quest
