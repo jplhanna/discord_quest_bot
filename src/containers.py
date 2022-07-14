@@ -1,4 +1,5 @@
 from asyncio import current_task
+from contextlib import asynccontextmanager
 from logging import FileHandler
 from logging import Formatter
 from logging import getLogger
@@ -49,6 +50,7 @@ class Database:
     def get_session(self) -> AsyncSession:
         return self._session_factory()
 
+    @asynccontextmanager
     async def session(self) -> AsyncGenerator[AsyncSession, None]:
         session: AsyncSession = self._session_factory()
         try:
@@ -73,7 +75,6 @@ class DiscordLogger:
 class Container(DeclarativeContainer):
     config = Configuration("configuration")
     config.from_dict(config_dict)  # type: ignore[arg-type] # The type is correct
-    # logging = Resource(fileConfig, fname="logging.ini")
     discord_logging = Resource(DiscordLogger)
     discord_logging.add_kwargs(logging_level=config.discord.log_level, file_name=config.discord.log_filename)
 
