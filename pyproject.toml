@@ -8,12 +8,12 @@ packages = [{ include = "local_server" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-discord = "*"
+discord = "~1.7.3"
 "discord.py-stubs" = "*"
-alembic = "*"
-psycopg2 = "*"
-furl = "*"
-asyncpg = "*"
+alembic = "^1.8"
+psycopg2 = "^2.9.3"
+furl = "^2.1.3"
+asyncpg = "0.26.0"
 dependency-injector = ">=4, <5"
 SQLAlchemy = { extras = ["asyncio", "mypy"], version = "^1.4.39" }
 
