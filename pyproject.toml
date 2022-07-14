@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "local-server"
+name = "discord-quest-bot"
 version = "0.1.0"
 description = "Discord bot for tracking and rewarding tasks"
 authors = ["jplhanna <jpl.hanna@gmail.com>"]
