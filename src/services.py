@@ -41,8 +41,6 @@ class QuestService(BaseService):
             return "This quest does not exist"
 
         # Is this right? Should I be pulling out the db into this layer?
-        # TODO I don't this works because the user is from a different session/context
-        #  need a way to have session available across the entirety of a discord command
         async with self._repository.session_factory() as session:
             user.quests.append(quest)
             await session.commit()

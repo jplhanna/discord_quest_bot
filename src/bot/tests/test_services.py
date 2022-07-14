@@ -1,5 +1,3 @@
-from unittest.mock import sentinel
-
 from asynctest import CoroutineMock
 from asynctest import MagicMock as AsyncMagicMock
 from pytest import mark
@@ -22,6 +20,6 @@ class TestQuestService:
         )
         quest_service = QuestService(repository=mock_quest_repository)
         # Act
-        res = await quest_service.accept_quest_if_available(mocked_user, sentinel.quest_name)
+        res = await quest_service.accept_quest_if_available(mocked_user, "Quest title")
         # Assert
-        assert res == result.format(sentinel.quest_name)
+        assert res == result.format("Quest title")
