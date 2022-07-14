@@ -1,3 +1,5 @@
+from unittest.mock import MagicMock
+
 from asynctest import CoroutineMock
 from asynctest import MagicMock as AsyncMagicMock
 from pytest import mark
@@ -8,15 +10,13 @@ from src.services import QuestService
 @mark.asyncio
 class TestQuestService:
     @mark.parametrize(
-        "quest_exists, result",
-        [(True, "You have accepted {}! Good luck adventurer"), (False, "This quest does not exist")],
+        "quest, result",
+        [(MagicMock(users=[]), "You have accepted {}! Good luck adventurer"), (None, "This quest does not exist")],
     )
-    async def test_accept_quest_if_available(self, mocked_user, mock_container, quest_exists, result):
+    async def test_accept_quest_if_available(self, mocked_user, mock_container, quest, result):
         # Arrange
-        session_factory = AsyncMagicMock()
-        session_factory.return_value.__aenter__.return_value.commit = CoroutineMock()
         mock_quest_repository = AsyncMagicMock(
-            get_first=CoroutineMock(return_value=quest_exists), session_factory=session_factory
+            get_first=CoroutineMock(return_value=quest), session=AsyncMagicMock(commit=CoroutineMock())
         )
         quest_service = QuestService(repository=mock_quest_repository)
         # Act
