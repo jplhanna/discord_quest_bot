@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
@@ -7,13 +8,20 @@ from typing import Optional
 from typing import Union
 
 from sqlalchemy import Column
+from sqlalchemy import ForeignKey
+from sqlalchemy import Table
+from sqlalchemy import func
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
-from sqlalchemy.sql import Selectable
 from sqlalchemy.sql.elements import UnaryExpression
 
 from src.typeshed import JoinListType
 from src.typeshed import JoinStruct
 from src.typeshed import SQLLogicType
+
+BaseModel = declarative_base()
 
 
 @dataclass
@@ -22,7 +30,7 @@ class QueryHandler:
     func_data: Any
     allow_empty_data: bool = field(default=False)
 
-    def update_query(self, query: Selectable) -> Selectable:
+    def update_query(self, query: Executable) -> Executable:
         if self.func_data or self.allow_empty_data and self.func_data is not None:
             query = getattr(query, self.func_str)(*self.func_data)
         return query
@@ -31,7 +39,7 @@ class QueryHandler:
 class DictQueryHandler(QueryHandler):
     func_data: Optional[dict]
 
-    def update_query(self, query: Selectable) -> Selectable:
+    def update_query(self, query: Executable) -> Executable:
         if self.func_data:
             query = getattr(query, self.func_str)(**self.func_data)
         return query
@@ -40,7 +48,7 @@ class DictQueryHandler(QueryHandler):
 class JoinQueryHandler(QueryHandler):
     func_data: Optional[JoinListType]
 
-    def update_query(self, query: FromClause) -> Selectable:  # type: ignore[override]
+    def update_query(self, query: FromClause) -> Executable:  # type: ignore[override]
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
@@ -51,7 +59,7 @@ class JoinQueryHandler(QueryHandler):
                     query = getattr(query, join_func)(*join_data)
                 else:
                     query = query.join(join_on)
-        return query
+        return query  # type: ignore[return-value]
 
 
 @dataclass
@@ -81,3 +89,31 @@ class QueryArgs:  # pylint: disable=R0902
             QueryHandler("distinct", self.distinct_on_list, allow_empty_data=True),
         ]
         return query_handlers
+
+
+def many_to_many_table(first_table: str, second_table: str) -> Table:
+    def get_column(table_name: str) -> Column:
+        return Column(f"{table_name.lower()}_id", ForeignKey(f"{table_name.lower()}.id"), primary_key=True)
+
+    table = Table(
+        f"{first_table.lower()}_{second_table.lower()}",
+        BaseModel.metadata,
+        get_column(first_table),
+        get_column(second_table),
+    )
+    return table
+
+
+def snake_case_table_name(model_name: str) -> str:
+    table_name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", model_name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", table_name).lower()
+
+
+class TableMeta(DeclarativeMeta):
+    def __init__(cls, classname: str, *args: Any, **kwargs: Any) -> None:
+        cls.__tablename__ = snake_case_table_name(classname)
+        super(TableMeta, cls).__init__(classname, *args, **kwargs)
+
+
+def case_insensitive_str_compare(column: Column, value: str) -> SQLLogicType:
+    return func.lower(column) == value.lower()
