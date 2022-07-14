@@ -1,3 +1,6 @@
 NEW_USER_MESSAGE = "You have been registered, prepare for adventure!"
 ALREADY_REGISTERED_MESSAGE = "You have already registered"
 REGISTER_FIRST_MESSAGE = "Please register first"
+GOOD_LUCK_ADVENTURER = "You have accepted {}! Good luck adventurer"
+QUEST_ALREADY_ACCEPTED = "You have already accepted this request"
+QUEST_DOES_NOT_EXIST = "This quest does not exist"

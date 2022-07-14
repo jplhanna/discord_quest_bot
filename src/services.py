@@ -4,6 +4,9 @@ from typing import Optional
 
 from sqlalchemy.orm import selectinload
 
+from src.bot.constants import GOOD_LUCK_ADVENTURER
+from src.bot.constants import QUEST_ALREADY_ACCEPTED
+from src.bot.constants import QUEST_DOES_NOT_EXIST
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.helpers.sqlalchemy_helpers import case_insensitive_str_compare
 from src.models import Quest
@@ -43,9 +46,11 @@ class QuestService(BaseService):
             )
         )
         if not quest:
-            return "This quest does not exist"
+            return QUEST_DOES_NOT_EXIST
 
-        # Is this right? Should I be pulling out the db into this layer?
+        if user in quest.users:
+            return QUEST_ALREADY_ACCEPTED
+
         quest.users.append(user)
         await self._repository.session.commit()
-        return f"You have accepted {quest_name}! Good luck adventurer"
+        return GOOD_LUCK_ADVENTURER.format(quest_name)
