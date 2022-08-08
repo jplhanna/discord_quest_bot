@@ -5,9 +5,9 @@ name: Python application
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -34,6 +34,9 @@ jobs:
       - name: Lint with pylint
         if: always()
         run: docker-compose run test-pipeline pylint src
+      - name: Check with bandit
+        if: always()
+        run: docker-compose run test-pipeline bandit -r src -c pyproject.toml
       - name: Lint with flake8
         if: always()
         run: |
