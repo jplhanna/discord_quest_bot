@@ -46,3 +46,13 @@ repos:
         language: system
         types: [ python ]
         exclude: alembic|test_.*|conftest\.py
+
+  - repo: local
+    hooks:
+      - id: bandit
+        name: bandit
+        entry: bandit
+        language: system
+        types: [ python ]
+        exclude: alembic|test_.*|conftest.py
+        args: [ -c, pyproject.toml ]
