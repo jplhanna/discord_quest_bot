@@ -10,10 +10,10 @@ from typing import Type
 from typing import cast
 
 from sqlalchemy import func
-from sqlalchemy.engine import Result
+from sqlalchemy.engine import Result  # type: ignore[attr-defined]
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy.sql import Executable
+from sqlalchemy.sql import Executable  # type: ignore[attr-defined]
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.typeshed import BaseModelType
