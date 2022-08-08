@@ -13,7 +13,7 @@ from sqlalchemy import Table
 from sqlalchemy import func
 from sqlalchemy.ext.declarative import DeclarativeMeta
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.sql import Executable
+from sqlalchemy.sql import Executable  # type: ignore[attr-defined]
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.elements import UnaryExpression
 
@@ -48,7 +48,7 @@ class DictQueryHandler(QueryHandler):
 class JoinQueryHandler(QueryHandler):
     func_data: Optional[JoinListType]
 
-    def update_query(self, query: FromClause) -> Executable:  # type: ignore[override]
+    def update_query(self, query: FromClause) -> Executable:
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
@@ -59,7 +59,7 @@ class JoinQueryHandler(QueryHandler):
                     query = getattr(query, join_func)(*join_data)
                 else:
                     query = query.join(join_on)
-        return query  # type: ignore[return-value]
+        return query
 
 
 @dataclass
@@ -116,4 +116,4 @@ class TableMeta(DeclarativeMeta):
 
 
 def case_insensitive_str_compare(column: Column, value: str) -> SQLLogicType:
-    return func.lower(column) == value.lower()
+    return func.lower(column) == value.lower()  # type: ignore[no-any-return]
