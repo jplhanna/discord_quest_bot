@@ -46,25 +46,25 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         return result
 
     async def get_query_with_entities(
-        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
+        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs] = None
     ) -> Result:
         query = self._query(query_args, to_select=entities_list)
         result: Result = await self.session.execute(query)
         return result
 
-    async def get_all(self, query_args: Optional[QueryArgs]) -> List[BaseModelType]:
+    async def get_all(self, query_args: Optional[QueryArgs] = None) -> List[BaseModelType]:
         query = await self.get_query(query_args)
         res: List[BaseModelType] = query.scalars().all()
         return res
 
     async def get_all_with_entities(
-        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
+        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs] = None
     ) -> List[tuple]:
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
         res: List[tuple] = query.scalars().all()
         return res
 
-    async def get_count(self, query_args: Optional[QueryArgs]) -> int:
+    async def get_count(self, query_args: Optional[QueryArgs] = None) -> int:
         query = await self.get_query_with_entities(
             entities_list=[func.count(self.model.id)],  # type: ignore[attr-defined] # issue with TypeVar bound
             query_args=query_args,
@@ -72,18 +72,18 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         count = cast(int, query.scalars().first())
         return count
 
-    async def get_first(self, query_args: Optional[QueryArgs]) -> Optional[BaseModelType]:
+    async def get_first(self, query_args: Optional[QueryArgs] = None) -> Optional[BaseModelType]:
         query: Result = await self.get_query(query_args)
         result: Optional[BaseModelType] = query.scalars().first()
         return result
 
-    async def get_one(self, query_args: Optional[QueryArgs]) -> BaseModelType:
+    async def get_one(self, query_args: Optional[QueryArgs] = None) -> BaseModelType:
         query = await self.get_query(query_args)
         result: BaseModelType = query.scalars().one()
         return result
 
     async def get_first_with_entities(
-        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs]
+        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs] = None
     ) -> Optional[tuple]:
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
         result: Optional[tuple] = query.scalars().first()
