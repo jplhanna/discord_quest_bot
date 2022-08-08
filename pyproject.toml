@@ -33,6 +33,7 @@ pytest-async-sqlalchemy = "*"
 asynctest = "*"
 pytest-randomly = "*"
 pytest-cov = "*"
+bandit = "^1.7.4"
 
 [build-system]
 requires = ["poetry-core"]
@@ -57,3 +58,6 @@ ignored-modules = ["dependency_injector.providers", "dependency_injector.contain
 
 [tool.pylint."REPORTS"]
 msg-template = "{path}:{line}: [{msg_id}, {obj}] {msg} ({symbol})"
+
+[tool.bandit]
+exclude_dirs = ["test"]
