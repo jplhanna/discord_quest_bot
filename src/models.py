@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List
 
 from sqlalchemy import BigInteger
 from sqlalchemy import Column
@@ -13,12 +14,16 @@ from src.helpers.sqlalchemy_helpers import many_to_many_table
 
 
 class CoreModelMixin(BaseModel, metaclass=TableMeta):
+    __repr_fields__: List[str] = []
+
     __abstract__ = True
     id = Column(Integer, primary_key=True)
     datetime_created = Column(DateTime, nullable=False, default=datetime.utcnow)
 
     def __repr__(self) -> str:
-        return f"ID: {self.id}"
+        fields = ["id"] + self.__repr_fields__
+        _repr = " ".join([f"{repr_field}: {getattr(self, repr_field)}" for repr_field in fields])
+        return _repr
 
 
 class User(CoreModelMixin):
@@ -30,6 +35,7 @@ class User(CoreModelMixin):
 
 
 class Quest(CoreModelMixin):
+    __repr_fields__ = ["name", "experience"]
     # Columns
     name = Column(String, nullable=False)
     experience = Column(Integer, nullable=False)
