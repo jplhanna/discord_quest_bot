@@ -16,8 +16,10 @@ class TestFormatQuestBoard:
         board = format_quest_board([quest])
         # Assert
         assert (
-            board == "====================\n"
-            "=  **Quests      XP**  =\n"
-            "=  **Test Quest  50**  =\n"
-            "===================="
+            board == "```\n"
+            "======================\n"
+            "||  Quests      XP  ||\n"
+            "||  Test Quest  50  ||\n"
+            "======================\n"
+            "```"
         )
