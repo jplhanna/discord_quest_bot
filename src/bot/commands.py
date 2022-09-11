@@ -1,3 +1,4 @@
+from discord import Intents
 from discord.ext import commands
 from discord.ext.commands import Context
 from discord.ext.commands import has_permissions
@@ -7,7 +8,9 @@ from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
 from src.bot.controllers import get_quest_list_text
 
-bot = commands.Bot(command_prefix="~")
+default_intent = Intents.default()
+default_intent.message_content = True  # type: ignore[attr-defined] # pylint: disable=E0237
+bot = commands.Bot(command_prefix="/", intents=default_intent)
 
 
 @bot.command(name="ping")
