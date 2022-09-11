@@ -48,7 +48,7 @@ class Database:
         await current_session.run_sync(BaseModel.metadata.create_all)
 
     def get_session(self) -> AsyncSession:
-        return self._session_factory()  # type: ignore[no-any-return]
+        return self._session_factory()
 
     @asynccontextmanager
     async def session(self) -> AsyncGenerator[AsyncSession, None]:

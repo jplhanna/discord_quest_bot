@@ -2,8 +2,7 @@ from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from unittest.mock import sentinel
 
-from pytest import fixture
-from pytest import mark
+import pytest
 
 from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
@@ -14,18 +13,18 @@ from src.bot.controllers import check_and_register_user
 wire_to = ["src.bot.controllers"]
 
 
-@fixture(params=[True, False])
+@pytest.fixture(params=[True, False])
 def mock_container_if_user_exists(mock_container, mocked_user, request):
     mocked_user_service = AsyncMock(
         get_user_by_discord_id=AsyncMock(return_value=mocked_user if request.param else None)
     )
     mock_container.user_service.override(mocked_user_service)
     mock_container.wire(wire_to)
-    yield mock_container, mocked_user_service, request.param
+    return mock_container, mocked_user_service, request.param
 
 
 class TestCheckAndRegisterUser:
-    @mark.asyncio
+    @pytest.mark.asyncio()
     async def test_account_already_exists(self, mock_container_if_user_exists):
         # Arrange
         _, mocked_user_service, user_exists = mock_container_if_user_exists
@@ -38,7 +37,7 @@ class TestCheckAndRegisterUser:
         assert res == expected_result_mapping[user_exists]
 
 
-@mark.asyncio
+@pytest.mark.asyncio()
 class TestAddQuestToUser:
     async def test_if_registered(self, mock_container_if_user_exists):
         # Arrange

@@ -7,6 +7,7 @@ from src.bot.constants import NEW_USER_MESSAGE
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.containers import Container
 from src.exceptions import NoIDProvided
+from src.helpers.message_helpers import format_quest_board
 from src.services import QuestService
 from src.services import UserService
 
@@ -34,3 +35,10 @@ async def add_quest_to_user(
         return REGISTER_FIRST_MESSAGE
     res = await quest_service.accept_quest_if_available(user, quest_name)
     return res
+
+
+@inject
+async def get_quest_list_text(quest_service: QuestService = Provide[Container.quest_service]) -> str:
+    quests = await quest_service.get_all_quests()
+    message = format_quest_board(quests)
+    return message
