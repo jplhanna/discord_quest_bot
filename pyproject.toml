@@ -34,6 +34,7 @@ asynctest = "*"
 pytest-randomly = "*"
 pytest-cov = "*"
 bandit = "^1.7.4"
+flake8-pytest-style = "^1.6.0"
 
 [build-system]
 requires = ["poetry-core"]
