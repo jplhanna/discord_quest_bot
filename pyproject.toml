@@ -27,7 +27,7 @@ black = "*"
 sqlalchemy-stubs = "*"
 pytest-asyncio = "*"
 faker = "*"
-coverage = "*"
+coverage = { extras = ["toml"], version = "^6.4.4" }
 pytest-async-sqlalchemy = "*"
 asynctest = "*"
 pytest-randomly = "*"
@@ -88,3 +88,28 @@ disallow_untyped_calls = false
 [[tool.mypy.overrides]]
 module = "furl"
 ignore_missing_imports = true
+
+[tool.black]
+line-length = 120
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = [
+    "ignore::DeprecationWarning"
+]
+markers = [
+    "integration"
+]
+
+[tool.coverage.run]
+branch = true
+omit = [
+    "alembic/*",
+    "run.py",
+    "config.py",
+    "conftest.py",
+    "constants.py"
+]
+
+[tool.coverage.report]
+skip_empty = true
