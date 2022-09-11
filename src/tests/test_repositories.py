@@ -1,5 +1,4 @@
 import pytest
-from pytest import mark
 from sqlalchemy import inspect
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
@@ -13,10 +12,10 @@ class TestUserRepository:
         # Act & Assert
         try:
             mock_user_repository._query(query_args)
-        except:  # noqa
-            assert False, "Empty query failed to build"
+        except Exception:  # noqa
+            pytest.fail("Empty query failed to build")
 
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         "query_arg",
         [
             {"filter_list": []},
@@ -34,11 +33,11 @@ class TestUserRepository:
         # Act & Assert
         try:
             mock_user_repository._query(query_args)
-        except:  # noqa
-            assert False, f"Query with empty args failed to build: {query_args}"
+        except Exception:  # noqa
+            pytest.fail(f"Query with empty args failed to build: {query_args}")
 
     # TECH DEBT Join and eager options are untested because currently there are no tables to join onto
-    @mark.parametrize(
+    @pytest.mark.parametrize(
         "query_args",
         [
             {"filter_list": [User.id == 1]},
@@ -56,8 +55,8 @@ class TestUserRepository:
         # Act & Assert
         try:
             mock_user_repository._query(query_args)
-        except:  # noqa
-            assert False, f"Query failed to build with non emtpy values {query_args}"
+        except Exception:  # noqa
+            pytest.fail(f"Query failed to build with non empty values {query_args}")
 
     def test_query_with_having_and_no_grouping_fails(self, mock_user_repository):
         # Arrange & Act & Assert
@@ -69,8 +68,8 @@ def get_user_data_for_query(usr):
     return QueryArgs(filter_dict={"discord_id": usr.discord_id})
 
 
-@mark.integration
-@mark.asyncio
+@pytest.mark.integration()
+@pytest.mark.asyncio()
 class TestBaseRepositoryIntegration:
     async def test_create_user(self, mock_user_with_db_repository, faker):
         # Arrange
@@ -86,8 +85,8 @@ class TestBaseRepositoryIntegration:
         # Assert
         assert inspect(db_user).was_deleted
 
-    @mark.parametrize(
-        "method, get_data",
+    @pytest.mark.parametrize(
+        ("method", "get_data"),
         [
             ("get_first", get_user_data_for_query),
             ("get_one", get_user_data_for_query),

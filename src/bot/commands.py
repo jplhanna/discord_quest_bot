@@ -5,6 +5,7 @@ from discord.ext.commands.errors import MissingRequiredArgument
 
 from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
+from src.bot.controllers import get_quest_list_text
 
 bot = commands.Bot(command_prefix="~")
 
@@ -31,3 +32,9 @@ async def accept_quest(ctx: Context, *, quest_name: str) -> None:
 async def accept_quest_error(ctx: Context, error: Exception) -> None:
     if isinstance(error, MissingRequiredArgument):
         await ctx.send("Must provide a quest to join")
+
+
+@bot.command(name="quest", aliases=["quest-board", "board"])
+async def get_quest_board(ctx: Context) -> None:
+    res = await get_quest_list_text()
+    await ctx.send(res)
