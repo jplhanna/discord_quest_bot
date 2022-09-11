@@ -7,7 +7,7 @@ from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
 from src.bot.controllers import get_quest_list_text
 
-bot = commands.Bot(command_prefix="/")
+bot = commands.Bot(command_prefix="~")
 
 
 @bot.command(name="ping")

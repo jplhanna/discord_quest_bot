@@ -28,20 +28,20 @@ class CoreModelMixin(BaseModel, metaclass=TableMeta):
 
 class User(CoreModelMixin):
     # Columns
-    discord_id = Column(BigInteger, unique=True)
+    discord_id: int = Column(BigInteger, unique=True)
 
     # Relationships
-    quests = relationship("Quest", secondary="user_quest", back_populates="users", uselist=True)
+    quests: list["Quest"] = relationship("Quest", secondary="user_quest", back_populates="users", uselist=True)
 
 
 class Quest(CoreModelMixin):
     __repr_fields__ = ["name", "experience"]
     # Columns
-    name = Column(String, nullable=False)
-    experience = Column(Integer, nullable=False)
+    name: str = Column(String, nullable=False)
+    experience: int = Column(Integer, nullable=False)
 
     # Relationships
-    users = relationship("User", secondary="user_quest", back_populates="quests", uselist=True)
+    users: list[User] = relationship("User", secondary="user_quest", back_populates="quests", uselist=True)
 
 
 user_quest = many_to_many_table("User", "Quest")
