@@ -62,3 +62,29 @@ msg-template = "{path}:{line}: [{msg_id}, {obj}] {msg} ({symbol})"
 
 [tool.bandit]
 exclude_dirs = ["test"]
+
+[tool.mypy]
+exclude = [
+    "test",
+    "alembic"
+]
+namespace_packages = true
+python_version = "3.10"
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+show_error_codes = true
+local_partial_types = true
+plugins = ["sqlalchemy.ext.mypy.plugin", "sqlmypy"]
+
+[[tool.mypy.overrides]]
+module = "sqlalchemy.*"
+ignore_missing_imports = true
+disallow_untyped_calls = false
+
+[[tool.mypy.overrides]]
+module = "furl"
+ignore_missing_imports = true
