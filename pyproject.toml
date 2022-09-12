@@ -35,6 +35,7 @@ pytest-cov = "*"
 bandit = "^1.7.4"
 flake8-pytest-style = "^1.6.0"
 "discord.py-stubs" = "*"
+Flake8-pyproject = "^1.1.0.post0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -113,3 +114,6 @@ omit = [
 
 [tool.coverage.report]
 skip_empty = true
+
+[tool.flake8]
+max-line-length = 120
