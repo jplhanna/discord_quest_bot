@@ -4,8 +4,7 @@ WORKDIR /app/
 COPY . /app/
 
 FROM base as install-poetry
-ENV POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_VERSION=1.2.0b3
+ENV POETRY_VIRTUALENVS_CREATE=false
 RUN curl -sSL https://install.python-poetry.org | python3 -
 RUN apt-get update && apt-get install -y --no-install-recommends gcc
 ENV PATH "/root/.local/bin:$PATH"
