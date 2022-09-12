@@ -1,3 +1,4 @@
+import logging
 from asyncio import current_task
 from contextlib import asynccontextmanager
 from logging import FileHandler
@@ -67,6 +68,7 @@ class DiscordLogger:
     def __init__(self, logging_level: str, file_name: str) -> None:
         self.discord_logger = getLogger("discord")
         self.discord_logger.setLevel(logging_level)
+        getLogger("discord.http").setLevel(logging.INFO)
         self.handler = FileHandler(filename=file_name, encoding="utf-8", mode="w")
         self.handler.setFormatter(Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
         self.discord_logger.addHandler(self.handler)
