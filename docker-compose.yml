@@ -9,6 +9,7 @@ services:
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: 'postgres'
+      DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
     volumes:
       - .:/app
     networks:
@@ -16,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: install-pipenv
+      target: install-poetry
     depends_on:
       - "postgres"
     command: python src/run.py
