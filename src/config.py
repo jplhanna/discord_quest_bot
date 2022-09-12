@@ -9,6 +9,9 @@ from src.typeshed import DiscordConfigDict
 
 ASYNC_PSQL_SCHEME = "postgresql+asyncpg"
 
+discord_owner_id_str = os.environ.get("DISCORD_OWNER_ID")
+DISCORD_OWNER_ID = int(discord_owner_id_str) if discord_owner_id_str else None
+
 DATABASE_NAME = os.environ.get("DATABASE_NAME")
 DATABASE_USER = os.environ.get("DATABASE_USER")
 DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
