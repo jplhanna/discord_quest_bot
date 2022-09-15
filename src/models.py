@@ -1,5 +1,6 @@
+from dataclasses import dataclass
+from dataclasses import field
 from datetime import datetime
-from typing import List
 
 from sqlalchemy import BigInteger
 from sqlalchemy import Column
@@ -8,40 +9,52 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
-from src.helpers.sqlalchemy_helpers import BaseModel
 from src.helpers.sqlalchemy_helpers import TableMeta
 from src.helpers.sqlalchemy_helpers import many_to_many_table
+from src.helpers.sqlalchemy_helpers import mapper_registry
 
 
-class CoreModelMixin(BaseModel, metaclass=TableMeta):
-    __repr_fields__: List[str] = []
-
+@mapper_registry.mapped
+@dataclass
+class CoreModelMixin(metaclass=TableMeta):
     __abstract__ = True
-    id = Column(Integer, primary_key=True)
-    datetime_created = Column(DateTime, nullable=False, default=datetime.utcnow)
+    id: int = field(init=False, metadata={"sa": Column(Integer, primary_key=True)})  # pylint: disable=C0103
+    datetime_created: datetime = field(
+        init=False, default_factory=datetime.utcnow, repr=False, metadata={"sa": Column(DateTime, nullable=False)}
+    )
+    datetime_edited: datetime = field(
+        init=False,
+        default_factory=datetime.utcnow,
+        repr=False,
+        metadata={"sa": Column(DateTime, nullable=False, onupdate=datetime.utcnow)},
+    )
 
-    def __repr__(self) -> str:
-        fields = ["id"] + self.__repr_fields__
-        _repr = " ".join([f"{repr_field}: {getattr(self, repr_field)}" for repr_field in fields])
-        return _repr
 
-
+@mapper_registry.mapped
+@dataclass
 class User(CoreModelMixin):
     # Columns
-    discord_id: int = Column(BigInteger, unique=True)
+    discord_id: int = field(metadata={"sa": Column(BigInteger, unique=True)})
 
     # Relationships
-    quests: list["Quest"] = relationship("Quest", secondary="user_quest", back_populates="users", uselist=True)
+    quests: list["Quest"] = field(
+        default_factory=list,
+        repr=False,
+        metadata={"sa": relationship("Quest", secondary="user_quest", back_populates="users")},
+    )
 
 
+@mapper_registry.mapped
+@dataclass
 class Quest(CoreModelMixin):
-    __repr_fields__ = ["name", "experience"]
     # Columns
-    name: str = Column(String, nullable=False)
-    experience: int = Column(Integer, nullable=False)
+    name: str = field(metadata={"sa": Column(String, nullable=False)})
+    experience: int = field(metadata={"sa": Column(Integer, nullable=False)})
 
     # Relationships
-    users: list[User] = relationship("User", secondary="user_quest", back_populates="quests", uselist=True)
+    users: list[User] = field(
+        default_factory=list, metadata={"sa": relationship("User", secondary="user_quest", back_populates="quests")}
+    )
 
 
 user_quest = many_to_many_table("User", "Quest")

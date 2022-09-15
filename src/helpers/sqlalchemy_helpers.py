@@ -2,8 +2,6 @@ import re
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-from typing import Dict
-from typing import List
 from typing import Optional
 from typing import Union
 
@@ -11,8 +9,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Table
 from sqlalchemy import func
-from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import registry
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.elements import UnaryExpression
@@ -21,7 +18,7 @@ from src.typeshed import JoinListType
 from src.typeshed import JoinStruct
 from src.typeshed import SQLLogicType
 
-BaseModel = declarative_base()
+mapper_registry: registry = registry()
 
 
 @dataclass
@@ -64,20 +61,20 @@ class JoinQueryHandler(QueryHandler):
 
 @dataclass
 class QueryArgs:  # pylint: disable=R0902
-    filter_list: Optional[List[SQLLogicType]] = None
-    filter_dict: Optional[Dict[str, Any]] = None
-    eager_options: Optional[List] = None
-    order_by_list: Optional[List[Union[Column, UnaryExpression]]] = None
+    filter_list: Optional[list[SQLLogicType]] = None
+    filter_dict: Optional[dict[str, Any]] = None
+    eager_options: Optional[list] = None
+    order_by_list: Optional[list[Union[Column, UnaryExpression]]] = None
     join_list: Optional[JoinListType] = None
-    distinct_on_list: Optional[List[Optional[Column]]] = None
-    group_by_list: Optional[List[Column]] = None
-    having_list: Optional[List[SQLLogicType]] = None
+    distinct_on_list: Optional[list[Optional[Column]]] = None
+    group_by_list: Optional[list[Column]] = None
+    having_list: Optional[list[SQLLogicType]] = None
 
     def __post_init__(self) -> None:
         if not self.group_by_list and self.having_list:
             raise Warning("Defining query with having clause but no group by clause")
 
-    def get_query_handlers(self) -> List[QueryHandler]:
+    def get_query_handlers(self) -> list[QueryHandler]:
         query_handlers = [
             DictQueryHandler("filter_by", self.filter_dict),
             JoinQueryHandler("join", self.join_list),
@@ -97,7 +94,7 @@ def many_to_many_table(first_table: str, second_table: str) -> Table:
 
     table = Table(
         f"{first_table.lower()}_{second_table.lower()}",
-        BaseModel.metadata,
+        mapper_registry.metadata,
         get_column(first_table),
         get_column(second_table),
     )
@@ -109,11 +106,12 @@ def snake_case_table_name(model_name: str) -> str:
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", table_name).lower()
 
 
-class TableMeta(DeclarativeMeta):
+class TableMeta(type):
     def __init__(cls, classname: str, *args: Any, **kwargs: Any) -> None:
         cls.__tablename__ = snake_case_table_name(classname)
-        super(TableMeta, cls).__init__(classname, *args, **kwargs)
+        cls.__sa_dataclass_metadata_key__ = "sa"
+        super().__init__(classname, *args, **kwargs)
 
 
-def case_insensitive_str_compare(column: Column, value: str) -> SQLLogicType:
+def case_insensitive_str_compare(column: str, value: str) -> SQLLogicType:
     return func.lower(column) == value.lower()
