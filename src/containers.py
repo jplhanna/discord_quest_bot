@@ -1,8 +1,7 @@
 from asyncio import current_task
 from contextlib import asynccontextmanager
-from logging import FileHandler
-from logging import Formatter
 from logging import getLogger
+from logging.config import dictConfig
 from typing import AsyncGenerator
 from typing import List
 
@@ -63,20 +62,10 @@ class Database:
             await session.close()
 
 
-class DiscordLogger:
-    def __init__(self, logging_level: str, file_name: str) -> None:
-        self.discord_logger = getLogger("discord")
-        self.discord_logger.setLevel(logging_level)
-        self.handler = FileHandler(filename=file_name, encoding="utf-8", mode="w")
-        self.handler.setFormatter(Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-        self.discord_logger.addHandler(self.handler)
-
-
 class Container(DeclarativeContainer):
     config = Configuration("configuration")
     config.from_dict(config_dict)  # type: ignore[arg-type] # The type is correct
-    discord_logging = Resource(DiscordLogger)
-    discord_logging.add_kwargs(logging_level=config.discord.log_level, file_name=config.discord.log_filename)
+    logging = Resource(dictConfig, config=config.logger)
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
 

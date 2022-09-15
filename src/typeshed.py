@@ -37,13 +37,29 @@ class DBConfigDict(TypedDict):
 
 class DiscordConfigDict(TypedDict):
     account_token: str
-    log_filename: str
-    log_level: str
+
+
+class FormatterDict(TypedDict):
+    format: str
+
+
+class LoggerItemDict(TypedDict):
+    level: int
+    handlers: list[str]
+
+
+class LoggerDict(TypedDict, total=False):
+    version: int
+    formatters: dict[str, FormatterDict]
+    handlers: dict[str, dict]
+    loggers: dict[str, LoggerItemDict]
+    root: LoggerItemDict
 
 
 class ConfigDict(TypedDict):
     db: DBConfigDict
     discord: DiscordConfigDict
+    logger: LoggerDict
 
 
 SQLLogicType = Union[BinaryExpression, BooleanClauseList, bool, BooleanColumnElement]
