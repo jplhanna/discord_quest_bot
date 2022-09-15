@@ -115,5 +115,5 @@ class TableMeta(type):
         super().__init__(classname, *args, **kwargs)
 
 
-def case_insensitive_str_compare(column: Column, value: str) -> SQLLogicType:
+def case_insensitive_str_compare(column: str, value: str) -> SQLLogicType:
     return func.lower(column) == value.lower()
