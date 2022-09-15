@@ -4,7 +4,6 @@ from dataclasses import field
 from typing import Any
 from typing import Callable
 from typing import Generic
-from typing import List
 from typing import Optional
 from typing import Type
 from typing import cast
@@ -32,7 +31,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             self._session = self.session_factory()
         return self._session
 
-    def _query(self, query_args: Optional[QueryArgs], to_select: List[EntitiesType] = None) -> Executable:
+    def _query(self, query_args: Optional[QueryArgs], to_select: list[EntitiesType] = None) -> Executable:
         query_handlers = query_args.get_query_handlers() if query_args else []
         to_select = to_select or [self.model]
         query: Executable = select(*to_select)
@@ -46,27 +45,27 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         return result
 
     async def get_query_with_entities(
-        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs] = None
+        self, entities_list: list[EntitiesType], query_args: Optional[QueryArgs] = None
     ) -> Result:
         query = self._query(query_args, to_select=entities_list)
         result: Result = await self.session.execute(query)
         return result
 
-    async def get_all(self, query_args: Optional[QueryArgs] = None) -> List[BaseModelType]:
+    async def get_all(self, query_args: Optional[QueryArgs] = None) -> list[BaseModelType]:
         query = await self.get_query(query_args)
-        res: List[BaseModelType] = query.scalars().all()
+        res: list[BaseModelType] = query.scalars().all()
         return res
 
     async def get_all_with_entities(
-        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs] = None
-    ) -> List[tuple]:
+        self, entities_list: list[EntitiesType], query_args: Optional[QueryArgs] = None
+    ) -> list[tuple]:
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-        res: List[tuple] = query.scalars().all()
+        res: list[tuple] = query.scalars().all()
         return res
 
     async def get_count(self, query_args: Optional[QueryArgs] = None) -> int:
         query = await self.get_query_with_entities(
-            entities_list=[func.count(self.model.id)],  # type: ignore[attr-defined] # issue with TypeVar bound
+            entities_list=[func.count(self.model.id)],
             query_args=query_args,
         )
         count = cast(int, query.scalars().first())
@@ -83,7 +82,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         return result
 
     async def get_first_with_entities(
-        self, entities_list: List[EntitiesType], query_args: Optional[QueryArgs] = None
+        self, entities_list: list[EntitiesType], query_args: Optional[QueryArgs] = None
     ) -> Optional[tuple]:
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
         result: Optional[tuple] = query.scalars().first()

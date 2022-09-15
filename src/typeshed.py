@@ -4,7 +4,6 @@ from typing import Literal
 from typing import Optional
 from typing import Sequence
 from typing import TYPE_CHECKING
-from typing import Tuple
 from typing import Type
 from typing import TypeVar
 from typing import TypedDict
@@ -23,7 +22,7 @@ from sqlalchemy.sql.functions import Function
 from sqlalchemy.sql.selectable import CTE
 
 if TYPE_CHECKING:
-    from src.helpers.sqlalchemy_helpers import BaseModel  # noqa
+    from src.models import CoreModelMixin  # noqa
 
     BooleanColumnElement = ColumnElement[Boolean]
 else:
@@ -63,7 +62,7 @@ class ConfigDict(TypedDict):
 
 
 SQLLogicType = Union[BinaryExpression, BooleanClauseList, bool, BooleanColumnElement]
-JoinOnType = Union[Type["BaseModel"], AliasedClass, RelationshipProperty]
+JoinOnType = Union[Type["CoreModelMixin"], AliasedClass, RelationshipProperty]
 
 
 @dataclass
@@ -72,7 +71,7 @@ class JoinStruct:
     join_on: Union[Optional[SQLLogicType], RelationshipProperty] = field(default=None)
     use_outer_join: bool = field(default=False)
 
-    def get_join_data(self) -> Union[Tuple[JoinOnType], Tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]]]:
+    def get_join_data(self) -> Union[tuple[JoinOnType], tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]]]:
         if self.join_on is not None:
             return self.join_model, self.join_on
         return (self.join_model,)
@@ -87,10 +86,10 @@ JoinListType = Sequence[
     Union[
         FromClause,
         JoinStruct,
-        Tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]],
-        Tuple[CTE, SQLLogicType],
+        tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]],
+        tuple[CTE, SQLLogicType],
     ]
 ]
 
-EntitiesType = Union[Column, Label, Type["BaseModel"], Function]
-BaseModelType = TypeVar("BaseModelType", bound="BaseModel")  # pylint: disable=C0103
+EntitiesType = Union[Column, Label, Type["CoreModelMixin"], Function]
+BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")  # pylint: disable=C0103

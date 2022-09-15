@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from logging import getLogger
 from logging.config import dictConfig
 from typing import AsyncGenerator
-from typing import List
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Configuration
@@ -16,7 +15,7 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from src.config import config_dict
-from src.helpers.sqlalchemy_helpers import BaseModel
+from src.helpers.sqlalchemy_helpers import mapper_registry
 from src.models import Quest
 from src.models import User
 from src.repositories import BaseRepository
@@ -25,7 +24,7 @@ from src.services import UserService
 
 logger = getLogger(__name__)
 
-WIRE_TO: List[str] = []
+WIRE_TO: list[str] = []
 
 
 class Database:
@@ -44,7 +43,7 @@ class Database:
 
     async def create_database(self) -> None:
         current_session = self.get_session()
-        await current_session.run_sync(BaseModel.metadata.create_all)
+        await current_session.run_sync(mapper_registry.metadata.create_all)
 
     def get_session(self) -> AsyncSession:
         return self._session_factory()
