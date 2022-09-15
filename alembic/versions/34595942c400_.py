@@ -5,9 +5,8 @@ Revises: eada4e111ff3
 Create Date: 2022-09-14 23:50:34.854016
 
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "34595942c400"
@@ -25,6 +24,7 @@ def upgrade():
         sa.Column("datetime_edited", sa.DateTime(), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=False),
         sa.Column("quest_id", sa.Integer(), nullable=False),
+        sa.Column("experience", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["quest_id"],
             ["quest.id"],
