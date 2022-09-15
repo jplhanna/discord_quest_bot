@@ -1,5 +1,3 @@
-from typing import List
-
 from src.helpers.constants import BLOCK_POST_TEXT
 from src.helpers.constants import BLOCK_PRE_TEXT
 from src.helpers.constants import BOX_VERTICAL_CHAR
@@ -17,7 +15,7 @@ def _create_single_quest_line(first_column: str, second_column: str, line_length
     return single_line
 
 
-def format_quest_board(quests: List[Quest]) -> str:
+def format_quest_board(quests: list[Quest]) -> str:
     """
     This function formats a list of quests to look like a quest board
     The formatting is normalized so that all quest names and XP values start at the same char position

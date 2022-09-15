@@ -3,7 +3,6 @@ from contextlib import asynccontextmanager
 from logging import getLogger
 from logging.config import dictConfig
 from typing import AsyncGenerator
-from typing import List
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Configuration
@@ -25,7 +24,7 @@ from src.services import UserService
 
 logger = getLogger(__name__)
 
-WIRE_TO: List[str] = []
+WIRE_TO: list[str] = []
 
 
 class Database:

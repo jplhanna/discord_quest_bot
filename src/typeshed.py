@@ -4,7 +4,6 @@ from typing import Literal
 from typing import Optional
 from typing import Sequence
 from typing import TYPE_CHECKING
-from typing import Tuple
 from typing import Type
 from typing import TypeVar
 from typing import TypedDict
@@ -72,7 +71,7 @@ class JoinStruct:
     join_on: Union[Optional[SQLLogicType], RelationshipProperty] = field(default=None)
     use_outer_join: bool = field(default=False)
 
-    def get_join_data(self) -> Union[Tuple[JoinOnType], Tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]]]:
+    def get_join_data(self) -> Union[tuple[JoinOnType], tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]]]:
         if self.join_on is not None:
             return self.join_model, self.join_on
         return (self.join_model,)
@@ -87,8 +86,8 @@ JoinListType = Sequence[
     Union[
         FromClause,
         JoinStruct,
-        Tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]],
-        Tuple[CTE, SQLLogicType],
+        tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]],
+        tuple[CTE, SQLLogicType],
     ]
 ]
 

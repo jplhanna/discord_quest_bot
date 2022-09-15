@@ -1,6 +1,5 @@
 from logging import Logger
 from logging import getLogger
-from typing import List
 from typing import Optional
 
 from sqlalchemy.orm import selectinload
@@ -56,6 +55,6 @@ class QuestService(BaseService):
         await self._repository.session.commit()
         return GOOD_LUCK_ADVENTURER.format(quest_name)
 
-    async def get_all_quests(self) -> List[Quest]:
+    async def get_all_quests(self) -> list[Quest]:
         quests = await self._repository.get_all()
         return quests
