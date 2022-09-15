@@ -18,7 +18,7 @@ from src.repositories import BaseRepository
 from src.test_config import TEST_ASYNC_DATABASE_URI
 from src.test_config import test_config_dict
 
-base_mock_container = Container()
+base_mock_container = Container(logging=MagicMock())
 
 
 @pytest.fixture()
