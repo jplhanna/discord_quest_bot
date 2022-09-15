@@ -108,7 +108,11 @@ class ExperienceTransaction(CoreModelMixin):
     # Columns
     user_id: int = field(init=False, metadata={"sa": Column(ForeignKey("user.id"), nullable=False)})
     quest_id: int = field(init=False, metadata={"sa": Column(ForeignKey("quest.id"), nullable=False)})
+    experience: int = field(init=False, metadata={"sa": Column(Integer, nullable=False)})
 
     # Relationship
     user: User = field(metadata={"sa": relationship(User, back_populates="experience")})
-    quest: User = field(metadata={"sa": relationship(Quest)})
+    quest: Quest = field(metadata={"sa": relationship(Quest)})
+
+    def __post_init__(self) -> None:
+        self.experience = self.quest.experience
