@@ -16,9 +16,11 @@ from sqlalchemy.orm import sessionmaker
 
 from src.config import config_dict
 from src.helpers.sqlalchemy_helpers import mapper_registry
+from src.models import ExperienceTransaction
 from src.models import Quest
 from src.models import User
 from src.repositories import BaseRepository
+from src.services import ExperienceTransactionService
 from src.services import QuestService
 from src.services import UserService
 
@@ -73,3 +75,6 @@ class Container(DeclarativeContainer):
 
     quest_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=Quest)
     quest_service = Factory(QuestService, repository=quest_repository)
+
+    xp_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=ExperienceTransaction)
+    xp_service = Factory(ExperienceTransactionService, repository=xp_repository)

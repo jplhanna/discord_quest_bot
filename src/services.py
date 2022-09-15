@@ -7,7 +7,8 @@ from sqlalchemy.orm import selectinload
 
 from src.constants import GOOD_LUCK_ADVENTURER
 from src.constants import QUEST_ALREADY_ACCEPTED
-from src.constants import QUEST_DOES_NOT_EXIST
+from src.exceptions import QuestDNE
+from src.exceptions import QuestNotAccepted
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.helpers.sqlalchemy_helpers import case_insensitive_str_compare
 from src.models import ExperienceTransaction
@@ -51,7 +52,7 @@ class QuestService(BaseService):
     async def accept_quest_if_available(self, user: User, quest_name: str) -> str:
         quest = await self._get_quest_by_name(quest_name)
         if not quest:
-            return QUEST_DOES_NOT_EXIST
+            raise QuestDNE(quest_name)
 
         if user in quest.users:
             return QUEST_ALREADY_ACCEPTED
@@ -60,14 +61,15 @@ class QuestService(BaseService):
         await self._repository.session.commit()
         return GOOD_LUCK_ADVENTURER.format(quest_name)
 
-    async def complete_quest_if_available(self, user: User, quest_name: str) -> str:
+    async def complete_quest_if_available(self, user: User, quest_name: str) -> tuple[Quest, bool]:
         quest = await self._get_quest_by_name(quest_name)
         if not quest:
-            return QUEST_DOES_NOT_EXIST
+            raise QuestDNE(quest_name)
 
         if user not in quest.users:
-            return "You have not accepted this quest."
-        return ""
+            raise QuestNotAccepted(quest_name)
+
+        return quest, True
 
     async def get_all_quests(self) -> list[Quest]:
         quests = await self._repository.get_all()
