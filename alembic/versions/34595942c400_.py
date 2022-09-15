@@ -35,8 +35,14 @@ def upgrade():
         ),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.add_column("quest", sa.Column("datetime_edited", sa.DateTime(), nullable=False))
-    op.add_column("user", sa.Column("datetime_edited", sa.DateTime(), nullable=False))
+    op.add_column("quest", sa.Column("datetime_edited", sa.DateTime(), nullable=True))
+    op.add_column("user", sa.Column("datetime_edited", sa.DateTime(), nullable=True))
+
+    op.execute('update "user" set datetime_edited=now();')
+    op.execute("update quest set datetime_edited=now();")
+
+    op.alter_column("quest", "datetime_edited", nullable=False)
+    op.alter_column("user", "datetime_edited", nullable=False)
     # ### end Alembic commands ###
 
 
