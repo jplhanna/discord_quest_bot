@@ -11,8 +11,7 @@ from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Table
 from sqlalchemy import func
-from sqlalchemy.ext.declarative import DeclarativeMeta
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import registry
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.elements import UnaryExpression
@@ -21,7 +20,7 @@ from src.typeshed import JoinListType
 from src.typeshed import JoinStruct
 from src.typeshed import SQLLogicType
 
-BaseModel = declarative_base()
+mapper_registry: registry = registry()
 
 
 @dataclass
@@ -97,7 +96,7 @@ def many_to_many_table(first_table: str, second_table: str) -> Table:
 
     table = Table(
         f"{first_table.lower()}_{second_table.lower()}",
-        BaseModel.metadata,
+        mapper_registry.metadata,
         get_column(first_table),
         get_column(second_table),
     )
@@ -109,10 +108,11 @@ def snake_case_table_name(model_name: str) -> str:
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", table_name).lower()
 
 
-class TableMeta(DeclarativeMeta):
+class TableMeta(type):
     def __init__(cls, classname: str, *args: Any, **kwargs: Any) -> None:
         cls.__tablename__ = snake_case_table_name(classname)
-        super(TableMeta, cls).__init__(classname, *args, **kwargs)
+        cls.__sa_dataclass_metadata_key__ = "sa"
+        super().__init__(classname, *args, **kwargs)
 
 
 def case_insensitive_str_compare(column: Column, value: str) -> SQLLogicType:

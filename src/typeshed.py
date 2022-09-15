@@ -23,7 +23,7 @@ from sqlalchemy.sql.functions import Function
 from sqlalchemy.sql.selectable import CTE
 
 if TYPE_CHECKING:
-    from src.helpers.sqlalchemy_helpers import BaseModel  # noqa
+    from src.models import CoreModelMixin  # noqa
 
     BooleanColumnElement = ColumnElement[Boolean]
 else:
@@ -63,7 +63,7 @@ class ConfigDict(TypedDict):
 
 
 SQLLogicType = Union[BinaryExpression, BooleanClauseList, bool, BooleanColumnElement]
-JoinOnType = Union[Type["BaseModel"], AliasedClass, RelationshipProperty]
+JoinOnType = Union[Type["CoreModelMixin"], AliasedClass, RelationshipProperty]
 
 
 @dataclass
@@ -92,5 +92,5 @@ JoinListType = Sequence[
     ]
 ]
 
-EntitiesType = Union[Column, Label, Type["BaseModel"], Function]
-BaseModelType = TypeVar("BaseModelType", bound="BaseModel")  # pylint: disable=C0103
+EntitiesType = Union[Column, Label, Type["CoreModelMixin"], Function]
+BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")  # pylint: disable=C0103
