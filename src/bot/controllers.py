@@ -8,6 +8,7 @@ from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.containers import Container
 from src.exceptions import NoIDProvided
 from src.helpers.message_helpers import format_quest_board
+from src.services import ExperienceTransactionService
 from src.services import QuestService
 from src.services import UserService
 
@@ -42,3 +43,21 @@ async def get_quest_list_text(quest_service: QuestService = Provide[Container.qu
     quests = await quest_service.get_all_quests()
     message = format_quest_board(quests)
     return message
+
+
+@inject
+async def complete_quest_for_user(
+    ctx: Context,
+    quest_name: str,
+    user_service: UserService = Provide[Container.user_service],
+    quest_service: QuestService = Provide[Container.quest_service],
+    xp_service: ExperienceTransactionService = Provide[Container],
+) -> str:
+    user = await user_service.get_user_by_discord_id(ctx.author.id)
+    if not user:
+        return REGISTER_FIRST_MESSAGE
+    quest, quest_completed = await quest_service.complete_quest_if_available(user, quest_name)
+    if quest_completed:
+        xp_transaction = await xp_service.earn_xp_for_quest(user, quest)
+        return f"You have successfully completed {quest.name} and earned {xp_transaction.experience}"
+    return "You are unable to complete this request"
