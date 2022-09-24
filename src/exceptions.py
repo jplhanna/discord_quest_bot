@@ -1,5 +1,6 @@
 from typing import Any
 
+from src.constants import QUEST_ALREADY_ACCEPTED
 from src.constants import QUEST_DOES_NOT_EXIST
 
 
@@ -22,6 +23,10 @@ class BaseQuestException(Exception):
 
 class QuestDNE(BaseQuestException):
     message = QUEST_DOES_NOT_EXIST
+
+
+class QuestAlreadyAccepted(BaseQuestException):
+    message = QUEST_ALREADY_ACCEPTED
 
 
 class QuestNotAccepted(BaseQuestException):

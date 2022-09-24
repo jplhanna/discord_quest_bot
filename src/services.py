@@ -6,7 +6,7 @@ from typing import Optional
 from sqlalchemy.orm import selectinload
 
 from src.constants import GOOD_LUCK_ADVENTURER
-from src.constants import QUEST_ALREADY_ACCEPTED
+from src.exceptions import QuestAlreadyAccepted
 from src.exceptions import QuestDNE
 from src.exceptions import QuestNotAccepted
 from src.helpers.sqlalchemy_helpers import QueryArgs
@@ -55,13 +55,13 @@ class QuestService(BaseService):
             raise QuestDNE(quest_name)
 
         if user in quest.users:
-            return QUEST_ALREADY_ACCEPTED
+            raise QuestAlreadyAccepted(quest_name)
 
         quest.users.append(user)
         await self._repository.session.commit()
         return GOOD_LUCK_ADVENTURER.format(quest_name)
 
-    async def complete_quest_if_available(self, user: User, quest_name: str) -> tuple[Quest, bool]:
+    async def complete_quest_if_available(self, user: User, quest_name: str) -> Quest:
         quest = await self._get_quest_by_name(quest_name)
         if not quest:
             raise QuestDNE(quest_name)
@@ -69,7 +69,7 @@ class QuestService(BaseService):
         if user not in quest.users:
             raise QuestNotAccepted(quest_name)
 
-        return quest, True
+        return quest
 
     async def get_all_quests(self) -> list[Quest]:
         quests = await self._repository.get_all()
