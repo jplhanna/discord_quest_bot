@@ -50,6 +50,24 @@ class QuestService(BaseService):
         )
 
     async def accept_quest_if_available(self, user: User, quest_name: str) -> str:
+        """
+        Attempts to find a quest the provided name and add it to the list of currently accepted quests
+        for the user
+
+        Parameters
+        ----------
+        user: User
+        quest_name: str
+
+        Returns
+        -------
+        str: A success message with the provided quest name
+
+        Raises
+        ------
+        QuestDNE: If no quest is found with the provided name
+        QuestAlreadyAccepted: If the provided user has already accepted this quest
+        """
         quest = await self._get_quest_by_name(quest_name)
         if not quest:
             raise QuestDNE(quest_name)
@@ -62,6 +80,23 @@ class QuestService(BaseService):
         return GOOD_LUCK_ADVENTURER.format(quest_name)
 
     async def complete_quest_if_available(self, user: User, quest_name: str) -> Quest:
+        """
+        Attempt to retrieve a quest for a quest and check that a user can complete it
+
+        Parameters
+        ----------
+        user: User
+        quest_name: str
+
+        Returns
+        -------
+        Quest: The matching quest object
+
+        Raises
+        ------
+        QuestDNE: If no quest is found with the provided name
+        QuestNotAccepted: If the user has not accepted the provided quest
+        """
         quest = await self._get_quest_by_name(quest_name)
         if not quest:
             raise QuestDNE(quest_name)
