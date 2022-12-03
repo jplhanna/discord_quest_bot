@@ -10,7 +10,6 @@ from sqlalchemy import Table
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import registry
 from sqlalchemy.orm.decl_api import DCTransformDeclarative
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
@@ -19,8 +18,6 @@ from sqlalchemy.sql.elements import UnaryExpression
 from src.typeshed import JoinListType
 from src.typeshed import JoinStruct
 from src.typeshed import SQLLogicType
-
-mapper_registry: registry = registry()
 
 
 class BaseModel(DeclarativeBase):
