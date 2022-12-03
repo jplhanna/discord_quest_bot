@@ -41,3 +41,8 @@ class TestQuestService:
         # Act & Assert
         with pytest.raises(QuestAlreadyAccepted):
             await quest_service.accept_quest_if_available(mocked_user, "Quest title")
+
+    async def test_quest_completed(self, mocked_user, mock_container):
+        # TODO implement service tests
+        pass
+
