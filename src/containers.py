@@ -11,11 +11,11 @@ from dependency_injector.providers import Resource
 from dependency_injector.providers import Singleton
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import async_scoped_session
+from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy.orm import sessionmaker
 
 from src.config import config_dict
-from src.helpers.sqlalchemy_helpers import mapper_registry
+from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import ExperienceTransaction
 from src.models import Quest
 from src.models import User
@@ -33,7 +33,7 @@ class Database:
     def __init__(self, db_url: str) -> None:
         self._async_engine = create_async_engine(db_url, echo=True)
         self._session_factory = async_scoped_session(
-            sessionmaker(
+            async_sessionmaker(
                 self._async_engine,
                 autocommit=False,
                 autoflush=False,
@@ -45,7 +45,7 @@ class Database:
 
     async def create_database(self) -> None:
         current_session = self.get_session()
-        await current_session.run_sync(mapper_registry.metadata.create_all)
+        await current_session.run_sync(BaseModel.metadata.create_all)
 
     def get_session(self) -> AsyncSession:
         return self._session_factory()

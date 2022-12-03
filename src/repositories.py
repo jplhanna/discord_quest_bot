@@ -5,6 +5,7 @@ from typing import Any
 from typing import Callable
 from typing import Generic
 from typing import Optional
+from typing import Sequence
 from typing import Type
 from typing import cast
 
@@ -31,7 +32,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             self._session = self.session_factory()
         return self._session
 
-    def _query(self, query_args: Optional[QueryArgs], to_select: list[EntitiesType] = None) -> Executable:
+    def _query(self, query_args: Optional[QueryArgs], to_select: list[EntitiesType] | None = None) -> Executable:
         query_handlers = query_args.get_query_handlers() if query_args else []
         to_select = to_select or [self.model]
         query: Executable = select(*to_select)
@@ -55,16 +56,16 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             result = result.unique()
         return result
 
-    async def get_all(self, query_args: Optional[QueryArgs] = None) -> list[BaseModelType]:
+    async def get_all(self, query_args: Optional[QueryArgs] = None) -> Sequence[BaseModelType]:
         query = await self.get_query(query_args)
-        res: list[BaseModelType] = query.scalars().all()
+        res: Sequence[BaseModelType] = query.scalars().all()
         return res
 
     async def get_all_with_entities(
         self, entities_list: list[EntitiesType], query_args: Optional[QueryArgs] = None
-    ) -> list[tuple]:
+    ) -> Sequence[tuple]:
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-        res: list[tuple] = query.scalars().all()
+        res: Sequence[tuple] = query.scalars().all()
         return res
 
     async def get_count(self, query_args: Optional[QueryArgs] = None) -> int:

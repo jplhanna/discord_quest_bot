@@ -2,6 +2,7 @@ from logging import Logger
 from logging import getLogger
 from typing import Coroutine
 from typing import Optional
+from typing import Sequence
 
 from sqlalchemy.orm import selectinload
 
@@ -106,7 +107,7 @@ class QuestService(BaseService):
 
         return quest
 
-    async def get_all_quests(self) -> list[Quest]:
+    async def get_all_quests(self) -> Sequence[Quest]:
         quests = await self._repository.get_all()
         return quests
 
