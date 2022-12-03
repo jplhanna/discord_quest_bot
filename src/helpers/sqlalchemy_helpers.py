@@ -3,13 +3,15 @@ from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
 from typing import Optional
-from typing import Union
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
 from sqlalchemy import Table
 from sqlalchemy import func
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import registry
+from sqlalchemy.orm.decl_api import DCTransformDeclarative
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.elements import UnaryExpression
@@ -19,6 +21,10 @@ from src.typeshed import JoinStruct
 from src.typeshed import SQLLogicType
 
 mapper_registry: registry = registry()
+
+
+class BaseModel(DeclarativeBase):
+    pass
 
 
 @dataclass
@@ -64,7 +70,7 @@ class QueryArgs:  # pylint: disable=R0902
     filter_list: Optional[list[SQLLogicType]] = None
     filter_dict: Optional[dict[str, Any]] = None
     eager_options: Optional[list] = None
-    order_by_list: Optional[list[Union[Column, UnaryExpression]]] = None
+    order_by_list: Optional[list[Column | UnaryExpression]] = None
     join_list: Optional[JoinListType] = None
     distinct_on_list: Optional[list[Optional[Column]]] = None
     group_by_list: Optional[list[Column]] = None
@@ -94,7 +100,7 @@ def many_to_many_table(first_table: str, second_table: str) -> Table:
 
     table = Table(
         f"{first_table.lower()}_{second_table.lower()}",
-        mapper_registry.metadata,
+        BaseModel.metadata,
         get_column(first_table),
         get_column(second_table),
     )
@@ -106,12 +112,11 @@ def snake_case_table_name(model_name: str) -> str:
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", table_name).lower()
 
 
-class TableMeta(type):
+class TableMeta(DCTransformDeclarative):
     def __init__(cls, classname: str, *args: Any, **kwargs: Any) -> None:
         cls.__tablename__ = snake_case_table_name(classname)
-        cls.__sa_dataclass_metadata_key__ = "sa"
         super().__init__(classname, *args, **kwargs)
 
 
-def case_insensitive_str_compare(column: str, value: str) -> SQLLogicType:
+def case_insensitive_str_compare(column: Mapped["str"], value: str) -> SQLLogicType:
     return func.lower(column) == value.lower()
