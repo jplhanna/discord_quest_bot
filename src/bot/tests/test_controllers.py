@@ -9,6 +9,9 @@ from src.bot.constants import NEW_USER_MESSAGE
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
+from src.bot.controllers import complete_quest_for_user
+from src.constants import QUEST_DOES_NOT_EXIST
+from src.exceptions import QuestDNE
 
 wire_to = ["src.bot.controllers"]
 
@@ -51,3 +54,39 @@ class TestAddQuestToUser:
         # Assert
         assert (res == REGISTER_FIRST_MESSAGE) is not user_exists
         assert mocked_quest_service.accept_quest_if_available.called is user_exists
+
+
+@pytest.mark.asyncio()
+class TestCompleteQuestForUser:
+    async def test_if_registered(self, mock_container_if_user_exists, mocked_ctx):
+        # Arrange
+        mock_container, _, user_exists = mock_container_if_user_exists
+        mocked_quest_service = AsyncMock()
+        mocked_xp_service = AsyncMock()
+        mock_container.quest_service.override(mocked_quest_service)
+        mock_container.xp_service.override(mocked_xp_service)
+        mock_container.wire(wire_to)
+
+        # Act
+        res = await complete_quest_for_user(mocked_ctx, sentinel.quest_name)
+
+        # Assert
+        assert (res == REGISTER_FIRST_MESSAGE) is not user_exists
+        assert mocked_quest_service.complete_quest_if_available.called is user_exists
+        assert mocked_xp_service.earn_xp_for_quest.called is user_exists
+
+    @pytest.mark.parametrize("mock_container_if_user_exists", [True], indirect=True)
+    async def test_fails_to_complete(self, mock_container_if_user_exists, mocked_ctx):
+        # Arrange
+        mocked_quest_service = AsyncMock(
+            complete_quest_if_available=AsyncMock(side_effect=QuestDNE(sentinel.quest_name))
+        )
+        mock_container, _, _ = mock_container_if_user_exists
+        mock_container.quest_service.override(mocked_quest_service)
+        mock_container.wire(wire_to)
+
+        # Act
+        res = await complete_quest_for_user(mocked_ctx, sentinel.quest_name)
+
+        # Assert
+        assert res == QUEST_DOES_NOT_EXIST

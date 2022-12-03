@@ -57,7 +57,7 @@ async def complete_quest_for_user(
     quest_name: str,
     user_service: UserService = Provide[Container.user_service],
     quest_service: QuestService = Provide[Container.quest_service],
-    xp_service: ExperienceTransactionService = Provide[Container],
+    xp_service: ExperienceTransactionService = Provide[Container.xp_service],
 ) -> str:
     user = await user_service.get_user_by_discord_id(ctx.author.id)
     if not user:
