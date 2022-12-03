@@ -12,7 +12,7 @@ from asynctest import MagicMock as AsyncMagicMock
 from sqlalchemy import inspect
 
 from src.containers import Container
-from src.helpers.sqlalchemy_helpers import mapper_registry
+from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.repositories import BaseRepository
 from src.test_config import TEST_ASYNC_DATABASE_URI
@@ -70,7 +70,7 @@ def _database_url() -> str:  # noqa: PT005
 
 @pytest.fixture(scope="session")
 def init_database() -> Callable:
-    return mapper_registry.metadata.create_all
+    return BaseModel.metadata.create_all
 
 
 @pytest.fixture()

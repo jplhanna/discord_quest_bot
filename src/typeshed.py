@@ -1,19 +1,16 @@
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Literal
-from typing import Optional
 from typing import Sequence
 from typing import TYPE_CHECKING
 from typing import Type
 from typing import TypeVar
 from typing import TypedDict
-from typing import Union
 
-from sqlalchemy import Boolean
-from sqlalchemy import Column
+from sqlalchemy import ColumnElement
+from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.orm.util import AliasedClass
-from sqlalchemy.sql import ColumnElement
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.elements import BinaryExpression
 from sqlalchemy.sql.elements import BooleanClauseList
@@ -23,10 +20,6 @@ from sqlalchemy.sql.selectable import CTE
 
 if TYPE_CHECKING:
     from src.models import CoreModelMixin  # noqa
-
-    BooleanColumnElement = ColumnElement[Boolean]
-else:
-    BooleanColumnElement = ColumnElement
 
 
 class DBConfigDict(TypedDict):
@@ -61,17 +54,17 @@ class ConfigDict(TypedDict):
     logger: LoggerDict
 
 
-SQLLogicType = Union[BinaryExpression, BooleanClauseList, bool, BooleanColumnElement]
-JoinOnType = Union[Type["CoreModelMixin"], AliasedClass, RelationshipProperty]
+SQLLogicType = BinaryExpression | BooleanClauseList | bool | Mapped["bool"] | ColumnElement["bool"]
+JoinOnType = Type["CoreModelMixin"] | AliasedClass | RelationshipProperty
 
 
 @dataclass
 class JoinStruct:
     join_model: JoinOnType
-    join_on: Union[Optional[SQLLogicType], RelationshipProperty] = field(default=None)
+    join_on: SQLLogicType | RelationshipProperty | None = field(default=None)
     use_outer_join: bool = field(default=False)
 
-    def get_join_data(self) -> Union[tuple[JoinOnType], tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]]]:
+    def get_join_data(self) -> tuple[JoinOnType] | tuple[JoinOnType, SQLLogicType | RelationshipProperty]:
         if self.join_on is not None:
             return self.join_model, self.join_on
         return (self.join_model,)
@@ -83,13 +76,8 @@ class JoinStruct:
 
 
 JoinListType = Sequence[
-    Union[
-        FromClause,
-        JoinStruct,
-        tuple[JoinOnType, Union[SQLLogicType, RelationshipProperty]],
-        tuple[CTE, SQLLogicType],
-    ]
+    FromClause | JoinStruct | tuple[JoinOnType, SQLLogicType | RelationshipProperty] | tuple[CTE, SQLLogicType]
 ]
 
-EntitiesType = Union[Column, Label, Type["CoreModelMixin"], Function]
+EntitiesType = Mapped | Label | Type["CoreModelMixin"] | Function
 BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")  # pylint: disable=C0103

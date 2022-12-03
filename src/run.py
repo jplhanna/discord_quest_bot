@@ -13,7 +13,7 @@ from src.typeshed import ConfigDict
 def start_server(config: ConfigDict = Provide[Container.config]) -> None:
     # Start bot
     logging.info("Starting bot")
-    bot.run(config["discord"]["account_token"], log_handler=None)  # type: ignore[call-arg]
+    bot.run(config["discord"]["account_token"], log_handler=None)
 
 
 if __name__ == "__main__":
