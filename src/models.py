@@ -11,12 +11,13 @@ from sqlalchemy.orm import relationship
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.helpers.sqlalchemy_helpers import many_to_many_table
 from src.helpers.sqlalchemy_helpers import snake_case_table_name
+from src.typeshed import MixinData
 
 
 class CoreModelMixin(MappedAsDataclass, BaseModel):
     @declared_attr  # type: ignore[arg-type]
-    def __tablename__(cls) -> str:  # pylint: disable=E0213
-        return snake_case_table_name(cls.__name__)
+    def __tablename__(self) -> str:  # pylint: disable=E0213
+        return snake_case_table_name(self.__name__)
 
     __abstract__ = True
     id: Mapped[int] = mapped_column(init=False, primary_key=True)
@@ -47,8 +48,20 @@ class User(CoreModelMixin):
         "Quest", default_factory=list, repr=False, secondary="user_quest", back_populates="users"
     )
     experience: Mapped[list["ExperienceTransaction"]] = relationship(
-        "ExperienceTransaction", back_populates="users", default_factory=list, repr=False
+        "ExperienceTransaction", back_populates="user", default_factory=list, repr=False
     )
+
+
+class UserResourceMixin:
+    __user_mixin_data__: MixinData
+
+    @declared_attr
+    def user_id(self) -> Mapped[int]:
+        return mapped_column(ForeignKey("user.id"), init=False)
+
+    @declared_attr
+    def user(self) -> Mapped[User]:
+        return relationship(User, back_populates=self.__user_mixin_data__.get("back_populates"))
 
 
 class Quest(CoreModelMixin):
@@ -78,7 +91,7 @@ class Quest(CoreModelMixin):
 user_quest = many_to_many_table("User", "Quest")
 
 
-class ExperienceTransaction(CoreModelMixin):
+class ExperienceTransaction(CoreModelMixin, UserResourceMixin):
     """
     Representation of an instance of a user earning experience
 
@@ -92,13 +105,13 @@ class ExperienceTransaction(CoreModelMixin):
     quest: Quest
     """
 
+    __user_mixin_data__ = MixinData(back_populates="experience")
+
     # Columns
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"), init=False)
     quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id"), init=False)
     experience: Mapped[int] = mapped_column(init=False)
 
     # Relationship
-    user: Mapped[User] = relationship(User, back_populates="experience")
     quest: Mapped[Quest] = relationship(Quest)
 
     def __post_init__(self) -> None:
