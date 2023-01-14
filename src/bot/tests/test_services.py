@@ -7,6 +7,7 @@ from asynctest import MagicMock as AsyncMagicMock
 from src.constants import GOOD_LUCK_ADVENTURER
 from src.exceptions import QuestAlreadyAccepted
 from src.exceptions import QuestDNE
+from src.exceptions import QuestNotAccepted
 from src.services import QuestService
 
 
@@ -43,6 +44,31 @@ class TestQuestService:
             await quest_service.accept_quest_if_available(mocked_user, "Quest title")
 
     async def test_quest_completed(self, mocked_user, mock_container):
-        # TODO implement service tests
-        pass
+        # Arrange
+        quest = MagicMock(users=[mocked_user])
+        mock_quest_repository = AsyncMagicMock(
+            get_first=CoroutineMock(return_value=quest, session=AsyncMagicMock(commit=CoroutineMock()))
+        )
+        quest_service = QuestService(repository=mock_quest_repository)
+        # Act
+        res = await quest_service.complete_quest_if_available(mocked_user, "Quest title")
+        # Assert
+        assert res == quest
 
+    async def test_cannot_complete_nonexistent_quest(self, mocked_user, mock_container):
+        # Arrange
+        mock_quest_repository = AsyncMagicMock(get_first=CoroutineMock(return_value=None))
+        quest_service = QuestService(repository=mock_quest_repository)
+        # Act & Assert
+        with pytest.raises(QuestDNE):
+            await quest_service.complete_quest_if_available(mocked_user, "Quest Title")
+
+    async def test_cannot_complete_unaccepted_quest(self, mocked_user, mock_container):
+        # Arrange
+        mock_quest_repository = AsyncMagicMock(
+            get_first=CoroutineMock(return_value=MagicMock(users=[]), session=AsyncMagicMock(commit=CoroutineMock()))
+        )
+        quest_service = QuestService(repository=mock_quest_repository)
+        # Act & Assert
+        with pytest.raises(QuestNotAccepted):
+            await quest_service.complete_quest_if_available(mocked_user, "Quest Title")
