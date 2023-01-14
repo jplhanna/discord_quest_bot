@@ -7,6 +7,7 @@ from typing import Sequence
 from sqlalchemy.orm import selectinload
 
 from src.constants import GOOD_LUCK_ADVENTURER
+from src.exceptions import MaxQuestCompletionReached
 from src.exceptions import QuestAlreadyAccepted
 from src.exceptions import QuestDNE
 from src.exceptions import QuestNotAccepted
@@ -74,7 +75,7 @@ class QuestService(BaseService):
             raise QuestDNE(quest_name)
 
         if user in quest.users:
-            raise QuestAlreadyAccepted(quest_name)
+            raise QuestAlreadyAccepted(quest)
 
         quest.users.append(user)
         await self._repository.session.commit()
@@ -103,7 +104,10 @@ class QuestService(BaseService):
             raise QuestDNE(quest_name)
 
         if user not in quest.users:
-            raise QuestNotAccepted(quest_name)
+            raise QuestNotAccepted(quest)
+
+        if quest.max_completion_count and quest.completed_users.count(user) >= quest.max_completion_count:
+            raise MaxQuestCompletionReached(quest)
 
         return quest
 

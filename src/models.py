@@ -2,6 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import BigInteger
 from sqlalchemy import ForeignKey
+from sqlalchemy import false
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import MappedAsDataclass
 from sqlalchemy.orm import declared_attr
@@ -9,7 +10,6 @@ from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
 
 from src.helpers.sqlalchemy_helpers import BaseModel
-from src.helpers.sqlalchemy_helpers import many_to_many_table
 from src.helpers.sqlalchemy_helpers import snake_case_table_name
 from src.typeshed import MixinData
 
@@ -69,26 +69,40 @@ class Quest(CoreModelMixin):
     A representation of an event(quest) a user can take part in
 
     Attributes
-    __________
+    ----------
     name: str
         Name of the quest
     experience: int
         How much experience a user will earn upon completion of a quest
     users: list[User]
         List of users who have accepted this quest
+    max_completion_count: Optional[int]
+        Number of times a quest can be completed by a single user, if None can be completed an infinite number of times
     """
 
     # Columns
     name: Mapped[str]
     experience: Mapped[int]
+    max_completion_count: Mapped[int | None] = mapped_column(default=-1)
 
     # Relationships
     users: Mapped[list[User]] = relationship(
         "User", default_factory=list, secondary="user_quest", back_populates="quests"
     )
 
+    completed_users: Mapped[list[User]] = relationship(
+        "User",
+        default_factory=list,
+        secondary="user_quest",
+        primaryjoin="and_(Quest.id == user_quest.c.quest_id, user_quest.c.completed)",
+    )
 
-user_quest = many_to_many_table("User", "Quest")
+
+class UserQuest(MappedAsDataclass, BaseModel):
+    __tablename__ = "user_quest"
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
+    quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id", ondelete="CASCADE"), primary_key=True)
+    completed: Mapped[bool] = mapped_column(init=False, default=False, server_default=false())
 
 
 class ExperienceTransaction(CoreModelMixin, UserResourceMixin):

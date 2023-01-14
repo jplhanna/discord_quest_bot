@@ -65,7 +65,7 @@ async def complete_quest_for_user(
 
     try:
         quest = await quest_service.complete_quest_if_available(user, quest_name)
-    except BaseQuestException as quest_error:
+    except (BaseQuestException, QuestDNE) as quest_error:
         return quest_error.message
     xp_transaction = await xp_service.earn_xp_for_quest(user, quest)
     return f"You have successfully completed {quest.name} and earned {xp_transaction.experience}"
