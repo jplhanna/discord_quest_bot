@@ -13,6 +13,7 @@ from sqlalchemy.orm import Mapped
 from sqlalchemy.orm.decl_api import DCTransformDeclarative
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
+from sqlalchemy.sql.base import ExecutableOption
 from sqlalchemy.sql.elements import UnaryExpression
 
 from src.typeshed import JoinListType
@@ -32,16 +33,13 @@ class QueryHandler:
 
     def update_query(self, query: Executable) -> Executable:
         if self.func_data or self.allow_empty_data and self.func_data is not None:
-            query = getattr(query, self.func_str)(*self.func_data)
-        return query
-
-
-class DictQueryHandler(QueryHandler):
-    func_data: Optional[dict]
-
-    def update_query(self, query: Executable) -> Executable:
-        if self.func_data:
-            query = getattr(query, self.func_str)(**self.func_data)
+            query_method = getattr(query, self.func_str)
+            if isinstance(self.func_data, (list, tuple)):
+                query = query_method(*self.func_data)
+            elif isinstance(self.func_data, dict):
+                query = query_method(**self.func_data)
+            else:
+                query = query_method(self.func_data)
         return query
 
 
@@ -62,6 +60,16 @@ class JoinQueryHandler(QueryHandler):
         return query  # type: ignore[return-value]
 
 
+class EagerOptionsHandler(QueryHandler):
+    func_data: Optional[list[ExecutableOption]]
+
+    def update_query(self, query: Executable) -> Executable:
+        if self.func_data:
+            query = query.options(*self.func_data)
+
+        return query
+
+
 @dataclass
 class QueryArgs:  # pylint: disable=R0902
     filter_list: Optional[list[SQLLogicType]] = None
@@ -72,6 +80,7 @@ class QueryArgs:  # pylint: disable=R0902
     distinct_on_list: Optional[list[Optional[Column]]] = None
     group_by_list: Optional[list[Column]] = None
     having_list: Optional[list[SQLLogicType]] = None
+    limit: Optional[int] = None
 
     def __post_init__(self) -> None:
         if not self.group_by_list and self.having_list:
@@ -79,7 +88,7 @@ class QueryArgs:  # pylint: disable=R0902
 
     def get_query_handlers(self) -> list[QueryHandler]:
         query_handlers = [
-            DictQueryHandler("filter_by", self.filter_dict),
+            QueryHandler("filter_by", self.filter_dict),
             JoinQueryHandler("join", self.join_list),
             QueryHandler("filter", self.filter_list),
             QueryHandler("group_by", self.group_by_list),
@@ -87,6 +96,7 @@ class QueryArgs:  # pylint: disable=R0902
             QueryHandler("options", self.eager_options),
             QueryHandler("order_by", self.order_by_list),
             QueryHandler("distinct", self.distinct_on_list, allow_empty_data=True),
+            QueryHandler("limit", self.limit),
         ]
         return query_handlers
 

@@ -30,10 +30,16 @@ def mock_container() -> Generator[Container, None, None]:
     mocked_container.unwire()
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def mocked_user() -> User:
     user = Mock(spec=User, discord_id=sentinel.discord_id)
     return user
+
+
+@pytest.fixture(scope="session")
+def mocked_ctx() -> MagicMock:
+    ctx = MagicMock(author=MagicMock(id=sentinel.discord_id))
+    return ctx
 
 
 @pytest.fixture()
