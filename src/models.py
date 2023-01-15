@@ -2,7 +2,7 @@ from datetime import datetime
 
 from sqlalchemy import BigInteger
 from sqlalchemy import ForeignKey
-from sqlalchemy import false
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import MappedAsDataclass
 from sqlalchemy.orm import declared_attr
@@ -12,9 +12,10 @@ from sqlalchemy.orm import relationship
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.helpers.sqlalchemy_helpers import snake_case_table_name
 from src.typeshed import MixinData
+from src.typeshed import SQLLogicType
 
 
-class CoreModelMixin(MappedAsDataclass, BaseModel):
+class CoreModelMixin(MappedAsDataclass, BaseModel, kw_only=True):
     @declared_attr  # type: ignore[arg-type]
     def __tablename__(self) -> str:  # pylint: disable=E0213
         return snake_case_table_name(self.__name__)
@@ -44,9 +45,7 @@ class User(CoreModelMixin):
     discord_id: Mapped[int] = mapped_column(BigInteger, unique=True)
 
     # Relationships
-    quests: Mapped[list["Quest"]] = relationship(
-        "Quest", default_factory=list, repr=False, secondary="user_quest", back_populates="users"
-    )
+    quests: Mapped[list["Quest"]] = relationship("UserQuest", default_factory=list, repr=False, back_populates="user")
     experience: Mapped[list["ExperienceTransaction"]] = relationship(
         "ExperienceTransaction", back_populates="user", default_factory=list, repr=False
     )
@@ -57,7 +56,7 @@ class UserResourceMixin:
 
     @declared_attr
     def user_id(self) -> Mapped[int]:
-        return mapped_column(ForeignKey("user.id"), init=False)
+        return mapped_column(ForeignKey("user.id"), init=False, repr=False)
 
     @declared_attr
     def user(self) -> Mapped[User]:
@@ -83,26 +82,34 @@ class Quest(CoreModelMixin):
     # Columns
     name: Mapped[str]
     experience: Mapped[int]
-    max_completion_count: Mapped[int | None] = mapped_column(default=-1)
+    max_completion_count: Mapped[int | None] = mapped_column(default=None)
 
     # Relationships
-    users: Mapped[list[User]] = relationship(
-        "User", default_factory=list, secondary="user_quest", back_populates="quests"
+    users: Mapped[list[User]] = relationship("UserQuest", default_factory=list, back_populates="quest", repr=False)
+
+
+class UserQuest(CoreModelMixin, UserResourceMixin):
+    __user_mixin_data__ = MixinData(back_populates="quests", index=True)
+
+    # Columns
+    quest_id: Mapped[int] = mapped_column(
+        ForeignKey("quest.id", ondelete="CASCADE"), index=True, repr=False, init=False
     )
+    date_completed: Mapped[datetime | None] = mapped_column(init=False, default=None)
 
-    completed_users: Mapped[list[User]] = relationship(
-        "User",
-        default_factory=list,
-        secondary="user_quest",
-        primaryjoin="and_(Quest.id == user_quest.c.quest_id, user_quest.c.completed)",
-    )
+    # Relationships
+    quest: Mapped[Quest] = relationship(Quest, back_populates="users")
 
+    @hybrid_property
+    def completed(self) -> bool:
+        return self.date_completed is not None
 
-class UserQuest(MappedAsDataclass, BaseModel):
-    __tablename__ = "user_quest"
-    user_id: Mapped[int] = mapped_column(ForeignKey("user.id", ondelete="CASCADE"), primary_key=True)
-    quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id", ondelete="CASCADE"), primary_key=True)
-    completed: Mapped[bool] = mapped_column(init=False, default=False, server_default=false())
+    @completed.expression  # type: ignore[no-redef]
+    def completed(self) -> SQLLogicType:
+        return self.date_completed.isnot(None)
+
+    def mark_complete(self) -> None:
+        self.date_completed = datetime.utcnow()
 
 
 class ExperienceTransaction(CoreModelMixin, UserResourceMixin):
@@ -122,7 +129,7 @@ class ExperienceTransaction(CoreModelMixin, UserResourceMixin):
     __user_mixin_data__ = MixinData(back_populates="experience")
 
     # Columns
-    quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id"), init=False)
+    quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id"), init=False, repr=False)
     experience: Mapped[int] = mapped_column(init=False)
 
     # Relationship

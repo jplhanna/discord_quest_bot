@@ -32,7 +32,7 @@ def mock_container() -> Generator[Container, None, None]:
 
 @pytest.fixture(scope="session")
 def mocked_user() -> User:
-    user = Mock(spec=User, discord_id=sentinel.discord_id)
+    user = Mock(spec=User, discord_id=sentinel.discord_id, id=sentinel.user_id, _sa_instance_state=MagicMock())
     return user
 
 

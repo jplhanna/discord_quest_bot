@@ -73,11 +73,11 @@ def get_user_data_for_query(usr):
 class TestBaseRepositoryIntegration:
     async def test_create_user(self, mock_user_with_db_repository, faker):
         # Arrange
-        discord_id = faker.unique.random_number(digits=18, fix_len=True)
+        user = User(discord_id=faker.unique.random_number(digits=18, fix_len=True))
         # Act
-        user = await mock_user_with_db_repository.create(discord_id=discord_id)
+        await mock_user_with_db_repository.add(user)
         # Assert
-        assert user.discord_id == discord_id
+        assert user == await mock_user_with_db_repository.get_first()
 
     async def test_delete_user(self, db_user, mock_user_with_db_repository):
         # Act

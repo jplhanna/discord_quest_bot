@@ -1,7 +1,7 @@
 from abc import ABC
 from dataclasses import dataclass
 from dataclasses import field
-from typing import Any
+from dataclasses import replace
 from typing import Callable
 from typing import Generic
 from typing import Optional
@@ -79,7 +79,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     async def get_first(self, query_args: Optional[QueryArgs] = None) -> Optional[BaseModelType]:
         if not query_args:
             query_args = QueryArgs()
-        query_args.limit = 1
+        replace(query_args, limit=1)
         query: Result = await self.get_query(query_args)
         result: Optional[BaseModelType] = query.scalars().first()
         return result
@@ -94,7 +94,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     ) -> Optional[tuple]:
         if not query_args:
             query_args = QueryArgs()
-        query_args.limit = 1
+        replace(query_args, limit=1)
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
         result: Optional[tuple] = query.scalars().first()
         return result
@@ -103,11 +103,9 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         res = await self.session.get(self.model, id_)
         return res
 
-    async def create(self, **data: Any) -> BaseModelType:
-        obj: BaseModelType = self.model(**data)
-        self.session.add(obj)
+    async def add(self, data: BaseModelType) -> None:
+        self.session.add(data)
         await self.session.commit()
-        return obj
 
     async def delete(self, obj: BaseModelType) -> None:
         await self.session.delete(obj)

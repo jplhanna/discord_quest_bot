@@ -1,3 +1,5 @@
+from dataclasses import dataclass
+from dataclasses import field
 from logging import Logger
 from logging import getLogger
 from typing import Coroutine
@@ -16,15 +18,17 @@ from src.helpers.sqlalchemy_helpers import case_insensitive_str_compare
 from src.models import ExperienceTransaction
 from src.models import Quest
 from src.models import User
+from src.models import UserQuest
 from src.repositories import BaseRepository
 
 
+@dataclass(frozen=True, kw_only=True)
 class BaseService:
-    def __init__(self, repository: BaseRepository) -> None:
-        self.logger: Logger = getLogger(
-            f"{__name__}.{self.__class__.__name__}",
-        )
-        self._repository = repository
+    logger: Logger = field(init=False)
+    _repository: BaseRepository
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "logger", getLogger(f"{__name__}.{self.__class__.__name__}"))
 
 
 class UserService(BaseService):
@@ -37,11 +41,15 @@ class UserService(BaseService):
         return await self._repository.get_first(QueryArgs(filter_dict=dict(discord_id=discord_id)))
 
     async def create_user(self, discord_id: int) -> User:
-        return await self._repository.create(discord_id=discord_id)
+        user = User(discord_id=discord_id)
+        await self._repository.add(user)
+        return user
 
 
+@dataclass(frozen=True)
 class QuestService(BaseService):
     _repository: BaseRepository[Quest]
+    _secondary_repository: BaseRepository[UserQuest]
 
     def _get_quest_by_name(self, quest_name: str) -> Coroutine[None, None, Optional[Quest]]:
         return self._repository.get_first(
@@ -50,6 +58,10 @@ class QuestService(BaseService):
                 eager_options=[selectinload(Quest.users)],
             )
         )
+
+    @staticmethod
+    def _get_uncompleted_query_count_args(quest: Quest, user: User) -> QueryArgs:
+        return QueryArgs(filter_dict={"user": user, "quest": quest, "completed": False})
 
     async def accept_quest_if_available(self, user: User, quest_name: str) -> str:
         """
@@ -74,11 +86,11 @@ class QuestService(BaseService):
         if not quest:
             raise QuestDNE(quest_name)
 
-        if user in quest.users:
+        if await self._secondary_repository.get_count(self._get_uncompleted_query_count_args(quest, user)) >= 1:
             raise QuestAlreadyAccepted(quest)
 
-        quest.users.append(user)
-        await self._repository.session.commit()
+        user_quest = UserQuest(user=user, quest=quest)
+        await self._secondary_repository.add(user_quest)
         return GOOD_LUCK_ADVENTURER.format(quest_name)
 
     async def complete_quest_if_available(self, user: User, quest_name: str) -> Quest:
@@ -103,11 +115,23 @@ class QuestService(BaseService):
         if not quest:
             raise QuestDNE(quest_name)
 
-        if user not in quest.users:
+        active_user_quest = await self._secondary_repository.get_first(
+            self._get_uncompleted_query_count_args(quest, user)
+        )
+
+        if not active_user_quest:
             raise QuestNotAccepted(quest)
 
-        if quest.max_completion_count and quest.completed_users.count(user) >= quest.max_completion_count:
+        completed_quests_args = QueryArgs(filter_dict={"quest": quest, "user": user, "completed": True})
+
+        if (
+            quest.max_completion_count
+            and await self._secondary_repository.get_count(completed_quests_args) >= quest.max_completion_count
+        ):
             raise MaxQuestCompletionReached(quest)
+
+        active_user_quest.mark_complete()
+        await self._repository.session.commit()
 
         return quest
 
@@ -120,5 +144,6 @@ class ExperienceTransactionService(BaseService):
     _repository: BaseRepository[ExperienceTransaction]
 
     async def earn_xp_for_quest(self, user: User, quest: Quest) -> ExperienceTransaction:
-        xp_transaction = await self._repository.create(user=user, quest=quest)
+        xp_transaction = ExperienceTransaction(user=user, quest=quest)
+        await self._repository.add(xp_transaction)
         return xp_transaction

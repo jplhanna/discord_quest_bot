@@ -70,7 +70,7 @@ class EagerOptionsHandler(QueryHandler):
         return query
 
 
-@dataclass
+@dataclass(frozen=True)
 class QueryArgs:  # pylint: disable=R0902
     filter_list: Optional[list[SQLLogicType]] = None
     filter_dict: Optional[dict[str, Any]] = None
