@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.helpers.sqlalchemy_helpers import snake_case_table_name
 from src.typeshed import MixinData
+from src.typeshed import SQLLogicType
 
 
 class CoreModelMixin(MappedAsDataclass, BaseModel, kw_only=True):
@@ -102,6 +103,10 @@ class UserQuest(CoreModelMixin, UserResourceMixin):
     @hybrid_property
     def completed(self) -> bool:
         return self.date_completed is not None
+
+    @completed.expression  # type: ignore[no-redef]
+    def completed(self) -> SQLLogicType:
+        return self.date_completed.isnot(None)
 
     def mark_complete(self) -> None:
         self.date_completed = datetime.utcnow()
