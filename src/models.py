@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any
 
 from sqlalchemy import BigInteger
 from sqlalchemy import ForeignKey
@@ -106,15 +105,6 @@ class UserQuest(CoreModelMixin, UserResourceMixin):
 
     def mark_complete(self) -> None:
         self.date_completed = datetime.utcnow()
-
-    def __eq__(self, other: Any) -> bool:
-        if isinstance(other, User):
-            return self.user == other  # pylint: disable=W0143
-        if isinstance(other, Quest):
-            return self.quest == other
-        if isinstance(other, UserQuest):
-            return self.id == other.id
-        raise TypeError(f"Cannot compare with {other}.")
 
 
 class ExperienceTransaction(CoreModelMixin, UserResourceMixin):
