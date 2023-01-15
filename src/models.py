@@ -3,6 +3,7 @@ from typing import Any
 
 from sqlalchemy import BigInteger
 from sqlalchemy import ForeignKey
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import MappedAsDataclass
 from sqlalchemy.orm import declared_attr
@@ -99,7 +100,7 @@ class UserQuest(CoreModelMixin, UserResourceMixin):
     # Relationships
     quest: Mapped[Quest] = relationship(Quest, back_populates="users")
 
-    @property
+    @hybrid_property
     def completed(self) -> bool:
         return self.date_completed is not None
 

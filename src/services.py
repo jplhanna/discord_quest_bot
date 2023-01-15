@@ -59,6 +59,10 @@ class QuestService(BaseService):
             )
         )
 
+    @staticmethod
+    def _get_uncompleted_query_count_args(quest: Quest, user: User) -> QueryArgs:
+        return QueryArgs(filter_dict={"user": user, "quest": quest, "completed": False})
+
     async def accept_quest_if_available(self, user: User, quest_name: str) -> str:
         """
         Attempts to find a quest the provided name and add it to the list of currently accepted quests
@@ -82,8 +86,7 @@ class QuestService(BaseService):
         if not quest:
             raise QuestDNE(quest_name)
 
-        uncompleted_query_args = QueryArgs(filter_dict={"user": user, "quest": quest, "completed": False})
-        if await self._secondary_repository.get_count(uncompleted_query_args) >= 1:
+        if await self._secondary_repository.get_count(self._get_uncompleted_query_count_args(quest, user)) >= 1:
             raise QuestAlreadyAccepted(quest)
 
         user_quest = UserQuest(user=user, quest=quest)
@@ -112,7 +115,11 @@ class QuestService(BaseService):
         if not quest:
             raise QuestDNE(quest_name)
 
-        if user not in quest.users:
+        active_user_quest = await self._secondary_repository.get_first(
+            self._get_uncompleted_query_count_args(quest, user)
+        )
+
+        if not active_user_quest:
             raise QuestNotAccepted(quest)
 
         completed_quests_args = QueryArgs(filter_dict={"quest": quest, "user": user, "completed": True})
@@ -123,8 +130,6 @@ class QuestService(BaseService):
         ):
             raise MaxQuestCompletionReached(quest)
 
-        completed_quests_args.filter_dict["completed"] = False  # type: ignore[index]
-        active_user_quest = await self._secondary_repository.get_one(completed_quests_args)
         active_user_quest.mark_complete()
         await self._repository.session.commit()
 
