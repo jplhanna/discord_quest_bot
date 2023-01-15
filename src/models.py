@@ -124,7 +124,7 @@ class ExperienceTransaction(CoreModelMixin, UserResourceMixin):
     __user_mixin_data__ = MixinData(back_populates="experience")
 
     # Columns
-    quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id"), init=False)
+    quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id"), init=False, repr=False)
     experience: Mapped[int] = mapped_column(init=False)
 
     # Relationship

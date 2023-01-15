@@ -19,12 +19,13 @@ class TestQuestService:
         mock_quest_repository = AsyncMagicMock(
             get_first=CoroutineMock(return_value=MagicMock(users=[])), session=AsyncMagicMock(commit=CoroutineMock())
         )
-        mock_user_quest_repo = AsyncMagicMock(get_count=CoroutineMock(return_value=0))
+        mock_user_quest_repo = AsyncMagicMock(get_count=CoroutineMock(return_value=0), add=CoroutineMock())
         quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=mock_user_quest_repo)
         # Act
         res = await quest_service.accept_quest_if_available(mocked_user, "Quest title")
         # Assert
         assert res == GOOD_LUCK_ADVENTURER.format("Quest title")
+        mock_user_quest_repo.add.assert_called()
 
     async def test_quest_dne(self, mocked_user, mock_container):
         # Arrange
