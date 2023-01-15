@@ -6,8 +6,12 @@ from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.containers import Container
+from src.exceptions import BaseQuestException
 from src.exceptions import NoIDProvided
+from src.exceptions import QuestAlreadyAccepted
+from src.exceptions import QuestDNE
 from src.helpers.message_helpers import format_quest_board
+from src.services import ExperienceTransactionService
 from src.services import QuestService
 from src.services import UserService
 
@@ -33,7 +37,10 @@ async def add_quest_to_user(
     user = await user_service.get_user_by_discord_id(ctx.author.id)
     if not user:
         return REGISTER_FIRST_MESSAGE
-    res = await quest_service.accept_quest_if_available(user, quest_name)
+    try:
+        res = await quest_service.accept_quest_if_available(user, quest_name)
+    except (QuestDNE, QuestAlreadyAccepted) as quest_error:
+        res = quest_error.message
     return res
 
 
@@ -42,3 +49,23 @@ async def get_quest_list_text(quest_service: QuestService = Provide[Container.qu
     quests = await quest_service.get_all_quests()
     message = format_quest_board(quests)
     return message
+
+
+@inject
+async def complete_quest_for_user(
+    ctx: Context,
+    quest_name: str,
+    user_service: UserService = Provide[Container.user_service],
+    quest_service: QuestService = Provide[Container.quest_service],
+    xp_service: ExperienceTransactionService = Provide[Container.xp_service],
+) -> str:
+    user = await user_service.get_user_by_discord_id(ctx.author.id)
+    if not user:
+        return REGISTER_FIRST_MESSAGE
+
+    try:
+        quest = await quest_service.complete_quest_if_available(user, quest_name)
+    except (BaseQuestException, QuestDNE) as quest_error:
+        return quest_error.message
+    xp_transaction = await xp_service.earn_xp_for_quest(user, quest)
+    return f"You have successfully completed {quest.name} and earned {xp_transaction.experience}"

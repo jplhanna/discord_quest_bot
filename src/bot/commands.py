@@ -7,6 +7,7 @@ from discord.ext.commands.errors import MissingRequiredArgument
 
 from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
+from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_quest_list_text
 from src.config import DISCORD_OWNER_ID
 
@@ -45,6 +46,12 @@ async def accept_quest_error(ctx: Context, error: Exception) -> None:
 )
 async def get_quest_board(ctx: Context) -> None:
     res = await get_quest_list_text()
+    await ctx.send(res)
+
+
+@bot.hybrid_command(name="complete-quest", help="Complete an available quest")
+async def completed_quest(ctx: Context, *, quest_name: str) -> None:
+    res = await complete_quest_for_user(ctx, quest_name)
     await ctx.send(res)
 
 
