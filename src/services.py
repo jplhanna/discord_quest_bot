@@ -38,7 +38,7 @@ class UserService(BaseService):
         return await self._repository.get_by_id(user_id)
 
     async def get_user_by_discord_id(self, discord_id: int) -> Optional[User]:
-        return await self._repository.get_first(QueryArgs(filter_dict=dict(discord_id=discord_id)))
+        return await self._repository.get_first(QueryArgs(filter_dict={"discord_id": discord_id}))
 
     async def create_user(self, discord_id: int) -> User:
         user = User(discord_id=discord_id)
@@ -89,7 +89,7 @@ class QuestService(BaseService):
         if await self._secondary_repository.get_count(self._get_uncompleted_query_count_args(quest, user)) >= 1:
             raise QuestAlreadyAccepted(quest)
 
-        user_quest = UserQuest(user=user, quest=quest)
+        user_quest = UserQuest(user=user, quest=quest)  # type: ignore[call-arg]
         await self._secondary_repository.add(user_quest)
         return GOOD_LUCK_ADVENTURER.format(quest_name)
 
@@ -144,6 +144,6 @@ class ExperienceTransactionService(BaseService):
     _repository: BaseRepository[ExperienceTransaction]
 
     async def earn_xp_for_quest(self, user: User, quest: Quest) -> ExperienceTransaction:
-        xp_transaction = ExperienceTransaction(user=user, quest=quest)
+        xp_transaction = ExperienceTransaction(user=user, quest=quest)  # type: ignore[call-arg]
         await self._repository.add(xp_transaction)
         return xp_transaction

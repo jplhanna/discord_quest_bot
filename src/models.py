@@ -51,16 +51,17 @@ class User(CoreModelMixin):
     )
 
 
-class UserResourceMixin:
-    __user_mixin_data__: MixinData
+class UserResourceMixin(MappedAsDataclass):
+    class Meta:
+        user_mixin_data: MixinData = MixinData()
 
-    @declared_attr
-    def user_id(self) -> Mapped[int]:
-        return mapped_column(ForeignKey("user.id"), init=False, repr=False)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("user.id"), init=False, repr=False, index=Meta.user_mixin_data.get("index")
+    )
 
     @declared_attr
     def user(self) -> Mapped[User]:
-        return relationship(User, back_populates=self.__user_mixin_data__.get("back_populates"))
+        return relationship(User, back_populates=self.Meta.user_mixin_data.get("back_populates"))
 
 
 class Quest(CoreModelMixin):
@@ -89,7 +90,8 @@ class Quest(CoreModelMixin):
 
 
 class UserQuest(CoreModelMixin, UserResourceMixin):
-    __user_mixin_data__ = MixinData(back_populates="quests", index=True)
+    class Meta:
+        user_mixin_data = MixinData(back_populates="quests", index=True)
 
     # Columns
     quest_id: Mapped[int] = mapped_column(
