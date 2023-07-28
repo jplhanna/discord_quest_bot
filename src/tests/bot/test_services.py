@@ -5,11 +5,11 @@ from asynctest import CoroutineMock
 from asynctest import MagicMock as AsyncMagicMock
 
 from src.constants import GOOD_LUCK_ADVENTURER
-from src.exceptions import MaxQuestCompletionReached
-from src.exceptions import QuestAlreadyAccepted
-from src.exceptions import QuestDNE
-from src.exceptions import QuestNotAccepted
-from src.services import QuestService
+from src.quests.exceptions import MaxQuestCompletionReached
+from src.quests.exceptions import QuestAlreadyAccepted
+from src.quests.exceptions import QuestDNE
+from src.quests.exceptions import QuestNotAccepted
+from src.quests.services import QuestService
 
 
 @pytest.mark.asyncio()

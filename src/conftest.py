@@ -56,7 +56,7 @@ def mock_user_with_db_repository(mock_user_repository, db_session):
 @pytest.fixture(scope="session")
 def container_for_testing() -> Generator[Container, None, None]:
     testing_container = copy(base_mock_container)
-    testing_container.config.from_dict(test_config_dict)  # type: ignore[arg-type]
+    testing_container.config.from_dict(test_config_dict)
     testing_container.init_resources()
     yield testing_container
     testing_container.unwire()
