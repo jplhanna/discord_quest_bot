@@ -45,7 +45,7 @@ repos:
         entry: ruff
         language: system
         types: [ python ]
-        exclude: alembic|test_.*|conftest\.py
+        exclude: alembic
 
   - repo: local
     hooks:
