@@ -41,7 +41,7 @@ class TestUserRepository:
         "query_args",
         [
             {"filter_list": [User.id == 1]},
-            {"filter_dict": dict(id=1)},
+            {"filter_dict": {"id": 1}},
             {"order_by_list": [User.id]},
             {"distinct_on_list": []},
             {"distinct_on_list": [User.id]},
