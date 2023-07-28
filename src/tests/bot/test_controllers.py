@@ -11,7 +11,7 @@ from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
 from src.bot.controllers import complete_quest_for_user
 from src.constants import QUEST_DOES_NOT_EXIST
-from src.exceptions import QuestDNE
+from src.quests.exceptions import QuestDNE
 
 wire_to = ["src.bot.controllers"]
 
