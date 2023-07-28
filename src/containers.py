@@ -16,13 +16,13 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 from src.config import config_dict
 from src.helpers.sqlalchemy_helpers import BaseModel
-from src.models import ExperienceTransaction
-from src.models import Quest
 from src.models import User
-from src.models import UserQuest
+from src.quests import ExperienceTransaction
+from src.quests import ExperienceTransactionService
+from src.quests import Quest
+from src.quests import QuestService
+from src.quests import UserQuest
 from src.repositories import BaseRepository
-from src.services import ExperienceTransactionService
-from src.services import QuestService
 from src.services import UserService
 
 logger = getLogger(__name__)

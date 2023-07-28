@@ -6,13 +6,13 @@ from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.containers import Container
-from src.exceptions import BaseQuestException
 from src.exceptions import NoIDProvided
-from src.exceptions import QuestAlreadyAccepted
-from src.exceptions import QuestDNE
 from src.helpers.message_helpers import format_quest_board
-from src.services import ExperienceTransactionService
-from src.services import QuestService
+from src.quests import ExperienceTransactionService
+from src.quests import QuestService
+from src.quests.exceptions import BaseQuestException
+from src.quests.exceptions import QuestAlreadyAccepted
+from src.quests.exceptions import QuestDNE
 from src.services import UserService
 
 

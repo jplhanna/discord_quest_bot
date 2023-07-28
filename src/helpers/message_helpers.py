@@ -8,7 +8,7 @@ from src.helpers.constants import EXPERIENCE_COLUMN_NAME
 from src.helpers.constants import MINIMUM_SPACING
 from src.helpers.constants import QUEST_COLUMN_NAME
 from src.helpers.constants import WRAPPER_TEXT_LEN
-from src.models import Quest
+from src.quests.models import Quest
 
 
 def _create_single_quest_line(first_column: str, second_column: str, line_length: int) -> str:
