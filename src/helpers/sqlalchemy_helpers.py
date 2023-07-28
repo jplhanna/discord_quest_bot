@@ -10,7 +10,6 @@ from sqlalchemy import Table
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
-from sqlalchemy.orm.decl_api import DCTransformDeclarative
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.base import ExecutableOption
@@ -26,7 +25,7 @@ class BaseModel(DeclarativeBase):
 
 
 @dataclass
-class QueryHandler:
+class _QueryHandler:
     func_str: str
     func_data: Any
     allow_empty_data: bool = field(default=False)
@@ -43,7 +42,7 @@ class QueryHandler:
         return query
 
 
-class JoinQueryHandler(QueryHandler):
+class _JoinQueryHandler(_QueryHandler):
     func_data: Optional[JoinListType]
 
     def update_query(self, query: FromClause) -> Executable:  # type: ignore[override]
@@ -60,7 +59,7 @@ class JoinQueryHandler(QueryHandler):
         return query  # type: ignore[return-value]
 
 
-class EagerOptionsHandler(QueryHandler):
+class _EagerOptionsHandler(_QueryHandler):
     func_data: Optional[list[ExecutableOption]]
 
     def update_query(self, query: Executable) -> Executable:
@@ -86,17 +85,17 @@ class QueryArgs:  # pylint: disable=R0902
         if not self.group_by_list and self.having_list:
             raise Warning("Defining query with having clause but no group by clause")
 
-    def get_query_handlers(self) -> list[QueryHandler]:
+    def get_query_handlers(self) -> list[_QueryHandler]:
         query_handlers = [
-            QueryHandler("filter_by", self.filter_dict),
-            JoinQueryHandler("join", self.join_list),
-            QueryHandler("filter", self.filter_list),
-            QueryHandler("group_by", self.group_by_list),
-            QueryHandler("having", self.having_list),
-            QueryHandler("options", self.eager_options),
-            QueryHandler("order_by", self.order_by_list),
-            QueryHandler("distinct", self.distinct_on_list, allow_empty_data=True),
-            QueryHandler("limit", self.limit),
+            _QueryHandler("filter_by", self.filter_dict),
+            _JoinQueryHandler("join", self.join_list),
+            _QueryHandler("filter", self.filter_list),
+            _QueryHandler("group_by", self.group_by_list),
+            _QueryHandler("having", self.having_list),
+            _QueryHandler("options", self.eager_options),
+            _QueryHandler("order_by", self.order_by_list),
+            _QueryHandler("distinct", self.distinct_on_list, allow_empty_data=True),
+            _QueryHandler("limit", self.limit),
         ]
         return query_handlers
 
@@ -119,12 +118,6 @@ def many_to_many_table(first_table: str, second_table: str) -> Table:
 def snake_case_table_name(model_name: str) -> str:
     table_name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", model_name)
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", table_name).lower()
-
-
-class TableMeta(DCTransformDeclarative):
-    def __init__(cls, classname: str, *args: Any, **kwargs: Any) -> None:
-        cls.__tablename__ = snake_case_table_name(classname)
-        super().__init__(classname, *args, **kwargs)
 
 
 def case_insensitive_str_compare(column: Mapped["str"], value: str) -> SQLLogicType:
