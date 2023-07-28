@@ -20,7 +20,6 @@ SQLAlchemy = { version = "^2.0.0b3", allow-prereleases = true }
 [tool.poetry.group.dev.dependencies]
 mypy = "*"
 pytest = "*"
-pylint = "*"
 pre-commit = "*"
 flake8 = "*"
 black = "*"
@@ -31,36 +30,23 @@ pytest-async-sqlalchemy = "*"
 asynctest = "*"
 pytest-randomly = "*"
 pytest-cov = "*"
-bandit = {extras = ["toml"], version = "^1.7.4"}
+bandit = { extras = ["toml"], version = "^1.7.4" }
 flake8-pytest-style = "^1.6.0"
 Flake8-pyproject = "^1.1.0.post0"
+ruff = "^0.0.280"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.pylint."MASTER"]
-max-line-length = 120
-ignore = ["alembic", "tests", "conftest.py"]
+[tool.ruff]
+select = ["E", "F", "W", "C"]
+fixable = ["ALL"]
+exclude = ["alembic"]
 
-[tool.pylint."MESSAGES CONTROL"]
-disable = ["too-few-public-methods",
-    "too-many-locals",
-    # docstring
-    "missing-class-docstring",
-    "missing-function-docstring",
-    "missing-module-docstring",
-    # allow disabling Pylin locally
-    "locally-disabled"]
+line-length = 120
 
-[tool.pylint."TYPE CHECK"]
-ignored-modules = ["dependency_injector.providers", "dependency_injector.containers"]
-
-[tool.pylint."REPORTS"]
-msg-template = "{path}:{line}: [{msg_id}, {obj}] {msg} ({symbol})"
-
-[tool.bandit]
-exclude_dirs = ["test"]
+target-version = "py310"
 
 [tool.mypy]
 exclude = [

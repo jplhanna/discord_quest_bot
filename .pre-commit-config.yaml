@@ -40,9 +40,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: pylint
-        name: pylint
-        entry: pylint
+      - id: ruff
+        name: ruff
+        entry: ruff
         language: system
         types: [ python ]
         exclude: alembic|test_.*|conftest\.py

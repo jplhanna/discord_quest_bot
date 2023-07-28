@@ -34,9 +34,9 @@ jobs:
       - name: Check type hints
         if: always()
         run: docker-compose run test-pipeline mypy src
-      - name: Lint with pylint
+      - name: Lint with ruff
         if: always()
-        run: docker-compose run test-pipeline pylint src
+        run: docker-compose run test-pipeline ruff src
       - name: Check with bandit
         if: always()
         run: docker-compose run test-pipeline bandit -r src -c pyproject.toml
