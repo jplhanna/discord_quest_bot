@@ -31,6 +31,9 @@ jobs:
         run: |
           docker-compose build test-pipeline
           docker-compose up -d test-db
+      - name: Check type hints
+        if: always()
+        run: docker-compose run test-pipeline mypy src
       - name: Lint with pylint
         if: always()
         run: docker-compose run test-pipeline pylint src
