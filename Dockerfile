@@ -1,11 +1,11 @@
-FROM python:3.10.4 as base
+FROM python:3.11.4 as base
 MAINTAINER JP Hanna "jpl.hanna@gmail.com"
 WORKDIR /app/
 COPY . /app/
 
 FROM base as install-poetry
 ENV POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_VERSION=1.3.2
+    POETRY_VERSION=1.5.1
 RUN curl -sSL https://install.python-poetry.org | python3 -
 RUN apt-get update && apt-get install -y --no-install-recommends gcc
 ENV PATH "/root/.local/bin:$PATH"
