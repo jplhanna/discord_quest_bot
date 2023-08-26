@@ -52,6 +52,9 @@ force-single-line = true
 force-to-top = ["services"]
 forced-separate = ["src.tests", "src.helpers"]
 
+[tool.ruff.mccabe]
+max-complexity = 10
+
 [tool.bandit]
 exclude_dirs = ["test"]
 
