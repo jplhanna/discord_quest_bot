@@ -1,4 +1,4 @@
-from typing import Sequence
+from collections.abc import Sequence
 
 from src.helpers.constants import BLOCK_POST_TEXT
 from src.helpers.constants import BLOCK_PRE_TEXT

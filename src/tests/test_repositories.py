@@ -12,7 +12,7 @@ class TestUserRepository:
         # Act & Assert
         try:
             mock_user_repository._query(query_args)
-        except Exception:  # noqa
+        except Exception:
             pytest.fail("Empty query failed to build")
 
     @pytest.mark.parametrize(
@@ -33,7 +33,7 @@ class TestUserRepository:
         # Act & Assert
         try:
             mock_user_repository._query(query_args)
-        except Exception:  # noqa
+        except Exception:
             pytest.fail(f"Query with empty args failed to build: {query_args}")
 
     # TECH DEBT Join and eager options are untested because currently there are no tables to join onto
@@ -55,10 +55,11 @@ class TestUserRepository:
         # Act & Assert
         try:
             mock_user_repository._query(query_args)
-        except Exception:  # noqa
+        except Exception:
             pytest.fail(f"Query failed to build with non empty values {query_args}")
 
-    def test_query_with_having_and_no_grouping_fails(self, mock_user_repository):
+    @pytest.mark.usefixtures("mock_user_repository")
+    def test_query_with_having_and_no_grouping_fails(self):
         # Arrange & Act & Assert
         with pytest.raises(Warning, match="Defining query with having clause but no group by clause"):
             QueryArgs(having_list=[User.id == 1])

@@ -2,7 +2,6 @@ import re
 from dataclasses import dataclass
 from dataclasses import field
 from typing import Any
-from typing import Optional
 
 from sqlalchemy import Column
 from sqlalchemy import ForeignKey
@@ -33,7 +32,7 @@ class _QueryHandler:
     def update_query(self, query: Executable) -> Executable:
         if self.func_data or self.allow_empty_data and self.func_data is not None:
             query_method = getattr(query, self.func_str)
-            if isinstance(self.func_data, (list, tuple)):
+            if isinstance(self.func_data, list | tuple):
                 query = query_method(*self.func_data)
             elif isinstance(self.func_data, dict):
                 query = query_method(**self.func_data)
@@ -43,7 +42,7 @@ class _QueryHandler:
 
 
 class _JoinQueryHandler(_QueryHandler):
-    func_data: Optional[JoinListType]
+    func_data: JoinListType | None
 
     def update_query(self, query: FromClause) -> Executable:  # type: ignore[override]
         if self.func_data:
@@ -60,7 +59,7 @@ class _JoinQueryHandler(_QueryHandler):
 
 
 class _EagerOptionsHandler(_QueryHandler):
-    func_data: Optional[list[ExecutableOption]]
+    func_data: list[ExecutableOption] | None
 
     def update_query(self, query: Executable) -> Executable:
         if self.func_data:
@@ -71,15 +70,15 @@ class _EagerOptionsHandler(_QueryHandler):
 
 @dataclass(frozen=True)
 class QueryArgs:  # pylint: disable=R0902
-    filter_list: Optional[list[SQLLogicType]] = None
-    filter_dict: Optional[dict[str, Any]] = None
-    eager_options: Optional[list] = None
-    order_by_list: Optional[list[Column | UnaryExpression]] = None
-    join_list: Optional[JoinListType] = None
-    distinct_on_list: Optional[list[Optional[Column]]] = None
-    group_by_list: Optional[list[Column]] = None
-    having_list: Optional[list[SQLLogicType]] = None
-    limit: Optional[int] = None
+    filter_list: list[SQLLogicType] | None = None
+    filter_dict: dict[str, Any] | None = None
+    eager_options: list | None = None
+    order_by_list: list[Column | UnaryExpression] | None = None
+    join_list: JoinListType | None = None
+    distinct_on_list: list[Column | None] | None = None
+    group_by_list: list[Column] | None = None
+    having_list: list[SQLLogicType] | None = None
+    limit: int | None = None
 
     def __post_init__(self) -> None:
         if not self.group_by_list and self.having_list:

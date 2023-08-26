@@ -39,7 +39,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 # All RET505 and up rules prevent use else returns which can have importance when conveying logic
-select = ["E", "F", "W", "C", "PT", "I", "RSE", "RET501", "RET502", "RET503" ,"RET504"]
+select = ["E", "F", "W", "C", "PT", "I", "RSE", "RET501", "RET502", "RET503" ,"RET504", "FBT", "ASYNC", "UP", "SIM", "TID", "TCH", "ARG", "RUF100"]
 fixable = ["ALL"]
 exclude = ["alembic"]
 

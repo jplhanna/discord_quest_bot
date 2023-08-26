@@ -1,9 +1,8 @@
+from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from typing import TYPE_CHECKING
 from typing import Literal
-from typing import Sequence
-from typing import Type
 from typing import TypedDict
 from typing import TypeVar
 
@@ -19,7 +18,7 @@ from sqlalchemy.sql.functions import Function
 from sqlalchemy.sql.selectable import CTE
 
 if TYPE_CHECKING:
-    from src.models import CoreModelMixin  # noqa
+    from src.models import CoreModelMixin
 
 
 class DBConfigDict(TypedDict):
@@ -55,7 +54,7 @@ class ConfigDict(TypedDict):
 
 
 SQLLogicType = BinaryExpression | BooleanClauseList | bool | Mapped["bool"] | ColumnElement["bool"]
-JoinOnType = Type["CoreModelMixin"] | AliasedClass | RelationshipProperty
+JoinOnType = type["CoreModelMixin"] | AliasedClass | RelationshipProperty
 
 
 @dataclass
@@ -79,7 +78,7 @@ JoinListType = Sequence[
     FromClause | JoinStruct | tuple[JoinOnType, SQLLogicType | RelationshipProperty] | tuple[CTE, SQLLogicType]
 ]
 
-EntitiesType = Mapped | Label | Type["CoreModelMixin"] | Function
+EntitiesType = Mapped | Label | type["CoreModelMixin"] | Function
 BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")  # pylint: disable=C0103
 
 

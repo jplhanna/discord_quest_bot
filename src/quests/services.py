@@ -1,7 +1,6 @@
+from collections.abc import Coroutine
+from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Coroutine
-from typing import Optional
-from typing import Sequence
 
 from sqlalchemy.orm import selectinload
 
@@ -25,7 +24,7 @@ class QuestService(BaseService):
     _repository: BaseRepository[Quest]
     _secondary_repository: BaseRepository[UserQuest]
 
-    def _get_quest_by_name(self, quest_name: str) -> Coroutine[None, None, Optional[Quest]]:
+    def _get_quest_by_name(self, quest_name: str) -> Coroutine[None, None, Quest | None]:
         return self._repository.get_first(
             QueryArgs(
                 filter_list=[case_insensitive_str_compare(Quest.name, quest_name)],

@@ -1,12 +1,10 @@
 from abc import ABC
+from collections.abc import Callable
+from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import replace
-from typing import Callable
 from typing import Generic
-from typing import Optional
-from typing import Sequence
-from typing import Type
 from typing import cast
 
 from sqlalchemy import func
@@ -23,8 +21,8 @@ from src.typeshed import EntitiesType
 @dataclass
 class BaseRepository(ABC, Generic[BaseModelType]):
     session_factory: Callable[..., AsyncSession]
-    model: Type[BaseModelType]
-    _session: Optional[AsyncSession] = field(default=None, init=False)
+    model: type[BaseModelType]
+    _session: AsyncSession | None = field(default=None, init=False)
 
     @property
     def session(self) -> AsyncSession:
@@ -32,7 +30,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             self._session = self.session_factory()
         return self._session
 
-    def _query(self, query_args: Optional[QueryArgs], to_select: list[EntitiesType] | None = None) -> Executable:
+    def _query(self, query_args: QueryArgs | None, to_select: list[EntitiesType] | None = None) -> Executable:
         query_handlers = query_args.get_query_handlers() if query_args else []
         to_select = to_select or [self.model]
         query: Executable = select(*to_select)
@@ -40,7 +38,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             query = query_handler.update_query(query)
         return query
 
-    async def get_query(self, query_args: Optional[QueryArgs] = None, use_unique: bool = False) -> Result:
+    async def get_query(self, query_args: QueryArgs | None = None, *, use_unique: bool = False) -> Result:
         query = self._query(query_args)
         result: Result = await self.session.execute(query)
         if use_unique:
@@ -48,7 +46,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         return result
 
     async def get_query_with_entities(
-        self, entities_list: list[EntitiesType], query_args: Optional[QueryArgs] = None, use_unique: bool = False
+        self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None, *, use_unique: bool = False
     ) -> Result:
         query = self._query(query_args, to_select=entities_list)
         result: Result = await self.session.execute(query)
@@ -56,49 +54,49 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             result = result.unique()
         return result
 
-    async def get_all(self, query_args: Optional[QueryArgs] = None) -> Sequence[BaseModelType]:
+    async def get_all(self, query_args: QueryArgs | None = None) -> Sequence[BaseModelType]:
         query = await self.get_query(query_args)
         res: Sequence[BaseModelType] = query.scalars().all()
         return res
 
     async def get_all_with_entities(
-        self, entities_list: list[EntitiesType], query_args: Optional[QueryArgs] = None
+        self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None
     ) -> Sequence[tuple]:
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
         res: Sequence[tuple] = query.scalars().all()
         return res
 
-    async def get_count(self, query_args: Optional[QueryArgs] = None) -> int:
+    async def get_count(self, query_args: QueryArgs | None = None) -> int:
         query = await self.get_query_with_entities(
             entities_list=[func.count(self.model.id)],  # pylint: disable=E1102
             query_args=query_args,
         )
         return cast(int, query.scalars().first())
 
-    async def get_first(self, query_args: Optional[QueryArgs] = None) -> Optional[BaseModelType]:
+    async def get_first(self, query_args: QueryArgs | None = None) -> BaseModelType | None:
         if not query_args:
             query_args = QueryArgs()
         replace(query_args, limit=1)
         query: Result = await self.get_query(query_args)
-        result: Optional[BaseModelType] = query.scalars().first()
+        result: BaseModelType | None = query.scalars().first()
         return result
 
-    async def get_one(self, query_args: Optional[QueryArgs] = None) -> BaseModelType:
+    async def get_one(self, query_args: QueryArgs | None = None) -> BaseModelType:
         query = await self.get_query(query_args)
         result: BaseModelType = query.scalar_one()
         return result
 
     async def get_first_with_entities(
-        self, entities_list: list[EntitiesType], query_args: Optional[QueryArgs] = None
-    ) -> Optional[tuple]:
+        self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None
+    ) -> tuple | None:
         if not query_args:
             query_args = QueryArgs()
         replace(query_args, limit=1)
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-        result: Optional[tuple] = query.scalars().first()
+        result: tuple | None = query.scalars().first()
         return result
 
-    async def get_by_id(self, id_: int) -> Optional[BaseModelType]:
+    async def get_by_id(self, id_: int) -> BaseModelType | None:
         return await self.session.get(self.model, id_)
 
     async def add(self, data: BaseModelType) -> None:

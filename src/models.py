@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import BigInteger
 from sqlalchemy import ForeignKey
@@ -7,7 +8,6 @@ from sqlalchemy.orm import MappedAsDataclass
 from sqlalchemy.orm import declared_attr
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
-from typing_extensions import TYPE_CHECKING
 
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.helpers.sqlalchemy_helpers import snake_case_table_name
