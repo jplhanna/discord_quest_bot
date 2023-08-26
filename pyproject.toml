@@ -38,7 +38,8 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
-select = ["E", "F", "W", "C", "PT", "I"]
+# All RET505 and up rules prevent use else returns which can have importance when conveying logic
+select = ["E", "F", "W", "C", "PT", "I", "RSE", "RET501", "RET502", "RET503" ,"RET504"]
 fixable = ["ALL"]
 exclude = ["alembic"]
 
