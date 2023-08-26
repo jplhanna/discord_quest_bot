@@ -1,8 +1,8 @@
+from typing import TYPE_CHECKING
 from typing import Callable
 from typing import Concatenate
 from typing import Coroutine
 from typing import ParamSpec
-from typing import TYPE_CHECKING
 
 from discord.ext.commands import Context
 from discord.ext.commands import HybridCommand

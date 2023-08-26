@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 from dataclasses import field
+from typing import TYPE_CHECKING
 from typing import Literal
 from typing import Sequence
-from typing import TYPE_CHECKING
 from typing import Type
-from typing import TypeVar
 from typing import TypedDict
+from typing import TypeVar
 
 from sqlalchemy import ColumnElement
 from sqlalchemy.orm import Mapped

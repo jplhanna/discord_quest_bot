@@ -14,8 +14,8 @@ from src.helpers.sqlalchemy_helpers import snake_case_table_name
 from src.typeshed import MixinData
 
 if TYPE_CHECKING:
-    from src.quests import Quest
     from src.quests import ExperienceTransaction
+    from src.quests import Quest
 
 
 class CoreModelMixin(MappedAsDataclass, BaseModel, kw_only=True):

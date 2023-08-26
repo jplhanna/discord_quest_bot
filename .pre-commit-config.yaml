@@ -22,15 +22,6 @@ repos:
 
   - repo: local
     hooks:
-      - id: flake8
-        name: flake8
-        entry: flake8
-        language: system
-        types: [ python ]
-        exclude: alembic
-
-  - repo: local
-    hooks:
       - id: mypy
         name: mypy
         entry: mypy
@@ -46,6 +37,7 @@ repos:
         language: system
         types: [ python ]
         exclude: alembic
+        args: [--fix, --exit-non-zero-on-fix]
 
   - repo: local
     hooks:
