@@ -3,12 +3,12 @@ from asyncio import new_event_loop
 from copy import copy
 from typing import Callable
 from typing import Generator
+from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from unittest.mock import Mock
 from unittest.mock import sentinel
 
 import pytest
-from asynctest import MagicMock as AsyncMagicMock
 from sqlalchemy import inspect
 
 from src.containers import Container
@@ -44,7 +44,7 @@ def mocked_ctx() -> MagicMock:
 
 @pytest.fixture()
 def mock_user_repository() -> BaseRepository[User]:
-    return BaseRepository(AsyncMagicMock(), User)
+    return BaseRepository(AsyncMock(), User)
 
 
 @pytest.fixture()
