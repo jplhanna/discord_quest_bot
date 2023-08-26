@@ -73,8 +73,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             entities_list=[func.count(self.model.id)],  # pylint: disable=E1102
             query_args=query_args,
         )
-        count = cast(int, query.scalars().first())
-        return count
+        return cast(int, query.scalars().first())
 
     async def get_first(self, query_args: Optional[QueryArgs] = None) -> Optional[BaseModelType]:
         if not query_args:
@@ -100,8 +99,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         return result
 
     async def get_by_id(self, id_: int) -> Optional[BaseModelType]:
-        res = await self.session.get(self.model, id_)
-        return res
+        return await self.session.get(self.model, id_)
 
     async def add(self, data: BaseModelType) -> None:
         self.session.add(data)

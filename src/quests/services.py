@@ -110,8 +110,7 @@ class QuestService(BaseService):
         return quest
 
     async def get_all_quests(self) -> Sequence[Quest]:
-        quests = await self._repository.get_all()
-        return quests
+        return await self._repository.get_all()
 
 
 class ExperienceTransactionService(BaseService):

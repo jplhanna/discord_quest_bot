@@ -86,7 +86,7 @@ class QueryArgs:  # pylint: disable=R0902
             raise Warning("Defining query with having clause but no group by clause")
 
     def get_query_handlers(self) -> list[_QueryHandler]:
-        query_handlers = [
+        return [
             _QueryHandler("filter_by", self.filter_dict),
             _JoinQueryHandler("join", self.join_list),
             _QueryHandler("filter", self.filter_list),
@@ -97,7 +97,6 @@ class QueryArgs:  # pylint: disable=R0902
             _QueryHandler("distinct", self.distinct_on_list, allow_empty_data=True),
             _QueryHandler("limit", self.limit),
         ]
-        return query_handlers
 
 
 def many_to_many_table(first_table: str, second_table: str) -> Table:
@@ -106,13 +105,12 @@ def many_to_many_table(first_table: str, second_table: str) -> Table:
             f"{table_name.lower()}_id", ForeignKey(f"{table_name.lower()}.id", ondelete="CASCADE"), primary_key=True
         )
 
-    table = Table(
+    return Table(
         f"{first_table.lower()}_{second_table.lower()}",
         BaseModel.metadata,
         get_column(first_table),
         get_column(second_table),
     )
-    return table
 
 
 def snake_case_table_name(model_name: str) -> str:

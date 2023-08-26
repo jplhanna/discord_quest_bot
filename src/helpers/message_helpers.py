@@ -13,8 +13,7 @@ from src.quests.models import Quest
 
 def _create_single_quest_line(first_column: str, second_column: str, line_length: int) -> str:
     num_spaces_needed = line_length - WRAPPER_TEXT_LEN - len(first_column) - len(second_column)
-    single_line = "".join([BLOCK_PRE_TEXT, first_column, " " * num_spaces_needed, second_column, BLOCK_POST_TEXT])
-    return single_line
+    return "".join([BLOCK_PRE_TEXT, first_column, " " * num_spaces_needed, second_column, BLOCK_POST_TEXT])
 
 
 def format_quest_board(quests: Sequence[Quest]) -> str:
@@ -34,7 +33,4 @@ def format_quest_board(quests: Sequence[Quest]) -> str:
     board_top_and_bottom = BOX_VERTICAL_CHAR * line_length
     header = _create_single_quest_line(QUEST_COLUMN_NAME, EXPERIENCE_COLUMN_NAME, line_length)
     board_quest_text = [_create_single_quest_line(quest.name, str(quest.experience), line_length) for quest in quests]
-    full_board = "\n".join(
-        [CODE_BLOCK, board_top_and_bottom, header, *board_quest_text, board_top_and_bottom, CODE_BLOCK]
-    )
-    return full_board
+    return "\n".join([CODE_BLOCK, board_top_and_bottom, header, *board_quest_text, board_top_and_bottom, CODE_BLOCK])
