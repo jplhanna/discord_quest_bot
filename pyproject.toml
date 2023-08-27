@@ -21,9 +21,6 @@ omit = [
   "constants.py"
 ]
 
-[tool.flake8]
-max-line-length = 120
-
 [tool.mypy]
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
@@ -69,7 +66,6 @@ psycopg2-binary = "^2.9.6"
 python = "^3.11"
 
 [tool.poetry.group.dev.dependencies]
-Flake8-pyproject = "^1.1.0.post0"
 bandit = {extras = ["toml"], version = "^1.7.4"}
 black = "*"
 coverage = {extras = ["toml"], version = "^6.4.4"}
