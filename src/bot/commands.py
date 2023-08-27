@@ -15,7 +15,7 @@ from src.bot.typeshed import CommandRegisterType
 from src.config import DISCORD_OWNER_ID
 
 default_intent = Intents.default()
-default_intent.message_content = True  # pylint: disable=E0237
+default_intent.message_content = True
 bot = Bot(command_prefix="~", intents=default_intent, owner_id=DISCORD_OWNER_ID)
 
 bot_hybrid_command_register = cast(CommandRegisterType, bot.hybrid_command)

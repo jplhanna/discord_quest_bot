@@ -20,7 +20,7 @@ from src.services import UserService
 async def check_and_register_user(ctx: Context, user_service: UserService = Provide[Container.user_service]) -> str:
     discord_id = ctx.author.id
     if not discord_id:
-        raise NoIDProvided()
+        raise NoIDProvided
     if await user_service.get_user_by_discord_id(discord_id):
         return ALREADY_REGISTERED_MESSAGE
     await user_service.create_user(discord_id=discord_id)
@@ -47,8 +47,7 @@ async def add_quest_to_user(
 @inject
 async def get_quest_list_text(quest_service: QuestService = Provide[Container.quest_service]) -> str:
     quests = await quest_service.get_all_quests()
-    message = format_quest_board(quests)
-    return message
+    return format_quest_board(quests)
 
 
 @inject
