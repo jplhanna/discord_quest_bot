@@ -1,8 +1,7 @@
 from unittest.mock import MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
-from asynctest import CoroutineMock
-from asynctest import MagicMock as AsyncMagicMock
 
 from src.constants import GOOD_LUCK_ADVENTURER
 from src.quests.exceptions import MaxQuestCompletionReached
@@ -16,10 +15,10 @@ from src.quests.services import QuestService
 class TestQuestService:
     async def test_accept_quest_if_available(self, mocked_user, mock_container):
         # Arrange
-        mock_quest_repository = AsyncMagicMock(
-            get_first=CoroutineMock(return_value=MagicMock(users=[])), session=AsyncMagicMock(commit=CoroutineMock())
+        mock_quest_repository = AsyncMock(
+            get_first=AsyncMock(return_value=MagicMock(users=[])), session=AsyncMock(commit=AsyncMock())
         )
-        mock_user_quest_repo = AsyncMagicMock(get_count=CoroutineMock(return_value=0), add=CoroutineMock())
+        mock_user_quest_repo = AsyncMock(get_count=AsyncMock(return_value=0), add=AsyncMock())
         quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=mock_user_quest_repo)
         # Act
         res = await quest_service.accept_quest_if_available(mocked_user, "Quest title")
@@ -29,8 +28,8 @@ class TestQuestService:
 
     async def test_quest_dne(self, mocked_user, mock_container):
         # Arrange
-        mock_quest_repository = AsyncMagicMock(get_first=CoroutineMock(return_value=None))
-        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=AsyncMagicMock())
+        mock_quest_repository = AsyncMock(get_first=AsyncMock(return_value=None))
+        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=AsyncMock())
         # Act & Assert
         with pytest.raises(QuestDNE):
             await quest_service.accept_quest_if_available(mocked_user, "Quest title")
@@ -38,10 +37,10 @@ class TestQuestService:
     async def test_quest_already_accepted(self, mocked_user, mock_container):
         # Arrange
         quest = MagicMock(users=[mocked_user])
-        mock_quest_repository = AsyncMagicMock(
-            get_first=CoroutineMock(return_value=quest), session=AsyncMagicMock(commit=CoroutineMock())
+        mock_quest_repository = AsyncMock(
+            get_first=AsyncMock(return_value=quest), session=AsyncMock(commit=AsyncMock())
         )
-        mock_user_quest_repo = AsyncMagicMock(get_count=CoroutineMock(return_value=1))
+        mock_user_quest_repo = AsyncMock(get_count=AsyncMock(return_value=1))
         quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=mock_user_quest_repo)
         # Act & Assert
         with pytest.raises(QuestAlreadyAccepted):
@@ -51,12 +50,12 @@ class TestQuestService:
     async def test_quest_completed(self, mocked_user, mock_container, max_completion_count):
         # Arrange
         quest = MagicMock(users=[mocked_user], max_completion_count=max_completion_count)
-        mock_quest_repository = AsyncMagicMock(
-            get_first=CoroutineMock(return_value=quest), session=AsyncMagicMock(commit=CoroutineMock())
+        mock_quest_repository = AsyncMock(
+            get_first=AsyncMock(return_value=quest), session=AsyncMock(commit=AsyncMock())
         )
         user_quest = MagicMock(user=mocked_user, quest=quest)
-        mock_user_quest_repository = AsyncMagicMock(
-            get_count=CoroutineMock(return_value=1), get_first=CoroutineMock(return_value=user_quest)
+        mock_user_quest_repository = AsyncMock(
+            get_count=AsyncMock(return_value=1), get_first=AsyncMock(return_value=user_quest)
         )
         quest_service = QuestService(
             _repository=mock_quest_repository, _secondary_repository=mock_user_quest_repository
@@ -68,18 +67,18 @@ class TestQuestService:
 
     async def test_cannot_complete_nonexistent_quest(self, mocked_user, mock_container):
         # Arrange
-        mock_quest_repository = AsyncMagicMock(get_first=CoroutineMock(return_value=None))
-        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=AsyncMagicMock())
+        mock_quest_repository = AsyncMock(get_first=AsyncMock(return_value=None))
+        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=AsyncMock())
         # Act & Assert
         with pytest.raises(QuestDNE):
             await quest_service.complete_quest_if_available(mocked_user, "Quest Title")
 
     async def test_cannot_complete_unaccepted_quest(self, mocked_user, mock_container):
         # Arrange
-        mock_quest_repository = AsyncMagicMock(
-            get_first=CoroutineMock(return_value=MagicMock()), session=AsyncMagicMock(commit=CoroutineMock())
+        mock_quest_repository = AsyncMock(
+            get_first=AsyncMock(return_value=MagicMock()), session=AsyncMock(commit=AsyncMock())
         )
-        mock_user_quest_repo = AsyncMagicMock(get_first=CoroutineMock(return_value=None))
+        mock_user_quest_repo = AsyncMock(get_first=AsyncMock(return_value=None))
         quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=mock_user_quest_repo)
         # Act & Assert
         with pytest.raises(QuestNotAccepted):
@@ -88,10 +87,10 @@ class TestQuestService:
     async def test_max_completion_count_reached(self, mocked_user, mock_container):
         # Arrange
         quest = MagicMock(users=[mocked_user], max_completion_count=1, completed_users=[mocked_user])
-        mock_quest_repository = AsyncMagicMock(
-            get_first=CoroutineMock(return_value=quest), session=AsyncMagicMock(commit=CoroutineMock())
+        mock_quest_repository = AsyncMock(
+            get_first=AsyncMock(return_value=quest), session=AsyncMock(commit=AsyncMock())
         )
-        mock_user_quest_repository = AsyncMagicMock(get_count=CoroutineMock(return_value=1), get_first=CoroutineMock())
+        mock_user_quest_repository = AsyncMock(get_count=AsyncMock(return_value=1), get_first=AsyncMock())
         quest_service = QuestService(
             _repository=mock_quest_repository, _secondary_repository=mock_user_quest_repository
         )
