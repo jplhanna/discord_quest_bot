@@ -1,8 +1,8 @@
 from asyncio import current_task
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from logging import getLogger
 from logging.config import dictConfig
-from typing import AsyncGenerator
 
 from dependency_injector.containers import DeclarativeContainer
 from dependency_injector.providers import Configuration

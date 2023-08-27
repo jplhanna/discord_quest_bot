@@ -1,8 +1,8 @@
 from asyncio import AbstractEventLoop
 from asyncio import new_event_loop
+from collections.abc import Callable
+from collections.abc import Generator
 from copy import copy
-from typing import Callable
-from typing import Generator
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from unittest.mock import Mock
@@ -32,14 +32,12 @@ def mock_container() -> Generator[Container, None, None]:
 
 @pytest.fixture(scope="session")
 def mocked_user() -> User:
-    user = Mock(spec=User, discord_id=sentinel.discord_id, id=sentinel.user_id, _sa_instance_state=MagicMock())
-    return user
+    return Mock(spec=User, discord_id=sentinel.discord_id, id=sentinel.user_id, _sa_instance_state=MagicMock())
 
 
 @pytest.fixture(scope="session")
 def mocked_ctx() -> MagicMock:
-    ctx = MagicMock(author=MagicMock(id=sentinel.discord_id))
-    return ctx
+    return MagicMock(author=MagicMock(id=sentinel.discord_id))
 
 
 @pytest.fixture()

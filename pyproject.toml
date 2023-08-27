@@ -1,105 +1,126 @@
-[tool.poetry]
-name = "discord-quest-bot"
-version = "0.1.1"
-description = "Discord bot for tracking and rewarding tasks"
-authors = ["jplhanna <jpl.hanna@gmail.com>"]
-readme = "README.md"
-packages = [{ include = "local_server" }]
-
-[tool.poetry.dependencies]
-python = "^3.11"
-alembic = "^1.8"
-furl = "^2.1.3"
-asyncpg = "0.27.0"
-dependency-injector = ">=4, <5"
-SQLAlchemy = { version = "^2.0.0b3", allow-prereleases = true }
-"discord.py" = "^2.0.1"
-psycopg2-binary = "^2.9.6"
-
-
-[tool.poetry.group.dev.dependencies]
-mypy = "*"
-pytest = "*"
-pre-commit = "*"
-flake8 = "*"
-black = "*"
-pytest-asyncio = "*"
-faker = "*"
-coverage = { extras = ["toml"], version = "^6.4.4" }
-pytest-async-sqlalchemy = "*"
-pytest-randomly = "*"
-pytest-cov = "*"
-bandit = { extras = ["toml"], version = "^1.7.4" }
-flake8-pytest-style = "^1.6.0"
-Flake8-pyproject = "^1.1.0.post0"
-ruff = "^0.0.280"
-
 [build-system]
-requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.ruff]
-select = ["E", "F", "W", "C"]
-fixable = ["ALL"]
-exclude = ["alembic"]
-
-line-length = 120
-
-target-version = "py310"
+requires = ["poetry-core"]
 
 [tool.bandit]
 exclude_dirs = ["test"]
 
-[tool.mypy]
-exclude = [
-    "test",
-    "alembic"
-]
-namespace_packages = true
-python_version = "3.10"
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_return_any = true
-warn_unreachable = true
-show_error_codes = true
-local_partial_types = true
-plugins = ["sqlalchemy.ext.mypy.plugin"]
-
-[[tool.mypy.overrides]]
-module = "sqlalchemy.*"
-ignore_missing_imports = true
-disallow_untyped_calls = false
-
-[[tool.mypy.overrides]]
-module = "furl"
-ignore_missing_imports = true
-
 [tool.black]
 line-length = 120
-
-[tool.pytest.ini_options]
-asyncio_mode = "auto"
-filterwarnings = [
-    "ignore::DeprecationWarning"
-]
-markers = [
-    "integration"
-]
-
-[tool.coverage.run]
-branch = true
-omit = [
-    "alembic/*",
-    "run.py",
-    "config.py",
-    "conftest.py",
-    "constants.py"
-]
 
 [tool.coverage.report]
 skip_empty = true
 
-[tool.flake8]
-max-line-length = 120
+[tool.coverage.run]
+branch = true
+omit = [
+  "alembic/*",
+  "run.py",
+  "config.py",
+  "conftest.py",
+  "constants.py"
+]
+
+[tool.mypy]
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+exclude = [
+  "test",
+  "alembic"
+]
+local_partial_types = true
+namespace_packages = true
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+python_version = "3.10"
+show_error_codes = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+disallow_untyped_calls = false
+ignore_missing_imports = true
+module = "sqlalchemy.*"
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = "furl"
+
+[tool.poetry]
+authors = ["jplhanna <jpl.hanna@gmail.com>"]
+description = "Discord bot for tracking and rewarding tasks"
+name = "discord-quest-bot"
+packages = [{include = "local_server"}]
+readme = "README.md"
+version = "0.1.1"
+
+[tool.poetry.dependencies]
+SQLAlchemy = {version = "^2.0.0b3", allow-prereleases = true}
+alembic = "^1.8"
+asyncpg = "0.27.0"
+dependency-injector = ">=4, <5"
+"discord.py" = "^2.0.1"
+furl = "^2.1.3"
+psycopg2-binary = "^2.9.6"
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+bandit = {extras = ["toml"], version = "^1.7.4"}
+black = "*"
+coverage = {extras = ["toml"], version = "^6.4.4"}
+faker = "*"
+flake8-pytest-style = "^1.6.0"
+mypy = "*"
+pre-commit = "*"
+pytest = "*"
+pytest-async-sqlalchemy = "*"
+pytest-asyncio = "*"
+pytest-cov = "*"
+pytest-randomly = "*"
+ruff = "^0.0.280"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+filterwarnings = [
+  "ignore::DeprecationWarning"
+]
+markers = [
+  "integration"
+]
+
+[tool.ruff]
+exclude = ["alembic"]
+fixable = ["ALL"]
+line-length = 120
+# All RET505 and up rules prevent use else returns which can have importance when conveying logic
+select = [
+  "E",
+  "F",
+  "W",
+  "C",
+  "PT",
+  "I",
+  "RSE",
+  "RET501",
+  "RET502",
+  "RET503",
+  "RET504",
+  "FBT",
+  "ASYNC",
+  "UP",
+  "SIM",
+  "TID",
+  "TCH",
+  "ARG",
+  "RUF100"
+]
+target-version = "py310"
+
+[tool.ruff.isort]
+force-single-line = true
+force-to-top = ["services"]
+forced-separate = ["src.tests", "src.helpers"]
+
+[tool.ruff.mccabe]
+max-complexity = 10
