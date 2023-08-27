@@ -3,3 +3,5 @@ __pycache__/
 logs/
 .coverage
 coverage.xml
+local.env
+docker-compose.override.yml
