@@ -42,7 +42,7 @@ def mocked_ctx() -> MagicMock:
 
 @pytest.fixture()
 def mock_user_repository() -> BaseRepository[User]:
-    return BaseRepository(AsyncMock(), User)
+    return BaseRepository(MagicMock(session=AsyncMock()), User)
 
 
 @pytest.fixture()
