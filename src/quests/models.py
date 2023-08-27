@@ -77,7 +77,8 @@ class ExperienceTransaction(CoreModelMixin, UserResourceMixin):
     quest: Quest
     """
 
-    __user_mixin_data__ = MixinData(back_populates="experience")
+    class Meta:
+        user_mixin_data = MixinData(back_populates="experience")
 
     # Columns
     quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id"), init=False, repr=False)
