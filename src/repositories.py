@@ -68,7 +68,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
 
     async def get_count(self, query_args: QueryArgs | None = None) -> int:
         query = await self.get_query_with_entities(
-            entities_list=[func.count(self.model.id)],  # pylint: disable=E1102
+            entities_list=[func.count(self.model.id)],
             query_args=query_args,
         )
         return cast(int, query.scalars().first())

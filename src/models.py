@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 
 class CoreModelMixin(MappedAsDataclass, BaseModel, kw_only=True):
     @declared_attr  # type: ignore[arg-type]
-    def __tablename__(self) -> str:  # pylint: disable=E0213
+    def __tablename__(self) -> str:
         return snake_case_table_name(self.__name__)
 
     __abstract__ = True

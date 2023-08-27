@@ -69,7 +69,7 @@ class _EagerOptionsHandler(_QueryHandler):
 
 
 @dataclass(frozen=True)
-class QueryArgs:  # pylint: disable=R0902
+class QueryArgs:
     filter_list: list[SQLLogicType] | None = None
     filter_dict: dict[str, Any] | None = None
     eager_options: list | None = None

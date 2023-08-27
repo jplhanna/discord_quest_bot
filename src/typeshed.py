@@ -79,7 +79,7 @@ JoinListType = Sequence[
 ]
 
 EntitiesType = Mapped | Label | type["CoreModelMixin"] | Function
-BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")  # pylint: disable=C0103
+BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")
 
 
 class MixinData(TypedDict, total=False):
