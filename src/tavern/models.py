@@ -10,6 +10,7 @@ from src.models import CoreModelMixin
 
 
 class Menu(CoreModelMixin):
+    server_id: Mapped[int]
     start_date: Mapped[date] = mapped_column(default_factory=datetime.today)
     items: Mapped[list["MenuItem"]] = relationship("MenuItem", back_populates="menu", default_factory=list)
 
