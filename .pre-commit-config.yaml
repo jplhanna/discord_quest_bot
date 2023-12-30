@@ -60,3 +60,8 @@ repos:
         types: [ python ]
         exclude: alembic|test_.*|conftest.py
         args: [ -c, pyproject.toml ]
+
+  - repo: https://github.com/milin/giticket
+    rev: v1.4
+    hooks:
+      - id: giticket
