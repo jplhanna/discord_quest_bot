@@ -70,5 +70,6 @@ repos:
     rev: v1.4
     hooks:
       - id: giticket
+        args: ['--regex=DQB-[0-9]+']
         stages:
           - commit-msg
