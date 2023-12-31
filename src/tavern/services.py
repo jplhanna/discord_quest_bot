@@ -3,12 +3,12 @@ from datetime import datetime
 from datetime import timedelta
 
 from sqlalchemy import func
+from sqlalchemy.orm import selectinload
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.repositories import BaseRepository
 from src.services import BaseService
 from src.tavern.models import Menu
-from src.tavern.models import MenuItem
 
 
 @dataclass(frozen=True)
@@ -21,8 +21,9 @@ class MenuService(BaseService):
             QueryArgs(
                 filter_dict={"server_id": server_id},
                 filter_list=[func.between(today, Menu.start_date, Menu.start_date + timedelta(days=7))],
+                eager_options=[selectinload(Menu.items)],
             )
         )
 
-    async def upsert_menu_item(self, menu: Menu, item_name: str, day_of_the_week: int) -> MenuItem:
+    async def upsert_menu_item(self, menu: Menu, item_name: str, day_of_the_week: int) -> None:
         pass

@@ -11,6 +11,7 @@ from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
 from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_quest_list_text
+from src.bot.controllers import get_tavern_menu
 from src.bot.typeshed import CommandRegisterType
 from src.config import DISCORD_OWNER_ID
 
@@ -65,3 +66,13 @@ async def completed_quest(ctx: Context, *, quest_name: str) -> None:
 @is_owner()
 async def sync_bot_commands(_: Context) -> None:
     await bot.tree.sync()
+
+
+@bot.hybrid_group(name="tavern")  # type: ignore[arg-type]
+def tavern_group() -> None:
+    pass
+
+
+@tavern_group.command(name="menu")  # type: ignore[arg-type]
+async def tavern_menu(ctx: Context) -> None:
+    await get_tavern_menu(ctx)

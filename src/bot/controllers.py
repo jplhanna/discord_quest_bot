@@ -14,6 +14,7 @@ from src.quests.exceptions import BaseQuestException
 from src.quests.exceptions import QuestAlreadyAccepted
 from src.quests.exceptions import QuestDNE
 from src.services import UserService
+from src.tavern import MenuService
 
 
 @inject
@@ -68,3 +69,16 @@ async def complete_quest_for_user(
         return quest_error.message
     xp_transaction = await xp_service.earn_xp_for_quest(user, quest)
     return f"You have successfully completed {quest.name} and earned {xp_transaction.experience}"
+
+
+@inject
+async def get_tavern_menu(ctx: Context, menu_service: MenuService = Provide[Container]) -> str:
+    if not ctx.guild:
+        return "Bad request"
+    menu = await menu_service.get_this_weeks_menu(ctx.guild.id)
+    if not menu:
+        return "No menu available"
+    menu_str = "Menu"
+    for item in menu.items:
+        menu_str += f"\n{item.food} "
+    return "Menu"
