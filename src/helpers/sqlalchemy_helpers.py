@@ -1,11 +1,15 @@
 import re
 from dataclasses import dataclass
 from dataclasses import field
+from enum import IntEnum
 from typing import Any
 
 from sqlalchemy import Column
+from sqlalchemy import Dialect
 from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
 from sqlalchemy import Table
+from sqlalchemy import TypeDecorator
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import Mapped
@@ -119,3 +123,29 @@ def snake_case_table_name(model_name: str) -> str:
 
 def case_insensitive_str_compare(column: Mapped["str"], value: str) -> SQLLogicType:
     return func.lower(column) == value.lower()
+
+
+class EnumColumn(TypeDecorator):
+    impl = Integer
+    python_type = IntEnum
+
+    def __init__(self, enum_class: type[IntEnum], *args: Any, **kwargs: Any) -> None:
+        self.python_type = enum_class
+        super().__init__(*args, **kwargs)
+
+    def process_bind_param(self, value: IntEnum | int | None, _: Dialect) -> int | None:
+        if value is None:
+            return value
+        if isinstance(value, self.python_type):
+            return value.value
+        if value not in self.python_type:
+            raise ValueError(f"{value} is not a supported day of the week.")
+        return value
+
+    def process_result_value(self, value: int | None, _: Dialect) -> IntEnum | None:
+        if value is None:
+            return value
+        try:
+            return self.python_type(value)
+        except ValueError as e:
+            raise ValueError(f"{value} is not a supported day of the week.") from e
