@@ -5,3 +5,4 @@ logs/
 coverage.xml
 local.env
 docker-compose.override.yml
+.env
