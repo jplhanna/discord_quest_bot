@@ -4,6 +4,8 @@ WORKDIR /app/
 COPY . /app/
 
 FROM base as install-poetry
+
+# Set env variables
 ENV PIPX_BIN_DIR="/opt/pipx" \
     POETRY_NO_INTERACTION=true \
     POETRY_VIRTUALENVS_CREATE=false \
@@ -13,13 +15,13 @@ ENV PIPX_BIN_DIR="/opt/pipx" \
     PATH="/root/.local/share/pipx/venvs/poetry/bin:$PATH"
 ENV PATH="$POETRY_VIRTUALENVS_PATH/bin:$PIPX_BIN_DIR:$PATH"
 
-
+# Install poetry
 RUN pip install --upgrade pip \
     && pip install pipx \
     && pipx install poetry==$POETRY_VERSION
 RUN apt-get update && apt-get install -y --no-install-recommends gcc
 
-# Install python dependencies in /.venv
+# Install python dependencies
 RUN poetry install --no-root --no-ansi --no-interaction --only=main --no-directory
 
 # Install application into container
