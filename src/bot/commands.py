@@ -69,8 +69,8 @@ async def sync_bot_commands(_: Context) -> None:
 
 
 @bot.hybrid_group(name="tavern")  # type: ignore[arg-type]
-def tavern_group() -> None:
-    pass
+async def tavern_group(ctx: Context) -> None:
+    await ctx.send("Available commands: \n - menu [List out all menu items for this week]")
 
 
 @tavern_group.command(name="menu")  # type: ignore[arg-type]

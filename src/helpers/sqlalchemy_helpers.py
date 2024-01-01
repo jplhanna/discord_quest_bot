@@ -12,6 +12,7 @@ from sqlalchemy import Table
 from sqlalchemy import TypeDecorator
 from sqlalchemy import func
 from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.orm import Mapped
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
@@ -77,7 +78,7 @@ class QueryArgs:
     filter_list: list[SQLLogicType] | None = None
     filter_dict: dict[str, Any] | None = None
     eager_options: list | None = None
-    order_by_list: list[Column | UnaryExpression] | None = None
+    order_by_list: list[Column | UnaryExpression | InstrumentedAttribute] | None = None
     join_list: JoinListType | None = None
     distinct_on_list: list[Column | None] | None = None
     group_by_list: list[Column] | None = None

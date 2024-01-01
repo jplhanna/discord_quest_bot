@@ -7,6 +7,7 @@ from typing import TypedDict
 from typing import TypeVar
 
 from sqlalchemy import ColumnElement
+from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import RelationshipProperty
 from sqlalchemy.orm.util import AliasedClass
@@ -75,7 +76,11 @@ class JoinStruct:
 
 
 JoinListType = Sequence[
-    FromClause | JoinStruct | tuple[JoinOnType, SQLLogicType | RelationshipProperty] | tuple[CTE, SQLLogicType]
+    FromClause
+    | JoinStruct
+    | tuple[JoinOnType, SQLLogicType | RelationshipProperty]
+    | tuple[CTE, SQLLogicType]
+    | InstrumentedAttribute
 ]
 
 EntitiesType = Mapped | Label | type["CoreModelMixin"] | Function
