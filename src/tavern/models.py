@@ -32,4 +32,4 @@ class MenuItem(CoreModelMixin):
     menu_id: Mapped[int] = mapped_column(ForeignKey("menu.id", ondelete="CASCADE"), init=False, repr=False)
 
     # relationships
-    menu: Mapped[Menu] = relationship(Menu, back_populates="items")
+    menu: Mapped[Menu] = relationship(Menu, back_populates="items", init=False)
