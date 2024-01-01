@@ -11,15 +11,15 @@ class TestMenu:
     @pytest.mark.parametrize(
         ("items", "update_dict"),
         [
-            ([item1 := MenuItem(food="food", day_of_the_week=DayOfWeek.saturday)], {DayOfWeek.saturday: [item1]}),
+            ([item1 := MenuItem(food="food", day_of_the_week=DayOfWeek.SATURDAY)], {DayOfWeek.SATURDAY: [item1]}),
             ([], {}),
             (
                 [
-                    item1 := MenuItem(food="food", day_of_the_week=DayOfWeek.monday),
-                    item2 := MenuItem(food="food 2", day_of_the_week=DayOfWeek.wednesday),
-                    item3 := MenuItem(food="food", day_of_the_week=DayOfWeek.monday),
+                    item1 := MenuItem(food="food", day_of_the_week=DayOfWeek.MONDAY),
+                    item2 := MenuItem(food="food 2", day_of_the_week=DayOfWeek.WEDNESDAY),
+                    item3 := MenuItem(food="food", day_of_the_week=DayOfWeek.MONDAY),
                 ],
-                {DayOfWeek.monday: [item1, item3], DayOfWeek.wednesday: [item2]},
+                {DayOfWeek.MONDAY: [item1, item3], DayOfWeek.WEDNESDAY: [item2]},
             ),
         ],
     )
@@ -30,13 +30,13 @@ class TestMenu:
         res = menu.grouped_items
         # Assert
         test_res = {
-            DayOfWeek.sunday: [],
-            DayOfWeek.monday: [],
-            DayOfWeek.tuesday: [],
-            DayOfWeek.wednesday: [],
-            DayOfWeek.thursday: [],
-            DayOfWeek.friday: [],
-            DayOfWeek.saturday: [],
+            DayOfWeek.SUNDAY: [],
+            DayOfWeek.MONDAY: [],
+            DayOfWeek.TUESDAY: [],
+            DayOfWeek.WEDNESDAY: [],
+            DayOfWeek.THURSDAY: [],
+            DayOfWeek.FRIDAY: [],
+            DayOfWeek.SATURDAY: [],
         }
         test_res.update(update_dict)
         assert res == test_res

@@ -72,7 +72,7 @@ async def complete_quest_for_user(
 
 
 @inject
-async def get_tavern_menu(ctx: Context, menu_service: MenuService = Provide[Container]) -> str:
+async def get_tavern_menu(ctx: Context, menu_service: MenuService = Provide[Container.menu_service]) -> str:
     if not ctx.guild:
         return "Bad request"
     menu = await menu_service.get_this_weeks_menu(ctx.guild.id)
@@ -80,7 +80,9 @@ async def get_tavern_menu(ctx: Context, menu_service: MenuService = Provide[Cont
         return "No menu available"
     menu_str = "Menu"
     for day, items in menu.grouped_items.items():
-        menu_str += f"\n{day.name}: "
+        menu_str += f"\n{day.name.title()}:"
+        if not items:
+            menu_str += "\n  No items available."
         for item in items:
             menu_str += f"\n  {item.food}"
     return menu_str

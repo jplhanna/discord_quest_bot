@@ -35,9 +35,9 @@ def mocked_user() -> User:
     return Mock(spec=User, discord_id=sentinel.discord_id, id=sentinel.user_id, _sa_instance_state=MagicMock())
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture()
 def mocked_ctx() -> MagicMock:
-    return MagicMock(author=MagicMock(id=sentinel.discord_id))
+    return MagicMock(author=MagicMock(id=sentinel.discord_id), guild=MagicMock(id=sentinel.guild_id))
 
 
 @pytest.fixture()

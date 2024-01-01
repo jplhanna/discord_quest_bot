@@ -10,8 +10,12 @@ from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
 from src.bot.controllers import complete_quest_for_user
+from src.bot.controllers import get_tavern_menu
 from src.constants import QUEST_DOES_NOT_EXIST
+from src.constants import DayOfWeek
 from src.quests.exceptions import QuestDNE
+from src.tavern import Menu
+from src.tavern.models import MenuItem
 
 wire_to = ["src.bot.controllers"]
 
@@ -90,3 +94,57 @@ class TestCompleteQuestForUser:
 
         # Assert
         assert res == QUEST_DOES_NOT_EXIST
+
+
+class TestGetTavernMenu:
+    @pytest.mark.usefixtures("mock_container")
+    async def test_get_no_guild(self, mocked_ctx):
+        # Arrange
+        mocked_ctx.guild = None
+        # Act
+        res = await get_tavern_menu(mocked_ctx)
+        # Assert
+        assert res == "Bad request"
+
+    async def test_get_with_no_menu(self, mocked_ctx, mock_container):
+        # Arrange
+        menu_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
+        mock_container.menu_service.override(menu_service)
+        mock_container.wire(wire_to)
+
+        # Act
+        res = await get_tavern_menu(mocked_ctx)
+
+        # Assert
+        assert res == "No menu available"
+
+    async def test_get_tavern_menu(self, mock_container, mocked_ctx):
+        # Arrange
+        menu_item = MenuItem(food="test", day_of_the_week=DayOfWeek.MONDAY)
+        menu_service = AsyncMock(
+            get_this_weeks_menu=AsyncMock(
+                return_value=Menu(server_id=sentinel.guild_id, start_date=sentinel.menu_start_date, items=[menu_item])
+            )
+        )
+        mock_container.menu_service.override(menu_service)
+        mock_container.wire(wire_to)
+        # Act
+        res = await get_tavern_menu(mocked_ctx)
+        # Assert
+        assert res == (
+            "Menu\n"
+            "Sunday:\n"
+            "  No items available.\n"
+            "Monday:\n"
+            f"  {menu_item.food}\n"
+            "Tuesday:\n"
+            "  No items available.\n"
+            "Wednesday:\n"
+            "  No items available.\n"
+            "Thursday:\n"
+            "  No items available.\n"
+            "Friday:\n"
+            "  No items available.\n"
+            "Saturday:\n"
+            "  No items available."
+        )

@@ -3,13 +3,12 @@ from datetime import datetime
 from datetime import timedelta
 
 from sqlalchemy import func
-from sqlalchemy.orm import contains_eager
+from sqlalchemy.orm import selectinload
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.repositories import BaseRepository
 from src.services import BaseService
 from src.tavern.models import Menu
-from src.tavern.models import MenuItem
 
 
 @dataclass(frozen=True)
@@ -22,9 +21,8 @@ class MenuService(BaseService):
             QueryArgs(
                 filter_dict={"server_id": server_id},
                 filter_list=[func.between(today, Menu.start_date, Menu.start_date + timedelta(days=7))],
-                eager_options=[contains_eager(Menu.items)],
-                join_list=[Menu.items],
-                order_by_list=[Menu.start_date, MenuItem.day_of_the_week],
+                eager_options=[selectinload(Menu.items)],
+                order_by_list=[Menu.start_date.desc()],
             )
         )
 

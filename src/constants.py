@@ -8,10 +8,10 @@ QUEST_DOES_NOT_EXIST = "This quest does not exist"
 
 # Enums
 class DayOfWeek(IntEnum):
-    sunday = 1
-    monday = 2
-    tuesday = 3
-    wednesday = 4
-    thursday = 5
-    friday = 6
-    saturday = 7
+    SUNDAY = 1
+    MONDAY = 2
+    TUESDAY = 3
+    WEDNESDAY = 4
+    THURSDAY = 5
+    FRIDAY = 6
+    SATURDAY = 7
