@@ -16,6 +16,13 @@ class Menu(CoreModelMixin):
     start_date: Mapped[date] = mapped_column(default_factory=datetime.today)
     items: Mapped[list["MenuItem"]] = relationship("MenuItem", back_populates="menu", default_factory=list)
 
+    @property
+    def grouped_items(self) -> dict[DayOfWeek, list["MenuItem"]]:
+        dow_items: dict[DayOfWeek, list[MenuItem]] = {day: [] for day in DayOfWeek}
+        for item in self.items:
+            dow_items[item.day_of_the_week].append(item)
+        return dow_items
+
 
 class MenuItem(CoreModelMixin):
     # Columns

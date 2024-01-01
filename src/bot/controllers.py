@@ -79,6 +79,8 @@ async def get_tavern_menu(ctx: Context, menu_service: MenuService = Provide[Cont
     if not menu:
         return "No menu available"
     menu_str = "Menu"
-    for item in menu.items:
-        menu_str += f"\n{item.food} "
-    return "Menu"
+    for day, items in menu.grouped_items.items():
+        menu_str += f"\n{day.name}: "
+        for item in items:
+            menu_str += f"\n  {item.food}"
+    return menu_str

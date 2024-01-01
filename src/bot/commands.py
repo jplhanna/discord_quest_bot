@@ -75,4 +75,5 @@ async def tavern_group(ctx: Context) -> None:
 
 @tavern_group.command(name="menu")  # type: ignore[arg-type]
 async def tavern_menu(ctx: Context) -> None:
-    await get_tavern_menu(ctx)
+    res = await get_tavern_menu(ctx)
+    await ctx.send(res)
