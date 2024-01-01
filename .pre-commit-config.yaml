@@ -1,5 +1,6 @@
 default_install_hook_types:
   - pre-commit
+  - prepare-commit-msg
   - commit-msg
 default_stages:
   - pre-commit
@@ -66,10 +67,16 @@ repos:
         exclude: alembic|test_.*|conftest.py
         args: [ -c, pyproject.toml ]
 
-  - repo: https://github.com/milin/giticket
-    rev: v1.4
+  - repo: https://github.com/radix-ai/auto-smart-commit
+    rev: v1.0.3
     hooks:
-      - id: giticket
-        args: [--mode=regex_match]
+      - id: auto-smart-commit
+        stages:
+          - prepare-commit-msg
+
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+      - id: gitlint
         stages:
           - commit-msg
