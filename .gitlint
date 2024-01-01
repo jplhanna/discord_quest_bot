@@ -39,7 +39,7 @@ min-length=5
 words=wip,foobar
 
 [title-match-regex]
-regex=^DQB-\d*
+regex=^DQB-\d+\s.*
 
 [body-max-line-length]
 line-length=120
@@ -49,7 +49,7 @@ min-length=5
 
 [body-changed-file-mention]
 # Files that need to be explicitly mentioned in the body when they change
-files=gitlint-core/gitlint/rules.py,README.md #
+files=gitlint-core/gitlint/rules.py,README.md,pyproject.toml,pre-commit-config.yaml,Dockerfile,docker-compose.yaml
 
 
 ### NAMED RULES ###
