@@ -16,7 +16,7 @@ from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.repositories import BaseRepository
 from src.test_config import TEST_ASYNC_DATABASE_URI
-from src.test_config import test_config_dict
+from src.test_config import test_config
 
 base_mock_container = Container(logging=MagicMock())
 
@@ -54,7 +54,7 @@ def mock_user_with_db_repository(mock_user_repository, db_session):
 @pytest.fixture(scope="session")
 def container_for_testing() -> Generator[Container, None, None]:
     testing_container = copy(base_mock_container)
-    testing_container.config.from_dict(test_config_dict)
+    testing_container.config.from_pydantic(test_config)
     testing_container.init_resources()
     yield testing_container
     testing_container.unwire()

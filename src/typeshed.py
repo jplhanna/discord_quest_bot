@@ -30,16 +30,12 @@ if TYPE_CHECKING:
     from src.models import CoreModelMixin
 
 
-class DBConfigDict(TypedDict):
-    database_uri: str
-    async_database_uri: str
-
-
 class DBSettings(BaseSettings):
     database_name: str
     database_user: str
     database_host: str
     database_password: str
+    database_port: str = Field(default="5432")
 
     @property
     def database_uri(self) -> str:
@@ -49,6 +45,7 @@ class DBSettings(BaseSettings):
                 scheme="postgresql",
                 username=self.database_user,
                 password=self.database_password,
+                port=self.database_port,
                 host=self.database_host,
                 path=self.database_name,
             ).url,
@@ -62,31 +59,21 @@ class DBSettings(BaseSettings):
                 scheme="postgresql+asyncpg",
                 username=self.database_user,
                 password=self.database_password,
+                port=self.database_port,
                 host=self.database_host,
                 path=self.database_name,
             ).url,
         )
 
 
-class DiscordConfigDict(TypedDict):
-    account_token: str
-
-
 class DiscordSettings(BaseSettings):
-    account_token: str = Field(env="DISCORD_ACCOUNT_TOKEN")
+    model_config = SettingsConfigDict(env_prefix="discord_")
 
-
-class FormatterDict(TypedDict):
-    format: str
+    account_token: str
 
 
 class FormatterSettings(BaseSettings):
     format: str
-
-
-class LoggerItemDict(TypedDict):
-    level: int
-    handlers: list[str]
 
 
 class HandlerSettings(BaseSettings):
@@ -108,14 +95,6 @@ class StreamHandlerSettings(HandlerSettings):
 class LoggerItemSettings(BaseSettings):
     handlers: list[str]
     level: int
-
-
-class LoggerDict(TypedDict, total=False):
-    version: int
-    formatters: dict[str, FormatterDict]
-    handlers: dict[str, dict]
-    loggers: dict[str, LoggerItemDict]
-    root: LoggerItemDict
 
 
 class LoggerSettings(BaseSettings):
@@ -158,12 +137,6 @@ class LoggerSettings(BaseSettings):
         }
     )
     root: LoggerItemSettings = Field(default=LoggerItemSettings(handlers=["error_handler"], level=NOTSET))
-
-
-class ConfigDict(TypedDict):
-    db: DBConfigDict
-    discord: DiscordConfigDict
-    logger: LoggerDict
 
 
 class Settings(BaseSettings):

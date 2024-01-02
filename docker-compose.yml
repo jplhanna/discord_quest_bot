@@ -1,13 +1,20 @@
 version: "3.7"
+x-common-variables: &common-variables
+  DATABASE_NAME: ${DATABASE_NAME}
+  DATABASE_USER: ${DATABASE_USER}
+  DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+
+x-common-db-variables: &common-db-variables
+  POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+  POSTGRES_USER: ${DATABASE_USER}
+
 services:
   backend:
     container_name: backend-${IMAGE_TAG-latest}
     image: discord_bot/backend:${IMAGE_TAG-latest}
     environment:
+      <<: *common-variables
       DISCORD_ACCOUNT_TOKEN: ${DISCORD_ACCOUNT_TOKEN}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USER: ${DATABASE_USER}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_HOST: 'postgres'
       DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
     volumes:
@@ -29,8 +36,7 @@ services:
     command: [ "postgres", "-c", "listen_addresses=*", "-c", "log_statement=all" ]
     restart: always
     environment:
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_USER: ${DATABASE_USER}
+      <<: *common-db-variables
       POSTGRES_DB: ${DATABASE_NAME}
       PGDATA: /var/lib/postgresql/data
     networks:
@@ -45,8 +51,7 @@ services:
   test-db:
     image: postgres:14
     environment:
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_USER: ${DATABASE_USER}
+      <<: *common-db-variables
       POSTGRES_DB: ${TEST_DATABASE_NAME}
     ports:
       - "5433:5432"
@@ -55,11 +60,15 @@ services:
     container_name: test-pipeline-${IMAGE_TAG-latest}
     image: discord_bot/test_pipeline:${IMAGE_TAG-latest}
     environment:
+      <<: *common-variables
       DATABASE_HOST: 'test-db'
-      TEST_DATABASE_NAME: ${TEST_DATABASE_NAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      TEST_DATABASE_PORT: '5432'
-      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_NAME: ${TEST_DATABASE_NAME}
+      DATABASE_PORT: '5432'
+      DISCORD_ACCOUNT_TOKEN: "fake_token"
+      LOGGER__HANDLERS__BASIC_HANDLER__HANDLER_CLASS: 'logging.StreamHandler'
+      LOGGER__HANDLERS__BASIC_HANDLER__LEVEL: 20
+      LOGGER__HANDLERS__BASIC_HANDLER__FORMATTER: 'simple_formatter'
+      LOGGER__HANDLERS__BASIC_HANDLER__STREAM: 'ext://sys.stdout'
     volumes:
       - .:/app
     build:
