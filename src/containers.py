@@ -14,7 +14,6 @@ from sqlalchemy.ext.asyncio import async_scoped_session
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from src.config import config_dict
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.quests import ExperienceTransaction
@@ -26,6 +25,7 @@ from src.repositories import BaseRepository
 from src.services import UserService
 from src.tavern import Menu
 from src.tavern import MenuService
+from src.typeshed import Settings
 
 logger = getLogger(__name__)
 
@@ -68,7 +68,7 @@ class Database:
 
 class Container(DeclarativeContainer):
     config = Configuration("configuration")
-    config.from_dict(config_dict)  # type: ignore[arg-type] # The type is correct
+    config.from_pydantic(Settings(), required=True)
     logging = Resource(dictConfig, config=config.logger)
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)

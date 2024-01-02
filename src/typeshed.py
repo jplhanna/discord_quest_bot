@@ -1,11 +1,19 @@
 from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
+from logging import DEBUG
+from logging import INFO
+from logging import NOTSET
 from typing import TYPE_CHECKING
 from typing import Literal
 from typing import TypedDict
 from typing import TypeVar
+from typing import cast
 
+from furl import furl
+from pydantic import Field
+from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict
 from sqlalchemy import ColumnElement
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.orm import Mapped
@@ -27,17 +35,79 @@ class DBConfigDict(TypedDict):
     async_database_uri: str
 
 
+class DBSettings(BaseSettings):
+    database_name: str
+    database_user: str
+    database_host: str
+    database_password: str
+
+    @property
+    def database_uri(self) -> str:
+        return cast(
+            str,
+            furl(
+                scheme="postgresql",
+                username=self.database_user,
+                password=self.database_password,
+                host=self.database_host,
+                path=self.database_name,
+            ).url,
+        )
+
+    @property
+    def async_database_uri(self) -> str:
+        return cast(
+            str,
+            furl(
+                scheme="postgresql+asyncpg",
+                username=self.database_user,
+                password=self.database_password,
+                host=self.database_host,
+                path=self.database_name,
+            ).url,
+        )
+
+
 class DiscordConfigDict(TypedDict):
     account_token: str
+
+
+class DiscordSettings(BaseSettings):
+    account_token: str = Field(env="DISCORD_ACCOUNT_TOKEN")
 
 
 class FormatterDict(TypedDict):
     format: str
 
 
+class FormatterSettings(BaseSettings):
+    format: str
+
+
 class LoggerItemDict(TypedDict):
     level: int
     handlers: list[str]
+
+
+class HandlerSettings(BaseSettings):
+    handler_class: str = Field(serialization_alias="class")
+    formatter: str
+
+
+class FileHandlerSettings(HandlerSettings):
+    filename: str
+    encoding: str
+    mode: str
+
+
+class StreamHandlerSettings(HandlerSettings):
+    level: int
+    stream: str
+
+
+class LoggerItemSettings(BaseSettings):
+    handlers: list[str]
+    level: int
 
 
 class LoggerDict(TypedDict, total=False):
@@ -48,10 +118,58 @@ class LoggerDict(TypedDict, total=False):
     root: LoggerItemDict
 
 
+class LoggerSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="logger", env_nested_delimiter="__")
+
+    version: int = Field(default=1)
+    formatters: dict[str, FormatterSettings] = Field(
+        default={
+            "base_formatter": FormatterSettings(format="[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s"),
+            "simple_formatter": FormatterSettings(format="[%(asctime)s] [%(levelname)s]: %(message)s"),
+        }
+    )
+    handlers: dict[str, FileHandlerSettings | StreamHandlerSettings] = Field(
+        default={
+            "file_handler": FileHandlerSettings(
+                handler_class="logging.FileHandler",
+                filename="logs/discord.log",
+                formatter="base_formatter",
+                encoding="utf-8",
+                mode="w",
+            ),
+            "error_handler": StreamHandlerSettings(
+                handler_class="logging.StreamHandler",
+                level=DEBUG,
+                formatter="base_formatter",
+                stream="ext://sys.stderr",
+            ),
+            "basic_handler": StreamHandlerSettings(
+                handler_class="logging.StreamHandler",
+                level=INFO,
+                formatter="simple_formatter",
+                stream="ext://sys.stdout",
+            ),
+        }
+    )
+    loggers: dict[str, LoggerItemSettings] = Field(
+        default={
+            "discord": LoggerItemSettings(level=DEBUG, handlers=["filer_handler"]),
+            "discord.http": LoggerItemSettings(level=INFO, handlers=["basic_handler"]),
+        }
+    )
+    root: LoggerItemSettings = Field(default=LoggerItemSettings(handlers=["error_handler"], level=NOTSET))
+
+
 class ConfigDict(TypedDict):
     db: DBConfigDict
     discord: DiscordConfigDict
     logger: LoggerDict
+
+
+class Settings(BaseSettings):
+    db: DBSettings = Field(default_factory=DBSettings)
+    discord: DiscordSettings = Field(default_factory=DiscordSettings)
+    logger: LoggerSettings = Field(default_factory=LoggerSettings)
 
 
 SQLLogicType = BinaryExpression | BooleanClauseList | bool | Mapped["bool"] | ColumnElement["bool"]
