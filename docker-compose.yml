@@ -41,10 +41,6 @@ services:
       PGDATA: /var/lib/postgresql/data
     networks:
       - network
-    ports:
-      - "5432:5432"
-    expose:
-      - "5432"
     volumes:
       - db:/var/lib/postgresql/data
 
@@ -53,8 +49,8 @@ services:
     environment:
       <<: *common-db-variables
       POSTGRES_DB: ${TEST_DATABASE_NAME}
-    ports:
-      - "5433:5432"
+    networks:
+      - network
 
   test-pipeline:
     container_name: test-pipeline-${IMAGE_TAG-latest}
