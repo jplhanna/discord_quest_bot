@@ -13,7 +13,9 @@ from src.typeshed import Settings
 def start_server(config: Settings = Provide[Container.config]) -> None:
     # Start bot
     logging.info("Starting bot")
-    bot.run(config.discord.account_token, log_handler=None)
+    # TECH DEBT Dependency Injector does not support pydantic settings v2 rn.
+    #  So we have to pass a dictionary dump around for now.
+    bot.run(config["discord"]["account_token"], log_handler=None)  # type: ignore[index]
 
 
 if __name__ == "__main__":

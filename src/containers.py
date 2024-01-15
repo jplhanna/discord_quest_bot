@@ -68,7 +68,7 @@ class Database:
 
 class Container(DeclarativeContainer):
     config = Configuration("configuration")
-    config.from_pydantic(Settings(), required=True)
+    config.from_dict(Settings().model_dump(mode="json", by_alias=True), required=True)
     logging = Resource(dictConfig, config=config.logger)
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)

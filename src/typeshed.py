@@ -132,7 +132,7 @@ class LoggerSettings(BaseSettings):
     )
     loggers: dict[str, LoggerItemSettings] = Field(
         default={
-            "discord": LoggerItemSettings(level=DEBUG, handlers=["filer_handler"]),
+            "discord": LoggerItemSettings(level=DEBUG, handlers=["file_handler"]),
             "discord.http": LoggerItemSettings(level=INFO, handlers=["basic_handler"]),
         }
     )
