@@ -5,6 +5,7 @@ from logging import DEBUG
 from logging import INFO
 from logging import NOTSET
 from typing import TYPE_CHECKING
+from typing import Annotated
 from typing import Literal
 from typing import TypedDict
 from typing import TypeVar
@@ -12,6 +13,7 @@ from typing import cast
 
 from furl import furl
 from pydantic import Field
+from pydantic import StringConstraints
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 from sqlalchemy import ColumnElement
@@ -30,11 +32,14 @@ if TYPE_CHECKING:
     from src.models import CoreModelMixin
 
 
+NonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+
+
 class DBSettings(BaseSettings):
-    database_name: str
-    database_user: str
-    database_host: str
-    database_password: str
+    database_name: NonEmptyString
+    database_user: NonEmptyString
+    database_host: NonEmptyString
+    database_password: NonEmptyString
     database_port: str = Field(default="5432")
 
     @property
@@ -69,31 +74,31 @@ class DBSettings(BaseSettings):
 class DiscordSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="discord_")
 
-    account_token: str
+    account_token: NonEmptyString = Field(min_length=1)
 
 
 class FormatterSettings(BaseSettings):
-    format: str
+    format: NonEmptyString
 
 
 class HandlerSettings(BaseSettings):
-    handler_class: str = Field(serialization_alias="class")
-    formatter: str
+    handler_class: NonEmptyString = Field(serialization_alias="class")
+    formatter: NonEmptyString
 
 
 class FileHandlerSettings(HandlerSettings):
-    filename: str
-    encoding: str
-    mode: str
+    filename: NonEmptyString
+    encoding: NonEmptyString
+    mode: NonEmptyString
 
 
 class StreamHandlerSettings(HandlerSettings):
     level: int
-    stream: str
+    stream: NonEmptyString
 
 
 class LoggerItemSettings(BaseSettings):
-    handlers: list[str]
+    handlers: list[NonEmptyString]
     level: int
 
 
@@ -101,13 +106,13 @@ class LoggerSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="logger", env_nested_delimiter="__")
 
     version: int = Field(default=1)
-    formatters: dict[str, FormatterSettings] = Field(
+    formatters: dict[NonEmptyString, FormatterSettings] = Field(
         default={
             "base_formatter": FormatterSettings(format="[%(asctime)s] [%(levelname)s] [%(name)s]: %(message)s"),
             "simple_formatter": FormatterSettings(format="[%(asctime)s] [%(levelname)s]: %(message)s"),
         }
     )
-    handlers: dict[str, FileHandlerSettings | StreamHandlerSettings] = Field(
+    handlers: dict[NonEmptyString, FileHandlerSettings | StreamHandlerSettings] = Field(
         default={
             "file_handler": FileHandlerSettings(
                 handler_class="logging.FileHandler",
@@ -130,7 +135,7 @@ class LoggerSettings(BaseSettings):
             ),
         }
     )
-    loggers: dict[str, LoggerItemSettings] = Field(
+    loggers: dict[NonEmptyString, LoggerItemSettings] = Field(
         default={
             "discord": LoggerItemSettings(level=DEBUG, handlers=["file_handler"]),
             "discord.http": LoggerItemSettings(level=INFO, handlers=["basic_handler"]),
