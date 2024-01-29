@@ -46,7 +46,7 @@ services:
 
   test-db:
     image: postgres:14
-    hostname: "test-db"
+    hostname: "test_db"
     environment:
       <<: *common-db-variables
       POSTGRES_DB: ${TEST_DATABASE_NAME}
@@ -58,7 +58,7 @@ services:
     image: discord_bot/test_pipeline:${IMAGE_TAG-latest}
     environment:
       <<: *common-variables
-      DATABASE_HOST: 'test-db'
+      DATABASE_HOST: 'test_db'
       DATABASE_NAME: ${TEST_DATABASE_NAME}
       DATABASE_PORT: '5432'
       DISCORD_ACCOUNT_TOKEN: "fake_token"
@@ -68,6 +68,8 @@ services:
       LOGGER__HANDLERS__BASIC_HANDLER__STREAM: 'ext://sys.stdout'
     volumes:
       - .:/app
+    networks:
+      - network
     build:
       context: .
       dockerfile: Dockerfile

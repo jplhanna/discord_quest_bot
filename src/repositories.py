@@ -11,8 +11,8 @@ from sqlalchemy import ColumnElement
 from sqlalchemy import func
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
 from sqlalchemy.sql import Executable
+from sqlmodel import select
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.typeshed import BaseModelType

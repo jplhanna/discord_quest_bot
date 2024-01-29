@@ -9,10 +9,10 @@ from dependency_injector.providers import Configuration
 from dependency_injector.providers import Factory
 from dependency_injector.providers import Resource
 from dependency_injector.providers import Singleton
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio import async_scoped_session
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config import Settings
 from src.helpers.sqlalchemy_helpers import BaseModel
