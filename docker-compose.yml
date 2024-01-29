@@ -46,6 +46,7 @@ services:
 
   test-db:
     image: postgres:14
+    hostname: "test-db"
     environment:
       <<: *common-db-variables
       POSTGRES_DB: ${TEST_DATABASE_NAME}

@@ -11,20 +11,19 @@ from sqlalchemy import Integer
 from sqlalchemy import Table
 from sqlalchemy import TypeDecorator
 from sqlalchemy import func
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy.orm import InstrumentedAttribute
-from sqlalchemy.orm import Mapped
 from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.base import ExecutableOption
 from sqlalchemy.sql.elements import UnaryExpression
+from sqlmodel import SQLModel
 
 from src.typeshed import JoinListType
 from src.typeshed import JoinStruct
 from src.typeshed import SQLLogicType
 
 
-class BaseModel(DeclarativeBase):
+class BaseModel(SQLModel):
     pass
 
 
@@ -122,7 +121,7 @@ def snake_case_table_name(model_name: str) -> str:
     return re.sub("([a-z0-9])([A-Z])", r"\1_\2", table_name).lower()
 
 
-def case_insensitive_str_compare(column: Mapped["str"], value: str) -> SQLLogicType:
+def case_insensitive_str_compare(column: "str", value: str) -> SQLLogicType:
     return func.lower(column) == value.lower()
 
 

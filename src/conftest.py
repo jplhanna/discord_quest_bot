@@ -11,14 +11,18 @@ from unittest.mock import sentinel
 import pytest
 from sqlalchemy import inspect
 
+from src.config import Settings
 from src.containers import Container
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.repositories import BaseRepository
-from src.test_config import TEST_ASYNC_DATABASE_URI
-from src.test_config import test_config
 
 base_mock_container = Container(logging=MagicMock())
+
+
+@pytest.fixture(scope="session")
+def test_config_obj():
+    return Settings()
 
 
 @pytest.fixture()
@@ -52,9 +56,9 @@ def mock_user_with_db_repository(mock_user_repository, db_session):
 
 
 @pytest.fixture(scope="session")
-def container_for_testing() -> Generator[Container, None, None]:
+def container_for_testing(test_config_obj) -> Generator[Container, None, None]:
     testing_container = copy(base_mock_container)
-    testing_container.config.from_pydantic(test_config)
+    testing_container.config.from_pydantic(test_config_obj)
     testing_container.init_resources()
     yield testing_container
     testing_container.unwire()
@@ -68,8 +72,8 @@ def event_loop() -> Generator[AbstractEventLoop, None, None]:
 
 
 @pytest.fixture(scope="session")
-def _database_url() -> str:  # noqa: PT005
-    return TEST_ASYNC_DATABASE_URI
+def _database_url(test_config_obj) -> str:  # noqa: PT005
+    return test_config_obj.db.async_database_uri
 
 
 @pytest.fixture(scope="session")

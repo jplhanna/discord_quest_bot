@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import async_scoped_session
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
 
+from src.config import Settings
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.quests import ExperienceTransaction
@@ -25,7 +26,6 @@ from src.repositories import BaseRepository
 from src.services import UserService
 from src.tavern import Menu
 from src.tavern import MenuService
-from src.typeshed import Settings
 
 logger = getLogger(__name__)
 

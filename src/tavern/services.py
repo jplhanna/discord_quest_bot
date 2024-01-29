@@ -1,9 +1,12 @@
 from dataclasses import dataclass
 from datetime import datetime
 from datetime import timedelta
+from typing import cast
 
 from sqlalchemy import func
+from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.orm import selectinload
+from sqlmodel import desc
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.repositories import BaseRepository
@@ -21,8 +24,8 @@ class MenuService(BaseService):
             QueryArgs(
                 filter_dict={"server_id": server_id},
                 filter_list=[func.between(today, Menu.start_date, Menu.start_date + timedelta(days=7))],
-                eager_options=[selectinload(Menu.items)],
-                order_by_list=[Menu.start_date.desc()],
+                eager_options=[selectinload(cast(QueryableAttribute, Menu.items))],
+                order_by_list=[desc(Menu.start_date)],
             )
         )
 

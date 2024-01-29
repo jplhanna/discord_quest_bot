@@ -4,9 +4,9 @@ from dependency_injector.wiring import Provide
 from dependency_injector.wiring import inject
 
 from src.bot.commands import bot
+from src.config import Settings
 from src.containers import WIRE_TO
 from src.containers import Container
-from src.typeshed import Settings
 
 
 @inject

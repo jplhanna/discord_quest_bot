@@ -1,7 +1,9 @@
 from collections.abc import Coroutine
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import cast
 
+from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.orm import selectinload
 
 from src.constants import GOOD_LUCK_ADVENTURER
@@ -28,7 +30,7 @@ class QuestService(BaseService):
         return self._repository.get_first(
             QueryArgs(
                 filter_list=[case_insensitive_str_compare(Quest.name, quest_name)],
-                eager_options=[selectinload(Quest.users)],
+                eager_options=[selectinload(cast(QueryableAttribute, Quest.users))],
             )
         )
 
@@ -62,7 +64,7 @@ class QuestService(BaseService):
         if await self._secondary_repository.get_count(self._get_uncompleted_query_count_args(quest, user)) >= 1:
             raise QuestAlreadyAccepted(quest)
 
-        user_quest = UserQuest(user=user, quest=quest)  # type: ignore[call-arg]
+        user_quest = UserQuest(user=user, quest=quest)
         await self._secondary_repository.add(user_quest)
         return GOOD_LUCK_ADVENTURER.format(quest_name)
 
@@ -116,6 +118,6 @@ class ExperienceTransactionService(BaseService):
     _repository: BaseRepository[ExperienceTransaction]
 
     async def earn_xp_for_quest(self, user: User, quest: Quest) -> ExperienceTransaction:
-        xp_transaction = ExperienceTransaction(user=user, quest=quest)  # type: ignore[call-arg]
+        xp_transaction = ExperienceTransaction(user=user, quest=quest)
         await self._repository.add(xp_transaction)
         return xp_transaction

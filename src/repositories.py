@@ -7,6 +7,7 @@ from dataclasses import replace
 from typing import Generic
 from typing import cast
 
+from sqlalchemy import ColumnElement
 from sqlalchemy import func
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -68,7 +69,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
 
     async def get_count(self, query_args: QueryArgs | None = None) -> int:
         query = await self.get_query_with_entities(
-            entities_list=[func.count(self.model.id)],
+            entities_list=[func.count(cast(ColumnElement, self.model.id))],
             query_args=query_args,
         )
         return cast(int, query.scalars().first())
