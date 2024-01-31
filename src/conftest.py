@@ -10,8 +10,6 @@ from unittest.mock import sentinel
 
 import pytest
 from sqlalchemy import inspect
-from sqlalchemy.ext.asyncio import async_sessionmaker
-from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config import Settings
 from src.containers import Container
@@ -55,23 +53,6 @@ def mock_user_repository() -> BaseRepository[User]:
 def mock_user_with_db_repository(mock_user_repository, db_session):
     mock_user_repository.session_factory.return_value = db_session
     return mock_user_repository
-
-
-@pytest.fixture()
-async def db_session(sqla_engine):
-    """
-    Fixture that returns a SQLAlchemy session with a SAVEPOINT, and the rollback to it
-    after the test completes.
-    """
-
-    session_maker = async_sessionmaker(sqla_engine, expire_on_commit=False, class_=AsyncSession)
-    session = session_maker()
-
-    try:
-        yield session
-    finally:
-        await session.rollback()
-        await session.close()
 
 
 @pytest.fixture(scope="session")

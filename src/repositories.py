@@ -77,7 +77,7 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     async def get_first(self, query_args: QueryArgs | None = None) -> BaseModelType | None:
         if not query_args:
             query_args = QueryArgs()
-        replace(query_args, limit=1)
+        query_args = replace(query_args, limit=1)
         query: Result = await self.get_query(query_args)
         result: BaseModelType | None = query.scalars().first()
         return result
