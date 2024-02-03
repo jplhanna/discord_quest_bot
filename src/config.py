@@ -6,6 +6,7 @@ from typing import cast
 
 from furl import furl
 from pydantic import Field
+from pydantic import computed_field
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
@@ -38,6 +39,7 @@ class DBSettings(BaseSettings):
     database_password: NonEmptyString
     database_port: str = Field(default="5432")
 
+    @computed_field  # type: ignore[misc]
     @property
     def database_uri(self) -> str:
         return cast(
@@ -52,6 +54,7 @@ class DBSettings(BaseSettings):
             ).url,
         )
 
+    @computed_field  # type: ignore[misc]
     @property
     def async_database_uri(self) -> str:
         return cast(
