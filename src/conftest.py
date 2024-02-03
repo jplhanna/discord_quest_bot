@@ -65,19 +65,19 @@ def container_for_testing(test_config_obj) -> Generator[Container, None, None]:
 
 
 @pytest.fixture(scope="session")
-def event_loop() -> Generator[AbstractEventLoop, None, None]:
+async def event_loop() -> Generator[AbstractEventLoop, None, None]:
     loop = new_event_loop()
     yield loop
     loop.close()
 
 
 @pytest.fixture(scope="session")
-def _database_url(test_config_obj) -> str:  # noqa: PT005
+async def _database_url(test_config_obj) -> str:  # noqa: PT005
     return test_config_obj.db.async_database_uri
 
 
 @pytest.fixture(scope="session")
-def init_database() -> Callable:
+async def init_database() -> Callable:
     return BaseModel.metadata.create_all
 
 
