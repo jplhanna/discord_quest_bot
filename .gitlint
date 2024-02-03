@@ -28,7 +28,7 @@ regex-style-search=true
 
 ### RULE CONFIGURATION ###
 [title-max-length]
-line-length=80
+line-length=100
 
 [title-min-length]
 min-length=5
