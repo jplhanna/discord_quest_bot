@@ -10,6 +10,8 @@ from unittest.mock import sentinel
 
 import pytest
 from sqlalchemy import inspect
+from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config import Settings
 from src.containers import Container
@@ -79,6 +81,22 @@ async def _database_url(test_config_obj) -> str:  # noqa: PT005
 @pytest.fixture(scope="session")
 async def init_database() -> Callable:
     return BaseModel.metadata.create_all
+
+
+@pytest.fixture()
+async def db_session(sqla_engine):
+    """
+    Fixture that returns a SQLAlchemy session with a SAVEPOINT, and the rollback to it
+    after the test completes.
+    """
+
+    Session = async_sessionmaker(sqla_engine, expire_on_commit=False, class_=AsyncSession)
+    session = Session()
+
+    try:
+        yield session
+    finally:
+        await session.close()
 
 
 @pytest.fixture()

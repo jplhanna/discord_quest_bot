@@ -12,11 +12,11 @@ from sqlalchemy import Table
 from sqlalchemy import TypeDecorator
 from sqlalchemy import func
 from sqlalchemy.orm import InstrumentedAttribute
-from sqlalchemy.sql import Executable
 from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.base import ExecutableOption
 from sqlalchemy.sql.elements import UnaryExpression
 from sqlmodel import SQLModel
+from sqlmodel.sql.expression import Select
 
 from src.typeshed import JoinListType
 from src.typeshed import JoinStruct
@@ -33,7 +33,7 @@ class _QueryHandler:
     func_data: Any
     allow_empty_data: bool = field(default=False)
 
-    def update_query(self, query: Executable) -> Executable:
+    def update_query(self, query: Select) -> Select:
         if self.func_data or self.allow_empty_data and self.func_data is not None:
             query_method = getattr(query, self.func_str)
             if isinstance(self.func_data, list | tuple):
@@ -48,7 +48,7 @@ class _QueryHandler:
 class _JoinQueryHandler(_QueryHandler):
     func_data: JoinListType | None
 
-    def update_query(self, query: FromClause) -> Executable:  # type: ignore[override]
+    def update_query(self, query: FromClause) -> Select:  # type: ignore[override]
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
@@ -65,7 +65,7 @@ class _JoinQueryHandler(_QueryHandler):
 class _EagerOptionsHandler(_QueryHandler):
     func_data: list[ExecutableOption] | None
 
-    def update_query(self, query: Executable) -> Executable:
+    def update_query(self, query: Select) -> Select:
         if self.func_data:
             query = query.options(*self.func_data)
 

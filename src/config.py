@@ -45,7 +45,7 @@ class DBSettings(BaseSettings):
         return cast(
             str,
             furl(
-                scheme="postgresql",
+                scheme=PSQL_SCHEME,
                 username=self.database_user,
                 password=self.database_password,
                 port=self.database_port,
@@ -60,7 +60,7 @@ class DBSettings(BaseSettings):
         return cast(
             str,
             furl(
-                scheme="postgresql+asyncpg",
+                scheme=ASYNC_PSQL_SCHEME,
                 username=self.database_user,
                 password=self.database_password,
                 port=self.database_port,
