@@ -82,7 +82,7 @@ pytest-async-sqlalchemy = "*"
 pytest-asyncio = "*"
 pytest-cov = "*"
 pytest-randomly = "*"
-ruff = "^0.0.280"
+ruff = "^0.2.0"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -121,10 +121,14 @@ select = [
 ]
 target-version = "py311"
 
-[tool.ruff.isort]
+[tool.ruff.lint.isort]
 force-single-line = true
 force-to-top = ["services"]
 forced-separate = ["src.tests", "src.helpers"]
+lines-between-types = 1
 
-[tool.ruff.mccabe]
+[tool.ruff.lint.mccabe]
 max-complexity = 10
+
+[tool.ruff.lint.per-file-ignores]
+"src/model_hub.py" = ["F401"]
