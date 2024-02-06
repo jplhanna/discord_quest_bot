@@ -1,6 +1,7 @@
 from datetime import date
 from datetime import datetime
 
+from sqlalchemy import BigInteger
 from sqlalchemy import Column
 from sqlmodel import Field
 from sqlmodel import Relationship
@@ -11,7 +12,7 @@ from src.models import CoreModelMixin
 
 
 class Menu(CoreModelMixin, table=True):
-    server_id: int
+    server_id: int = Field(sa_type=BigInteger)
     start_date: date = Field(default_factory=datetime.today)
     items: list["MenuItem"] = Relationship(back_populates="menu")
 

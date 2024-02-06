@@ -4,7 +4,7 @@ from datetime import timedelta
 from typing import cast
 
 from sqlalchemy import Date
-from sqlalchemy import func
+from sqlalchemy import cast as sql_cast
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.orm import selectinload
 from sqlmodel import desc
@@ -25,7 +25,7 @@ class TavernService(BaseService):
         return await self._repository.get_first(
             QueryArgs(
                 filter_dict={"server_id": server_id},
-                filter_list=[func.literal(today, Date).between(Menu.start_date, Menu.start_date + timedelta(days=7))],
+                filter_list=[sql_cast(today, Date).between(Menu.start_date, Menu.start_date + timedelta(days=7))],
                 eager_options=[selectinload(cast(QueryableAttribute, Menu.items))],
                 order_by_list=[desc(Menu.start_date)],
             )
