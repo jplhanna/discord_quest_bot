@@ -1,7 +1,6 @@
 .github
 .mypy_cache
 .pytest_cache
-alembic
-alembic.ini
-logs
+logsd
 local.env
+.gitignore
