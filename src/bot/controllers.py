@@ -7,6 +7,7 @@ from src.bot.constants import NEW_USER_MESSAGE
 from src.bot.constants import NO_MENU_THIS_WEEK_MESSAGE
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
+from src.constants import DayOfWeek
 from src.containers import Container
 from src.exceptions import NoIDProvided
 from src.helpers.message_helpers import format_quest_board
@@ -16,7 +17,7 @@ from src.quests.exceptions import BaseQuestException
 from src.quests.exceptions import QuestAlreadyAccepted
 from src.quests.exceptions import QuestDNE
 from src.services import UserService
-from src.tavern import MenuService
+from src.tavern import TavernService
 
 
 @inject
@@ -74,10 +75,10 @@ async def complete_quest_for_user(
 
 
 @inject
-async def get_tavern_menu(ctx: Context, menu_service: MenuService = Provide[Container.menu_service]) -> str:
+async def get_tavern_menu(ctx: Context, tavern_service: TavernService = Provide[Container.tavern_service]) -> str:
     if not ctx.guild:
         return SERVER_ONLY_BAD_REQUEST_MESSAGE
-    menu = await menu_service.get_this_weeks_menu(ctx.guild.id)
+    menu = await tavern_service.get_this_weeks_menu(ctx.guild.id)
     if not menu:
         return NO_MENU_THIS_WEEK_MESSAGE
     menu_str = "Menu"
@@ -88,3 +89,20 @@ async def get_tavern_menu(ctx: Context, menu_service: MenuService = Provide[Cont
         for item in items:
             menu_str += f"\n  {item.food}"
     return menu_str
+
+
+@inject
+async def upsert_tavern_menu(
+    ctx: Context,
+    item_name_str: str,
+    day_of_week: DayOfWeek,
+    tavern_service: TavernService = Provide[Container.tavern_service],
+) -> str:
+    if not ctx.guild:
+        return SERVER_ONLY_BAD_REQUEST_MESSAGE
+    server_id = ctx.guild.id
+    menu = await tavern_service.get_this_weeks_menu(server_id)
+    if not menu:
+        menu = await tavern_service.create_menu_for_week(server_id)
+    await tavern_service.upsert_menu_item(menu, item_name_str, day_of_week)
+    return "Item added"

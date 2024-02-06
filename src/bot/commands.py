@@ -10,6 +10,7 @@ from src.bot.controllers import check_and_register_user
 from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_quest_list_text
 from src.bot.controllers import get_tavern_menu
+from src.bot.controllers import upsert_tavern_menu
 from src.config import DISCORD_OWNER_ID
 from src.constants import DayOfWeek
 
@@ -75,6 +76,7 @@ async def tavern_menu(ctx: Context) -> None:
 
 
 @tavern_menu.command(name="add")
+@has_permissions(administrator=True)  # TODO maybe this should be a specific permission
 async def tavern_menu_add(ctx: Context, *, day_of_week: DayOfWeek, menu_item: str) -> None:
-    print(day_of_week, menu_item)
-    await ctx.send("Item added")
+    res = await upsert_tavern_menu(ctx, menu_item, day_of_week)
+    await ctx.send(res)

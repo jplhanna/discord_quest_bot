@@ -1,4 +1,4 @@
 from src.tavern.models import Menu
-from src.tavern.services import MenuService
+from src.tavern.services import TavernService
 
-__all__ = ["Menu", "MenuService"]
+__all__ = ["Menu", "TavernService"]

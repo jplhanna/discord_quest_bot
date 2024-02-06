@@ -13,10 +13,11 @@ from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.repositories import BaseRepository
 from src.services import BaseService
 from src.tavern.models import Menu
+from src.tavern.models import MenuItem
 
 
 @dataclass(frozen=True)
-class MenuService(BaseService):
+class TavernService(BaseService):
     _repository: BaseRepository[Menu]
 
     async def get_this_weeks_menu(self, server_id: int) -> Menu | None:
@@ -30,5 +31,12 @@ class MenuService(BaseService):
             )
         )
 
+    async def create_menu_for_week(self, server_id: int) -> Menu:
+        menu = Menu(server_id=server_id)
+        await self._repository.add(menu)
+        return menu
+
     async def upsert_menu_item(self, menu: Menu, item_name: str, day_of_the_week: int) -> None:
-        pass
+        menu_item = MenuItem(food=item_name, day_of_the_week=day_of_the_week)
+        menu.items.append(menu_item)
+        await self._repository.update()

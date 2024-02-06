@@ -109,7 +109,7 @@ class TestGetTavernMenu:
     async def test_get_with_no_menu(self, mocked_ctx, mock_container):
         # Arrange
         menu_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
-        mock_container.menu_service.override(menu_service)
+        mock_container.tavern_service.override(menu_service)
         mock_container.wire(wire_to)
 
         # Act
@@ -126,7 +126,7 @@ class TestGetTavernMenu:
                 return_value=Menu(server_id=sentinel.guild_id, start_date=sentinel.menu_start_date, items=[menu_item])
             )
         )
-        mock_container.menu_service.override(menu_service)
+        mock_container.tavern_service.override(menu_service)
         mock_container.wire(wire_to)
         # Act
         res = await get_tavern_menu(mocked_ctx)

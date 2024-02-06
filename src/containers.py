@@ -25,7 +25,7 @@ from src.quests import UserQuest
 from src.repositories import BaseRepository
 from src.services import UserService
 from src.tavern import Menu
-from src.tavern import MenuService
+from src.tavern import TavernService
 
 logger = getLogger(__name__)
 
@@ -84,4 +84,4 @@ class Container(DeclarativeContainer):
     xp_service = Factory(ExperienceTransactionService, _repository=xp_repository)
 
     menu_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=Menu)
-    menu_service = Factory(MenuService, _repository=menu_repository)
+    tavern_service = Factory(TavernService, _repository=menu_repository)

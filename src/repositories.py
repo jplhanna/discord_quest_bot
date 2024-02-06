@@ -94,8 +94,11 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     async def get_by_id(self, id_: int) -> BaseModelType | None:
         return await self.session.get(self.model, id_)
 
-    async def add(self, data: BaseModelType) -> None:
-        self.session.add(data)
+    async def add(self, obj: BaseModelType) -> None:
+        self.session.add(obj)
+        await self.session.commit()
+
+    async def update(self) -> None:
         await self.session.commit()
 
     async def delete(self, obj: BaseModelType) -> None:
