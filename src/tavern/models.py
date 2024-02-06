@@ -1,10 +1,12 @@
 from datetime import date
 from datetime import datetime
 
+from sqlalchemy import Column
 from sqlmodel import Field
 from sqlmodel import Relationship
 
 from src.constants import DayOfWeek
+from src.helpers.sqlalchemy_helpers import EnumColumn
 from src.models import CoreModelMixin
 
 
@@ -24,7 +26,7 @@ class Menu(CoreModelMixin, table=True):
 class MenuItem(CoreModelMixin, table=True):
     # Columns
     food: str
-    day_of_the_week: DayOfWeek = Field()
+    day_of_the_week: DayOfWeek = Field(sa_column=Column(EnumColumn(DayOfWeek)))
 
     menu_id: int = Field(foreign_key="menu.id", repr=False)
 

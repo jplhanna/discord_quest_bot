@@ -53,8 +53,6 @@ class User(CoreModelMixin, table=True):
 
 
 class UserResourceMixin(BaseModel):
-    __abstract__ = True
-
     class Meta:
         user_mixin_data: MixinData = MixinData()
 

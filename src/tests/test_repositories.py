@@ -1,4 +1,5 @@
 import pytest
+
 from sqlalchemy import inspect
 
 from src.helpers.sqlalchemy_helpers import QueryArgs

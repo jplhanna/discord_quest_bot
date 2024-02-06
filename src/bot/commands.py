@@ -11,6 +11,7 @@ from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_quest_list_text
 from src.bot.controllers import get_tavern_menu
 from src.config import DISCORD_OWNER_ID
+from src.constants import DayOfWeek
 
 default_intent = Intents.default()
 default_intent.message_content = True
@@ -67,7 +68,13 @@ async def tavern_group(ctx: Context) -> None:
     await ctx.send("Available commands: \n - menu [List out all menu items for this week]")
 
 
-@tavern_group.command(name="menu")
+@tavern_group.group(name="menu")
 async def tavern_menu(ctx: Context) -> None:
     res = await get_tavern_menu(ctx)
     await ctx.send(res)
+
+
+@tavern_menu.command(name="add")
+async def tavern_menu_add(ctx: Context, *, day_of_week: DayOfWeek, menu_item: str) -> None:
+    print(day_of_week, menu_item)
+    await ctx.send("Item added")

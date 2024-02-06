@@ -9,6 +9,7 @@ from unittest.mock import Mock
 from unittest.mock import sentinel
 
 import pytest
+
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
