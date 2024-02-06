@@ -81,16 +81,19 @@ async def get_tavern_menu(ctx: Context, tavern_service: TavernService = Provide[
     menu = await tavern_service.get_this_weeks_menu(ctx.guild.id)
     if not menu:
         return NO_MENU_THIS_WEEK_MESSAGE
-    menu_str = "Menu"
+    menu_str = f"Menu for the week of {menu.start_date.strftime('%b %d, %Y')}"
+    # TODO fix the formatting for this.
+    #  it's hard to tell what days don't have any items, and which do.
     for day, items in menu.grouped_items.items():
-        menu_str += f"\n{day.name.title()}:"
+        menu_str += f"\n*{day.name.title()}*:"
         if not items:
             menu_str += "\n  No items available."
         for item in items:
-            menu_str += f"\n  {item.food}"
+            menu_str += f"\n  - {item.food.capitalize()}"
     return menu_str
 
 
+# TODO test this
 @inject
 async def upsert_tavern_menu(
     ctx: Context,

@@ -64,19 +64,19 @@ async def sync_bot_commands(_: Context) -> None:
     await bot.tree.sync()
 
 
-@bot.hybrid_group(name="tavern")
+@bot.hybrid_group(name="tavern", fallback="help")
 async def tavern_group(ctx: Context) -> None:
     await ctx.send("Available commands: \n - menu [List out all menu items for this week]")
 
 
-@tavern_group.group(name="menu")
+@tavern_group.group(name="menu", fallback="please")
 async def tavern_menu(ctx: Context) -> None:
     res = await get_tavern_menu(ctx)
     await ctx.send(res)
 
 
 @tavern_menu.command(name="add")
-@has_permissions(administrator=True)  # TODO maybe this should be a specific permission
+@has_permissions(administrator=True)
 async def tavern_menu_add(ctx: Context, *, day_of_week: DayOfWeek, menu_item: str) -> None:
     res = await upsert_tavern_menu(ctx, menu_item, day_of_week)
     await ctx.send(res)

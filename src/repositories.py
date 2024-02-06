@@ -94,9 +94,11 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     async def get_by_id(self, id_: int) -> BaseModelType | None:
         return await self.session.get(self.model, id_)
 
-    async def add(self, obj: BaseModelType) -> None:
+    async def add(self, obj: BaseModelType, and_refresh: list[str] | None = None) -> None:
         self.session.add(obj)
         await self.session.commit()
+        if and_refresh:
+            await self.session.refresh(obj, attribute_names=and_refresh)
 
     async def update(self) -> None:
         await self.session.commit()
