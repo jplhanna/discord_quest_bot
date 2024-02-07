@@ -36,7 +36,7 @@ class TavernService(BaseService):
         await self._repository.add(menu, and_refresh=["items"])
         return menu
 
-    async def upsert_menu_item(self, menu: Menu, item_name: str, day_of_the_week: int) -> None:
+    async def insert_menu_item(self, menu: Menu, item_name: str, day_of_the_week: int) -> None:
         menu_item = MenuItem(food=item_name, day_of_the_week=day_of_the_week)
         menu.items.append(menu_item)
         await self._repository.update()
