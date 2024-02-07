@@ -64,7 +64,7 @@ class TestUserRepository:
     def test_query_with_having_and_no_grouping_fails(self):
         # Arrange & Act & Assert
         with pytest.raises(Warning, match="Defining query with having clause but no group by clause"):
-            QueryArgs(having_list=[User.id == 1])
+            QueryArgs(having=[User.id == 1])
 
 
 def get_user_data_for_query(usr):

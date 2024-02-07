@@ -80,13 +80,13 @@ class QueryArgs:
     eager_options: list | None = None
     order_by_list: list[Column | UnaryExpression | InstrumentedAttribute] | None = None
     join_on: JoinListType | None = None
-    distinct_on_list: list[Column | None] | None = None
-    group_by_list: list[Column] | None = None
-    having_list: list[SQLLogicType] | None = None
+    distinct_on: list[Column | None] | None = None
+    group_by: list[Column] | None = None
+    having: list[SQLLogicType] | None = None
     limit: int | None = None
 
     def __post_init__(self) -> None:
-        if not self.group_by_list and self.having_list:
+        if not self.group_by and self.having:
             raise Warning("Defining query with having clause but no group by clause")
 
     def get_query_handlers(self) -> list[_QueryHandler]:
@@ -94,11 +94,11 @@ class QueryArgs:
             _QueryHandler("filter_by", self.filter_dict),
             _JoinQueryHandler("join", self.join_on),
             _QueryHandler("filter", self.filter_list),
-            _QueryHandler("group_by", self.group_by_list),
-            _QueryHandler("having", self.having_list),
+            _QueryHandler("group_by", self.group_by),
+            _QueryHandler("having", self.having),
             _QueryHandler("options", self.eager_options),
             _QueryHandler("order_by", self.order_by_list),
-            _QueryHandler("distinct", self.distinct_on_list, allow_empty_data=True),
+            _QueryHandler("distinct", self.distinct_on, allow_empty_data=True),
             _QueryHandler("limit", self.limit),
         ]
 
