@@ -11,18 +11,37 @@ from src.tavern.models import MenuItem
 
 class TestDeleteMenuItem:
     @pytest.mark.parametrize(
-        ("item_name", "day_of_week"),
-        [("Not food", DayOfWeek.MONDAY), ("Not food", None), ("Food", DayOfWeek.WEDNESDAY)],
+        ("menu_items", "item_name", "day_of_week"),
+        [
+            ([MenuItem(food="Food", day_of_the_week=DayOfWeek.MONDAY)], "Not food", DayOfWeek.MONDAY),
+            ([MenuItem(food="Food", day_of_the_week=DayOfWeek.MONDAY)], "Not food", None),
+            ([MenuItem(food="Food", day_of_the_week=DayOfWeek.MONDAY)], "Food", DayOfWeek.WEDNESDAY),
+            ([], "Food", DayOfWeek.MONDAY),
+            ([], "Food", None),
+        ],
     )
-    async def test_no_items_found(self, faker, item_name, day_of_week):
+    async def test_no_items_found(self, faker, menu_items, item_name, day_of_week):
         # Arrange
         menu_item_repo = AsyncMock()
         tavern_service = TavernService(menu_item_repository=menu_item_repo)
-        menu_item = MenuItem(food="Food", day_of_the_week=DayOfWeek.MONDAY)
         menu = Menu(
-            server_id=faker.random_number(digits=10, fix_len=True), start_date=faker.date_object(), items=[menu_item]
+            server_id=faker.random_number(digits=10, fix_len=True), start_date=faker.date_object(), items=menu_items
         )
 
         # Act & Assert
         with pytest.raises(NoMenuItemFoundError, match=f"No menu item could be found with the name {item_name}"):
             await tavern_service.delete_menu_item(menu, item_name, day_of_week)
+
+    @pytest.mark.parametrize("day_of_week", [None, DayOfWeek.MONDAY])
+    async def test_item_deleted(self, faker, day_of_week):
+        # Arrange
+        menu_item_repository = AsyncMock(delete=AsyncMock())
+        tavern_service = TavernService(menu_item_repository=menu_item_repository)
+        menu_item = MenuItem(food="Food", day_of_the_week=DayOfWeek.MONDAY)
+        menu = Menu(
+            server_id=faker.random_number(digits=10, fix_len=True), start_date=faker.date_object(), items=[menu_item]
+        )
+        # Act
+        await tavern_service.delete_menu_item(menu, "Food", day_of_week)
+        # Assert
+        menu_item_repository.delete.assert_called_with(menu_item)

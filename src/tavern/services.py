@@ -53,5 +53,6 @@ class TavernService(MultiRepoService):
         for item in items:
             if item.food == item_name:
                 await self._repositories.menu_item.delete(item)
+                return
         else:
             raise NoMenuItemFoundError(item_name)
