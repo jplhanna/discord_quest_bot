@@ -110,7 +110,7 @@ async def upsert_tavern_menu(
 
 
 @inject
-async def remove_tavern_menu(
+async def remove_from_tavern_menu(
     ctx: Context,
     item_name_str: str,
     day_of_week: DayOfWeek | None,
@@ -126,7 +126,6 @@ async def remove_tavern_menu(
         await tavern_service.delete_menu_item(menu, item_name_str, day_of_week)
     except NoMenuItemFoundError:
         day_of_week_error_text = f" on {day_of_week.name.lower()}" if day_of_week else ""
-        return f"{item_name_str.capitalize()} could not be found{day_of_week_error_text} in this week's menu"
+        return f"{item_name_str.capitalize()} could not be found{day_of_week_error_text} in this week's menu."
 
-    # remove item from items
     return "Item successfully removed"

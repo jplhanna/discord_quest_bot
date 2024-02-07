@@ -14,11 +14,13 @@ from src.bot.controllers import add_quest_to_user
 from src.bot.controllers import check_and_register_user
 from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_tavern_menu
+from src.bot.controllers import remove_from_tavern_menu
 from src.bot.controllers import upsert_tavern_menu
 from src.constants import QUEST_DOES_NOT_EXIST
 from src.constants import DayOfWeek
 from src.quests.exceptions import QuestDNE
 from src.tavern import Menu
+from src.tavern.exceptions import NoMenuItemFoundError
 from src.tavern.models import MenuItem
 
 wire_to = ["src.bot.controllers"]
@@ -179,7 +181,7 @@ class TestUpsertTavernMenu:
 
     async def test_with_pre_existing_menu(self, mocked_ctx, mock_container, faker):
         # Arrange
-        menu = Menu(start_date=faker.date(), server_id=mocked_ctx.guild.id)
+        menu = Menu(start_date=faker.date_object(), server_id=mocked_ctx.guild.id)
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
         mock_container.tavern_service.override(tavern_service)
         mock_container.wire(wire_to)
@@ -189,3 +191,47 @@ class TestUpsertTavernMenu:
         assert res == "Item added"
         tavern_service.create_menu_for_week.assert_not_called()
         tavern_service.insert_menu_item.assert_called_with(menu, "New item", DayOfWeek.MONDAY)
+
+
+class TestRemoveTavernMenu:
+    @pytest.mark.usefixtures("mock_container")
+    async def test_no_guild(self, mocked_ctx):
+        # Arrange
+        mocked_ctx.guild = None
+        # Act
+        res = await remove_from_tavern_menu(mocked_ctx, "fake", DayOfWeek.MONDAY)
+        # Assert
+        assert res == SERVER_ONLY_BAD_REQUEST_MESSAGE
+
+    async def test_no_pre_existing_menu(self, mocked_ctx, mock_container):
+        # Arrange
+        tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
+        mock_container.tavern_service.override(tavern_service)
+        mock_container.wire(wire_to)
+        # Act
+        res = await remove_from_tavern_menu(mocked_ctx, "New item", DayOfWeek.MONDAY)
+        # Assert
+        assert res == NO_MENU_THIS_WEEK_MESSAGE
+        tavern_service.delete_menu_item.assert_not_called()
+
+    @pytest.mark.parametrize(
+        ("day_of_week", "error_text"),
+        [
+            (None, "Not food could not be found in this week's menu."),
+            (DayOfWeek.MONDAY, "Not food could not be found on monday in this week's menu."),
+        ],
+    )
+    async def test_item_not_found(self, mocked_ctx, mock_container, faker, day_of_week, error_text):
+        # Arrange
+        menu_item = MenuItem(food="Food", day_of_the_week=DayOfWeek.MONDAY)
+        menu = Menu(start_date=faker.date_object(), server_id=mocked_ctx.guild.id, items=[menu_item])
+        tavern_service = AsyncMock(
+            get_this_weeks_menu=AsyncMock(return_value=menu),
+            delete_menu_item=AsyncMock(side_effect=NoMenuItemFoundError("Not food")),
+        )
+        mock_container.tavern_service.override(tavern_service)
+        mock_container.wire(wire_to)
+        # Act
+        res = await remove_from_tavern_menu(mocked_ctx, "Not food", day_of_week)
+        # Assert
+        assert res == error_text
