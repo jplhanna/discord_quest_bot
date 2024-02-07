@@ -78,7 +78,7 @@ class QueryArgs:
     filter_list: list[SQLLogicType] | None = None
     filter_dict: dict[str, Any] | None = None
     eager_options: list | None = None
-    order_by_list: list[Column | UnaryExpression | InstrumentedAttribute] | None = None
+    order_by: list[Column | UnaryExpression | InstrumentedAttribute] | None = None
     join_on: JoinListType | None = None
     distinct_on: list[Column | None] | None = None
     group_by: list[Column] | None = None
@@ -97,7 +97,7 @@ class QueryArgs:
             _QueryHandler("group_by", self.group_by),
             _QueryHandler("having", self.having),
             _QueryHandler("options", self.eager_options),
-            _QueryHandler("order_by", self.order_by_list),
+            _QueryHandler("order_by", self.order_by),
             _QueryHandler("distinct", self.distinct_on, allow_empty_data=True),
             _QueryHandler("limit", self.limit),
         ]

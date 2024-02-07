@@ -91,13 +91,18 @@ async def db_session(sqla_engine):
     after the test completes.
     """
 
-    Session = async_sessionmaker(sqla_engine, expire_on_commit=False, class_=AsyncSession)
-    session = Session()
+    connection = await sqla_engine.connect()
+    trans = await connection.begin()
+
+    session_maker = async_sessionmaker(connection, expire_on_commit=False, class_=AsyncSession)
+    session = session_maker()
 
     try:
         yield session
     finally:
         await session.close()
+        await trans.rollback()
+        await connection.close()
 
 
 @pytest.fixture()

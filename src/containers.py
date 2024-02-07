@@ -26,6 +26,7 @@ from src.repositories import BaseRepository
 from src.services import UserService
 from src.tavern import Menu
 from src.tavern import TavernService
+from src.tavern.models import MenuItem
 
 logger = getLogger(__name__)
 
@@ -74,14 +75,17 @@ class Container(DeclarativeContainer):
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
 
     user_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=User)
-    user_service = Factory(UserService, _repository=user_repository)
+    user_service = Factory(UserService, repository=user_repository)
 
     quest_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=Quest)
     user_quest_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=UserQuest)
-    quest_service = Factory(QuestService, _repository=quest_repository, _secondary_repository=user_quest_repository)
+    quest_service = Factory(
+        QuestService, quest_repository=quest_repository, user_quest_repository=user_quest_repository
+    )
 
     xp_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=ExperienceTransaction)
-    xp_service = Factory(ExperienceTransactionService, _repository=xp_repository)
+    xp_service = Factory(ExperienceTransactionService, repository=xp_repository)
 
     menu_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=Menu)
-    tavern_service = Factory(TavernService, _repository=menu_repository)
+    menu_item_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=MenuItem)
+    tavern_service = Factory(TavernService, menu_repository=menu_repository, menu_item_repository=menu_item_repository)

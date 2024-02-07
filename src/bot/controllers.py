@@ -18,6 +18,7 @@ from src.quests.exceptions import QuestAlreadyAccepted
 from src.quests.exceptions import QuestDNE
 from src.services import UserService
 from src.tavern import TavernService
+from src.tavern.exceptions import NoMenuItemFoundError
 
 
 @inject
@@ -91,7 +92,6 @@ async def get_tavern_menu(ctx: Context, tavern_service: TavernService = Provide[
     return menu_str
 
 
-# TODO test this
 @inject
 async def upsert_tavern_menu(
     ctx: Context,
@@ -107,3 +107,26 @@ async def upsert_tavern_menu(
         menu = await tavern_service.create_menu_for_week(server_id)
     await tavern_service.insert_menu_item(menu, item_name_str, day_of_week)
     return "Item added"
+
+
+@inject
+async def remove_tavern_menu(
+    ctx: Context,
+    item_name_str: str,
+    day_of_week: DayOfWeek | None,
+    tavern_service: TavernService = Provide[Container.tavern_service],
+) -> str:
+    if not ctx.guild:
+        return SERVER_ONLY_BAD_REQUEST_MESSAGE
+    menu = await tavern_service.get_this_weeks_menu(ctx.guild.id)
+    if not menu:
+        return NO_MENU_THIS_WEEK_MESSAGE
+
+    try:
+        await tavern_service.delete_menu_item(menu, item_name_str, day_of_week)
+    except NoMenuItemFoundError:
+        day_of_week_error_text = f" on {day_of_week.name.lower()}" if day_of_week else ""
+        return f"{item_name_str.capitalize()} could not be found{day_of_week_error_text} in this week's menu"
+
+    # remove item from items
+    return "Item successfully removed"

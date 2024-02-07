@@ -1,3 +1,4 @@
+from datetime import date
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 from unittest.mock import sentinel
@@ -111,8 +112,8 @@ class TestGetTavernMenu:
 
     async def test_get_with_no_menu(self, mocked_ctx, mock_container):
         # Arrange
-        menu_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
-        mock_container.tavern_service.override(menu_service)
+        tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
+        mock_container.tavern_service.override(tavern_service)
         mock_container.wire(wire_to)
 
         # Act
@@ -124,22 +125,22 @@ class TestGetTavernMenu:
     async def test_get_tavern_menu(self, mock_container, mocked_ctx):
         # Arrange
         menu_item = MenuItem(food="test", day_of_the_week=DayOfWeek.MONDAY)
-        menu_service = AsyncMock(
+        tavern_service = AsyncMock(
             get_this_weeks_menu=AsyncMock(
-                return_value=Menu(server_id=sentinel.guild_id, start_date=sentinel.menu_start_date, items=[menu_item])
+                return_value=Menu(server_id=sentinel.guild_id, start_date=date(2024, 6, 6), items=[menu_item])
             )
         )
-        mock_container.tavern_service.override(menu_service)
+        mock_container.tavern_service.override(tavern_service)
         mock_container.wire(wire_to)
         # Act
         res = await get_tavern_menu(mocked_ctx)
         # Assert
         assert res == (
-            "Menu\n"
+            "Menu for the week of Jun 06, 2024\n"
             "**Sunday**:\n"
             "  No items available.\n"
             "**Monday**:\n"
-            f"  - {menu_item.food}\n"
+            f"  - {menu_item.food.capitalize()}\n"
             "**Tuesday**:\n"
             "  No items available.\n"
             "**Wednesday**:\n"

@@ -1,6 +1,7 @@
 from discord import Intents
 from discord.ext.commands import Bot
 from discord.ext.commands import Context
+from discord.ext.commands import guild_only
 from discord.ext.commands import has_permissions
 from discord.ext.commands import is_owner
 from discord.ext.commands.errors import MissingRequiredArgument
@@ -10,6 +11,7 @@ from src.bot.controllers import check_and_register_user
 from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_quest_list_text
 from src.bot.controllers import get_tavern_menu
+from src.bot.controllers import remove_tavern_menu
 from src.bot.controllers import upsert_tavern_menu
 from src.config import DISCORD_OWNER_ID
 from src.constants import DayOfWeek
@@ -77,6 +79,15 @@ async def tavern_menu(ctx: Context) -> None:
 
 @tavern_menu.command(name="add")
 @has_permissions(administrator=True)
+@guild_only()
 async def tavern_menu_add(ctx: Context, *, day_of_week: DayOfWeek, menu_item: str) -> None:
     res = await upsert_tavern_menu(ctx, menu_item, day_of_week)
+    await ctx.send(res)
+
+
+@tavern_menu.command(name="remove")
+@has_permissions(administrator=True)
+@guild_only()
+async def tavern_menu_remove(ctx: Context, *, menu_item: str, day_of_week: DayOfWeek | None) -> None:
+    res = await remove_tavern_menu(ctx, menu_item, day_of_week)
     await ctx.send(res)

@@ -22,6 +22,7 @@ from sqlalchemy.sql.selectable import CTE
 
 if TYPE_CHECKING:
     from src.models import CoreModelMixin
+    from src.repositories import BaseRepository
 
 
 NonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
@@ -62,3 +63,9 @@ BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")
 class MixinData(BaseModel):
     back_populates: str | None = None
     index: bool = False
+
+
+class RepositoryHandler:
+    def __init__(self, **repositories: "BaseRepository") -> None:
+        for key, repository in repositories.items():
+            setattr(self, key.removesuffix("_repository"), repository)

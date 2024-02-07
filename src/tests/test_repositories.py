@@ -23,10 +23,10 @@ class TestUserRepository:
             {"filter_list": []},
             {"filter_dict": {}},
             {"eager_options": []},
-            {"order_by_list": []},
-            {"join_list": []},
-            {"group_by_list": []},
-            {"having_list": []},
+            {"order_by": []},
+            {"join_on": []},
+            {"group_by": []},
+            {"having": []},
         ],
     )
     def test_query_builder_with_empty_values(self, mock_user_repository, query_arg):
@@ -43,11 +43,11 @@ class TestUserRepository:
         [
             {"filter_list": [User.id == 1]},
             {"filter_dict": {"id": 1}},
-            {"order_by_list": [User.id]},
-            {"distinct_on_list": []},
-            {"distinct_on_list": [User.id]},
-            {"group_by_list": [User.id]},
-            {"group_by_list": [User.id], "having_list": [User.id == 1]},
+            {"order_by": [User.id]},
+            {"distinct_on": []},
+            {"distinct_on": [User.id]},
+            {"group_by": [User.id]},
+            {"group_by": [User.id], "having": [User.id == 1]},
             {"join_on": [ExperienceTransaction]},
         ],
     )
@@ -132,7 +132,7 @@ class TestBaseRepositoryIntegration:
 
     async def test_update(self, db_user, mock_user_with_db_repository, faker):
         # Arrange
-        new_id = faker.random_number(digits=10, fix_len=True)
+        new_id = faker.random_number(digits=18, fix_len=True)
         db_user.discord_id = new_id
         # Act
         await mock_user_with_db_repository.update()
