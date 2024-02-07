@@ -4,6 +4,7 @@ from sqlalchemy import inspect
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.models import User
+from src.quests import ExperienceTransaction
 
 
 class TestUserRepository:
@@ -37,7 +38,6 @@ class TestUserRepository:
         except Exception:
             pytest.fail(f"Query with empty args failed to build: {query_args}")
 
-    # TECH DEBT Join and eager options are untested because currently there are no tables to join onto
     @pytest.mark.parametrize(
         "query_args",
         [
@@ -48,6 +48,7 @@ class TestUserRepository:
             {"distinct_on_list": [User.id]},
             {"group_by_list": [User.id]},
             {"group_by_list": [User.id], "having_list": [User.id == 1]},
+            {"join_on": [ExperienceTransaction]},
         ],
     )
     def test_query_builder_with_non_empty_values(self, mock_user_repository, query_args):
@@ -128,3 +129,14 @@ class TestBaseRepositoryIntegration:
         count = await mock_user_with_db_repository.get_count(get_user_data_for_query(db_user))
         # Assert
         assert count == 1
+
+    async def test_update(self, db_user, mock_user_with_db_repository, faker):
+        # Arrange
+        new_id = faker.random_number(digits=10, fix_len=True)
+        db_user.discord_id = new_id
+        # Act
+        await mock_user_with_db_repository.update()
+        mock_user_with_db_repository.session.expunge_all()
+        # Assert
+        user = await mock_user_with_db_repository.get_first()
+        assert user.discord_id == new_id

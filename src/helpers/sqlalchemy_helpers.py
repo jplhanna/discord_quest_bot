@@ -79,7 +79,7 @@ class QueryArgs:
     filter_dict: dict[str, Any] | None = None
     eager_options: list | None = None
     order_by_list: list[Column | UnaryExpression | InstrumentedAttribute] | None = None
-    join_list: JoinListType | None = None
+    join_on: JoinListType | None = None
     distinct_on_list: list[Column | None] | None = None
     group_by_list: list[Column] | None = None
     having_list: list[SQLLogicType] | None = None
@@ -92,7 +92,7 @@ class QueryArgs:
     def get_query_handlers(self) -> list[_QueryHandler]:
         return [
             _QueryHandler("filter_by", self.filter_dict),
-            _JoinQueryHandler("join", self.join_list),
+            _JoinQueryHandler("join", self.join_on),
             _QueryHandler("filter", self.filter_list),
             _QueryHandler("group_by", self.group_by_list),
             _QueryHandler("having", self.having_list),
