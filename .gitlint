@@ -1,0 +1,77 @@
+### GENERAL CONFIG  ###
+[general]
+# Ignore rules, reference them by id or name (comma-separated)
+ignore=title-trailing-punctuation, T3
+
+# verbosity should be a value between 1 and 3
+verbosity = 2
+
+# By default gitlint will ignore certain commits
+ignore-merge-commits=true
+ignore-revert-commits=true
+ignore-fixup-commits=true
+ignore-fixup-amend-commits=true
+ignore-squash-commits=true
+
+# Ignore any data sent to gitlint via stdin
+ignore-stdin=true
+
+# Fetch additional meta-data from the local repository when manually passing a
+# commit message to gitlint via stdin or --commit-msg. Disabled by default.
+staged=true
+
+# Hard fail when the target commit range is empty.
+fail-without-commits=true
+
+# Whether to use Python `search` instead of `match` semantics in rules
+regex-style-search=true
+
+### RULE CONFIGURATION ###
+[title-max-length]
+line-length=100
+
+[title-min-length]
+min-length=5
+
+[title-must-not-contain-word]
+# Comma-separated list of words that should not occur in
+# the commit message title (case-insensitive).
+words=wip,foobar
+
+[title-match-regex]
+regex=^DQB-\d+\s.*
+
+[body-max-line-length]
+line-length=120
+
+[body-min-length]
+min-length=5
+
+[body-changed-file-mention]
+# Files that need to be explicitly mentioned in the body when they change
+files=gitlint-core/gitlint/rules.py,README.md,pyproject.toml,pre-commit-config.yaml,Dockerfile,docker-compose.yaml
+
+
+### NAMED RULES ###
+[title-must-not-contain-word:Additional-Words]
+words=foo,bar
+
+
+### IGNORE RULES CONFIGURATION ###
+[ignore-by-title]
+# Ignore rules for commits of which the title matches a regex
+regex=^Release(.*) #
+ignore=T1,body-min-length #
+
+[ignore-by-body]
+# Ignore rules for commits of which the body has a line that matches a regex
+regex=(.*)release(.*) #
+ignore=T1,body-min-length
+
+[ignore-body-lines]
+# Ignore all lines that start with 'Co-Authored-By'
+regex=^Co-Authored-By #
+
+[ignore-by-author-name]
+regex=(.*)dependabot(.*) #
+ignore=T1,body-min-length

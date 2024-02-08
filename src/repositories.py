@@ -7,11 +7,12 @@ from dataclasses import replace
 from typing import Generic
 from typing import cast
 
+from sqlalchemy import ColumnElement
+from sqlalchemy import ScalarResult
 from sqlalchemy import func
-from sqlalchemy.engine import Result
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
-from sqlalchemy.sql import Executable
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
+from sqlmodel.sql.expression import Select
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.typeshed import BaseModelType
@@ -30,60 +31,54 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             self._session = self.session_factory()
         return self._session
 
-    def _query(self, query_args: QueryArgs | None, to_select: list[EntitiesType] | None = None) -> Executable:
+    def _query(self, query_args: QueryArgs | None, to_select: list[EntitiesType] | None = None) -> Select:
         query_handlers = query_args.get_query_handlers() if query_args else []
         to_select = to_select or [self.model]
-        query: Executable = select(*to_select)
+        query: Select = select(*to_select)
         for query_handler in query_handlers:
             query = query_handler.update_query(query)
         return query
 
-    async def get_query(self, query_args: QueryArgs | None = None, *, use_unique: bool = False) -> Result:
+    async def get_query(self, query_args: QueryArgs | None = None) -> ScalarResult:
         query = self._query(query_args)
-        result: Result = await self.session.execute(query)
-        if use_unique:
-            result = result.unique()
-        return result
+        return cast(ScalarResult, await self.session.exec(query))
 
     async def get_query_with_entities(
-        self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None, *, use_unique: bool = False
-    ) -> Result:
+        self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None
+    ) -> ScalarResult:
         query = self._query(query_args, to_select=entities_list)
-        result: Result = await self.session.execute(query)
-        if use_unique:
-            result = result.unique()
-        return result
+        return cast(ScalarResult, await self.session.exec(query))
 
     async def get_all(self, query_args: QueryArgs | None = None) -> Sequence[BaseModelType]:
         query = await self.get_query(query_args)
-        res: Sequence[BaseModelType] = query.scalars().all()
+        res: Sequence[BaseModelType] = query.all()
         return res
 
     async def get_all_with_entities(
         self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None
     ) -> Sequence[tuple]:
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-        res: Sequence[tuple] = query.scalars().all()
+        res: Sequence[tuple] = query.all()
         return res
 
     async def get_count(self, query_args: QueryArgs | None = None) -> int:
         query = await self.get_query_with_entities(
-            entities_list=[func.count(self.model.id)],
+            entities_list=[func.count(cast(ColumnElement, self.model.id))],
             query_args=query_args,
         )
-        return cast(int, query.scalars().first())
+        return cast(int, query.first())
 
     async def get_first(self, query_args: QueryArgs | None = None) -> BaseModelType | None:
         if not query_args:
             query_args = QueryArgs()
-        replace(query_args, limit=1)
-        query: Result = await self.get_query(query_args)
-        result: BaseModelType | None = query.scalars().first()
+        query_args = replace(query_args, limit=1)
+        query = await self.get_query(query_args)
+        result: BaseModelType | None = query.first()
         return result
 
     async def get_one(self, query_args: QueryArgs | None = None) -> BaseModelType:
         query = await self.get_query(query_args)
-        result: BaseModelType = query.scalar_one()
+        result: BaseModelType = query.one()
         return result
 
     async def get_first_with_entities(
@@ -93,14 +88,19 @@ class BaseRepository(ABC, Generic[BaseModelType]):
             query_args = QueryArgs()
         replace(query_args, limit=1)
         query = await self.get_query_with_entities(entities_list=entities_list, query_args=query_args)
-        result: tuple | None = query.scalars().first()
+        result: tuple | None = query.first()
         return result
 
     async def get_by_id(self, id_: int) -> BaseModelType | None:
         return await self.session.get(self.model, id_)
 
-    async def add(self, data: BaseModelType) -> None:
-        self.session.add(data)
+    async def add(self, obj: BaseModelType, and_refresh: list[str] | None = None) -> None:
+        self.session.add(obj)
+        await self.session.commit()
+        if and_refresh:
+            await self.session.refresh(obj, attribute_names=and_refresh)
+
+    async def update(self) -> None:
         await self.session.commit()
 
     async def delete(self, obj: BaseModelType) -> None:

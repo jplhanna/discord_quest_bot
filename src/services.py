@@ -1,23 +1,36 @@
-from dataclasses import dataclass
-from dataclasses import field
 from logging import Logger
 from logging import getLogger
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.models import User
 from src.repositories import BaseRepository
+from src.typeshed import RepositoryHandler
 
 
-@dataclass(frozen=True, kw_only=True)
 class BaseService:
-    logger: Logger = field(init=False)
+    logger: Logger
+
+    def __init__(self) -> None:
+        self.logger = getLogger(f"{__name__}.{self.__class__.__name__}")
+
+
+class SingleRepoService(BaseService):
     _repository: BaseRepository
 
-    def __post_init__(self) -> None:
-        object.__setattr__(self, "logger", getLogger(f"{__name__}.{self.__class__.__name__}"))
+    def __init__(self, repository: BaseRepository) -> None:
+        super().__init__()
+        self._repository = repository
 
 
-class UserService(BaseService):
+class MultiRepoService(BaseService):
+    _repositories: RepositoryHandler
+
+    def __init__(self, **repositories: BaseRepository) -> None:
+        super().__init__()
+        self._repositories = RepositoryHandler(**repositories)
+
+
+class UserService(SingleRepoService):
     _repository: BaseRepository[User]
 
     async def get_user_by_id(self, user_id: int) -> User | None:

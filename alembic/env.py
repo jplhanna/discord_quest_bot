@@ -6,16 +6,18 @@ from sqlalchemy import pool
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
-from src.config import DATABASE_URI
+from src.config import DBSettings
 from src.helpers.sqlalchemy_helpers import BaseModel
+from src import model_hub
 
 config = context.config
+db_settings = DBSettings()
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)  # type: ignore
 
-config.set_main_option("sqlalchemy.url", DATABASE_URI)
+config.set_main_option("sqlalchemy.url", db_settings.database_uri)
 
 # add your model's MetaData object here
 # for 'autogenerate' support

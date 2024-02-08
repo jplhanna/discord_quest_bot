@@ -1,7 +1,8 @@
 from collections.abc import Coroutine
 from collections.abc import Sequence
-from dataclasses import dataclass
+from typing import cast
 
+from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.orm import selectinload
 
 from src.constants import GOOD_LUCK_ADVENTURER
@@ -16,19 +17,24 @@ from src.quests.exceptions import QuestDNE
 from src.quests.exceptions import QuestNotAccepted
 from src.quests.models import UserQuest
 from src.repositories import BaseRepository
-from src.services import BaseService
+from src.services import MultiRepoService
+from src.services import SingleRepoService
+from src.typeshed import RepositoryHandler
 
 
-@dataclass(frozen=True)
-class QuestService(BaseService):
-    _repository: BaseRepository[Quest]
-    _secondary_repository: BaseRepository[UserQuest]
+class QuestRepositoryHandler(RepositoryHandler):
+    quest: BaseRepository[Quest]
+    user_quest: BaseRepository[UserQuest]
+
+
+class QuestService(MultiRepoService):
+    _repositories: QuestRepositoryHandler
 
     def _get_quest_by_name(self, quest_name: str) -> Coroutine[None, None, Quest | None]:
-        return self._repository.get_first(
+        return self._repositories.quest.get_first(
             QueryArgs(
                 filter_list=[case_insensitive_str_compare(Quest.name, quest_name)],
-                eager_options=[selectinload(Quest.users)],
+                eager_options=[selectinload(cast(QueryableAttribute, Quest.users))],
             )
         )
 
@@ -59,11 +65,11 @@ class QuestService(BaseService):
         if not quest:
             raise QuestDNE(quest_name)
 
-        if await self._secondary_repository.get_count(self._get_uncompleted_query_count_args(quest, user)) >= 1:
+        if await self._repositories.user_quest.get_count(self._get_uncompleted_query_count_args(quest, user)) >= 1:
             raise QuestAlreadyAccepted(quest)
 
-        user_quest = UserQuest(user=user, quest=quest)  # type: ignore[call-arg]
-        await self._secondary_repository.add(user_quest)
+        user_quest = UserQuest(user=user, quest=quest)
+        await self._repositories.user_quest.add(user_quest)
         return GOOD_LUCK_ADVENTURER.format(quest_name)
 
     async def complete_quest_if_available(self, user: User, quest_name: str) -> Quest:
@@ -88,7 +94,7 @@ class QuestService(BaseService):
         if not quest:
             raise QuestDNE(quest_name)
 
-        active_user_quest = await self._secondary_repository.get_first(
+        active_user_quest = await self._repositories.user_quest.get_first(
             self._get_uncompleted_query_count_args(quest, user)
         )
 
@@ -99,23 +105,23 @@ class QuestService(BaseService):
 
         if (
             quest.max_completion_count
-            and await self._secondary_repository.get_count(completed_quests_args) >= quest.max_completion_count
+            and await self._repositories.user_quest.get_count(completed_quests_args) >= quest.max_completion_count
         ):
             raise MaxQuestCompletionReached(quest)
 
         active_user_quest.mark_complete()
-        await self._repository.session.commit()
+        await self._repositories.quest.session.commit()
 
         return quest
 
     async def get_all_quests(self) -> Sequence[Quest]:
-        return await self._repository.get_all()
+        return await self._repositories.quest.get_all()
 
 
-class ExperienceTransactionService(BaseService):
+class ExperienceTransactionService(SingleRepoService):
     _repository: BaseRepository[ExperienceTransaction]
 
     async def earn_xp_for_quest(self, user: User, quest: Quest) -> ExperienceTransaction:
-        xp_transaction = ExperienceTransaction(user=user, quest=quest)  # type: ignore[call-arg]
+        xp_transaction = ExperienceTransaction(user=user, quest=quest)
         await self._repository.add(xp_transaction)
         return xp_transaction
