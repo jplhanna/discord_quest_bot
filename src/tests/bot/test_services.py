@@ -20,7 +20,7 @@ class TestQuestService:
             get_first=AsyncMock(return_value=MagicMock(users=[])), session=AsyncMock(commit=AsyncMock())
         )
         mock_user_quest_repo = AsyncMock(get_count=AsyncMock(return_value=0), add=AsyncMock())
-        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=mock_user_quest_repo)
+        quest_service = QuestService(quest_repository=mock_quest_repository, user_quest_repository=mock_user_quest_repo)
         # Act
         res = await quest_service.accept_quest_if_available(mocked_user, "Quest title")
         # Assert
@@ -30,7 +30,7 @@ class TestQuestService:
     async def test_quest_dne(self, mocked_user):
         # Arrange
         mock_quest_repository = AsyncMock(get_first=AsyncMock(return_value=None))
-        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=AsyncMock())
+        quest_service = QuestService(quest_repository=mock_quest_repository, user_quest_repository=AsyncMock())
         # Act & Assert
         with pytest.raises(QuestDNE):
             await quest_service.accept_quest_if_available(mocked_user, "Quest title")
@@ -42,7 +42,7 @@ class TestQuestService:
             get_first=AsyncMock(return_value=quest), session=AsyncMock(commit=AsyncMock())
         )
         mock_user_quest_repo = AsyncMock(get_count=AsyncMock(return_value=1))
-        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=mock_user_quest_repo)
+        quest_service = QuestService(quest_repository=mock_quest_repository, user_quest_repository=mock_user_quest_repo)
         # Act & Assert
         with pytest.raises(QuestAlreadyAccepted):
             await quest_service.accept_quest_if_available(mocked_user, "Quest title")
@@ -59,7 +59,7 @@ class TestQuestService:
             get_count=AsyncMock(return_value=1), get_first=AsyncMock(return_value=user_quest)
         )
         quest_service = QuestService(
-            _repository=mock_quest_repository, _secondary_repository=mock_user_quest_repository
+            quest_repository=mock_quest_repository, user_quest_repository=mock_user_quest_repository
         )
         # Act
         res = await quest_service.complete_quest_if_available(mocked_user, "Quest title")
@@ -69,7 +69,7 @@ class TestQuestService:
     async def test_cannot_complete_nonexistent_quest(self, mocked_user):
         # Arrange
         mock_quest_repository = AsyncMock(get_first=AsyncMock(return_value=None))
-        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=AsyncMock())
+        quest_service = QuestService(quest_repository=mock_quest_repository, user_quest_repository=AsyncMock())
         # Act & Assert
         with pytest.raises(QuestDNE):
             await quest_service.complete_quest_if_available(mocked_user, "Quest Title")
@@ -80,7 +80,7 @@ class TestQuestService:
             get_first=AsyncMock(return_value=MagicMock()), session=AsyncMock(commit=AsyncMock())
         )
         mock_user_quest_repo = AsyncMock(get_first=AsyncMock(return_value=None))
-        quest_service = QuestService(_repository=mock_quest_repository, _secondary_repository=mock_user_quest_repo)
+        quest_service = QuestService(quest_repository=mock_quest_repository, user_quest_repository=mock_user_quest_repo)
         # Act & Assert
         with pytest.raises(QuestNotAccepted):
             await quest_service.complete_quest_if_available(mocked_user, "Quest Title")
@@ -93,7 +93,7 @@ class TestQuestService:
         )
         mock_user_quest_repository = AsyncMock(get_count=AsyncMock(return_value=1), get_first=AsyncMock())
         quest_service = QuestService(
-            _repository=mock_quest_repository, _secondary_repository=mock_user_quest_repository
+            quest_repository=mock_quest_repository, user_quest_repository=mock_user_quest_repository
         )
         # Act & Assert
         with pytest.raises(MaxQuestCompletionReached):

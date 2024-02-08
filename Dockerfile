@@ -19,7 +19,6 @@ ENV PATH="$POETRY_VIRTUALENVS_PATH/bin:$PIPX_BIN_DIR:$PATH"
 RUN pip install --upgrade pip \
     && pip install pipx \
     && pipx install poetry==$POETRY_VERSION
-RUN apt-get update && apt-get install -y --no-install-recommends gcc
 
 # Install python dependencies
 RUN poetry install --no-root --no-ansi --no-interaction --only=main --no-directory

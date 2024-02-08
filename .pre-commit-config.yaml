@@ -1,5 +1,6 @@
 default_install_hook_types:
   - pre-commit
+  - prepare-commit-msg
   - commit-msg
 default_stages:
   - pre-commit
@@ -14,7 +15,7 @@ repos:
         args: [ --line-length=120 ]
 
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.10.0
+    rev: v2.12.0
     hooks:
       - id: pretty-format-toml
         args: [--autofix]
@@ -25,7 +26,7 @@ repos:
       - id: check-poetry
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: check-merge-conflict
@@ -66,9 +67,16 @@ repos:
         exclude: alembic|test_.*|conftest.py
         args: [ -c, pyproject.toml ]
 
-  - repo: https://github.com/milin/giticket
-    rev: v1.4
+  - repo: https://github.com/radix-ai/auto-smart-commit
+    rev: v1.0.3
     hooks:
-      - id: giticket
+      - id: auto-smart-commit
+        stages:
+          - prepare-commit-msg
+
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.19.1
+    hooks:
+      - id: gitlint
         stages:
           - commit-msg

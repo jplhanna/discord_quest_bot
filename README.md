@@ -20,6 +20,7 @@ DISCORD_ACCOUNT_TOKEN="account token for you discord bot"
 DATABASE_NAME="Name for the database"
 DATABASE_USER="Name for user with access to the database"
 DATABASE_PASSWORD="Password to the database"
+DISCORD_OWNER_ID="The discord id of the owner of the channel you are using."
 ```
 
 Install all packages and start the server using `Docker` and `docker-compose`

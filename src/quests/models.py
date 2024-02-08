@@ -1,19 +1,15 @@
 from datetime import datetime
 
-from sqlalchemy import ForeignKey
-from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlmodel import Field
+from sqlmodel import Relationship
 
 from src.models import CoreModelMixin
 from src.models import User
 from src.models import UserResourceMixin
 from src.typeshed import MixinData
-from src.typeshed import SQLLogicType
 
 
-class Quest(CoreModelMixin):
+class Quest(CoreModelMixin, table=True):
     """
     A representation of an event(quest) a user can take part in
 
@@ -30,40 +26,35 @@ class Quest(CoreModelMixin):
     """
 
     # Columns
-    name: Mapped[str]
-    experience: Mapped[int]
-    max_completion_count: Mapped[int | None] = mapped_column(default=None)
+    name: str
+    experience: int
+    max_completion_count: int | None = Field(default=None)
 
     # Relationships
-    users: Mapped[list[User]] = relationship("UserQuest", default_factory=list, back_populates="quest", repr=False)
+    users: list[User] = Relationship(sa_relationship_args=["user_quest"], back_populates="quests")
 
 
-class UserQuest(CoreModelMixin, UserResourceMixin):
+class UserQuest(CoreModelMixin, UserResourceMixin, table=True):
     class Meta:
         user_mixin_data = MixinData(back_populates="quests", index=True)
 
     # Columns
-    quest_id: Mapped[int] = mapped_column(
-        ForeignKey("quest.id", ondelete="CASCADE"), index=True, repr=False, init=False
-    )
-    date_completed: Mapped[datetime | None] = mapped_column(init=False, default=None)
+    quest_id: int = Field(foreign_key="quest.id", index=True, repr=False)
+    date_completed: datetime | None = Field(default=None)
 
     # Relationships
-    quest: Mapped[Quest] = relationship(Quest, back_populates="users")
+    quest: Quest = Relationship()
+    user: User = Relationship()
 
-    @hybrid_property
+    @property
     def completed(self) -> bool:
         return self.date_completed is not None
-
-    @completed.expression  # type: ignore[no-redef]
-    def completed(self) -> SQLLogicType:
-        return self.date_completed.isnot(None)
 
     def mark_complete(self) -> None:
         self.date_completed = datetime.utcnow()
 
 
-class ExperienceTransaction(CoreModelMixin, UserResourceMixin):
+class ExperienceTransaction(CoreModelMixin, UserResourceMixin, table=True):
     """
     Representation of an instance of a user earning experience
 
@@ -77,14 +68,13 @@ class ExperienceTransaction(CoreModelMixin, UserResourceMixin):
     quest: Quest
     """
 
-    __user_mixin_data__ = MixinData(back_populates="experience")
-
     # Columns
-    quest_id: Mapped[int] = mapped_column(ForeignKey("quest.id"), init=False, repr=False)
-    experience: Mapped[int] = mapped_column(init=False)
+    quest_id: int = Field(foreign_key="quest.id", repr=False)
+    experience: int = Field()
 
     # Relationship
-    quest: Mapped[Quest] = relationship(Quest)
+    quest: Quest = Relationship()
+    user: User = Relationship(back_populates="experience")
 
     def __post_init__(self) -> None:
         self.experience = self.quest.experience
