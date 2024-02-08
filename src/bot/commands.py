@@ -34,7 +34,15 @@ async def register_user(ctx: Context) -> None:
     await ctx.send(res)
 
 
-@bot.hybrid_command(name="accept-quest", help="Accept a quest by name")
+@bot.hybrid_group(
+    name="quests", fallback="board", aliases=["board"], help="Return a list of all currently available quests"
+)
+async def quest_group(ctx: Context) -> None:
+    res = await get_quest_list_text()
+    await ctx.send(res)
+
+
+@quest_group.command(name="accept", help="Accept a quest by name")
 async def accept_quest(ctx: Context, *, quest_name: str) -> None:
     res = await add_quest_to_user(ctx, quest_name)
     await ctx.send(res)
@@ -46,15 +54,7 @@ async def accept_quest_error(ctx: Context, error: Exception) -> None:
         await ctx.send("Must provide a quest to join")
 
 
-@bot.hybrid_command(
-    name="quests", aliases=["quest-board", "board"], help="Return a list of all currently available quests"
-)
-async def get_quest_board(ctx: Context) -> None:
-    res = await get_quest_list_text()
-    await ctx.send(res)
-
-
-@bot.hybrid_command(name="complete-quest", help="Complete an available quest")
+@quest_group.command(name="complete", help="Complete an available quest")
 async def completed_quest(ctx: Context, *, quest_name: str) -> None:
     res = await complete_quest_for_user(ctx, quest_name)
     await ctx.send(res)
