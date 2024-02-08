@@ -1,6 +1,6 @@
 .github
 .mypy_cache
 .pytest_cache
-logsd
+logs
 local.env
 .gitignore
