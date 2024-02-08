@@ -1,5 +1,8 @@
+import random
+
 from dependency_injector.wiring import Provide
 from dependency_injector.wiring import inject
+from discord import Guild
 from discord.ext.commands import Context
 
 from src.bot.constants import ALREADY_REGISTERED_MESSAGE
@@ -7,6 +10,7 @@ from src.bot.constants import NEW_USER_MESSAGE
 from src.bot.constants import NO_MENU_THIS_WEEK_MESSAGE
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
+from src.constants import ChooseStyle
 from src.constants import DayOfWeek
 from src.containers import Container
 from src.exceptions import NoIDProvided
@@ -129,3 +133,20 @@ async def remove_from_tavern_menu(
         return f"{item_name_str.capitalize()} could not be found{day_of_week_error_text} in this week's menu."
 
     return "Item successfully removed"
+
+
+@inject
+async def select_from_tavern_menu(
+    guild: Guild,
+    style: ChooseStyle,
+    day_of_week: DayOfWeek,
+    tavern_service: TavernService = Provide[Container.tavern_service],
+) -> str:
+    menu = await tavern_service.get_this_weeks_menu(guild.id)
+    if not menu:
+        return NO_MENU_THIS_WEEK_MESSAGE
+    if not (food_items := menu.grouped_items.get(day_of_week)):
+        return "No items to select for the day you asked"
+    if style == ChooseStyle.FIRST:
+        return food_items[0].food
+    return random.choice(food_items).food  # nosec
