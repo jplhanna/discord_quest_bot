@@ -7,6 +7,7 @@ from discord.ext.commands import Context
 
 from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
+from src.bot.constants import NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
 from src.bot.constants import NO_MENU_THIS_WEEK_MESSAGE
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
@@ -146,7 +147,8 @@ async def select_from_tavern_menu(
     if not menu:
         return NO_MENU_THIS_WEEK_MESSAGE
     if not (food_items := menu.grouped_items.get(day_of_week)):
-        return "No items to select for the day you asked"
-    if style == ChooseStyle.FIRST:
-        return food_items[0].food
-    return random.choice(food_items).food  # nosec
+        return NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
+    food_text = food_items[0].food.title()
+    if style == ChooseStyle.RANDOM:
+        food_text = random.choice(food_items).food.title()  # nosec
+    return f"Order Up!\n{food_text}"

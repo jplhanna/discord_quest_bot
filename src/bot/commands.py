@@ -104,6 +104,5 @@ async def tavern_menu_remove(ctx: Context, *, menu_item: str, day_of_week: DayOf
 async def tavern_menu_choose(ctx: Context, *, flags: RandomChoiceFlag) -> None:
     if not flags.day_of_week:
         flags.day_of_week = DayOfWeek(date.today().weekday())
-    food = await select_from_tavern_menu(cast(Guild, ctx.guild), flags.style, flags.day_of_week)
-    await ctx.send("Order up!")
-    await ctx.send(food.title())
+    res = await select_from_tavern_menu(cast(Guild, ctx.guild), flags.style, flags.day_of_week)
+    await ctx.send(res)

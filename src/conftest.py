@@ -43,8 +43,13 @@ def mocked_user() -> User:
 
 
 @pytest.fixture()
-def mocked_ctx() -> MagicMock:
-    return MagicMock(author=MagicMock(id=sentinel.discord_id), guild=MagicMock(id=sentinel.guild_id))
+def mocked_guild() -> MagicMock:
+    return MagicMock(id=sentinel.guild_id)
+
+
+@pytest.fixture()
+def mocked_ctx(mocked_guild) -> MagicMock:
+    return MagicMock(author=MagicMock(id=sentinel.discord_id), guild=mocked_guild)
 
 
 @pytest.fixture()
