@@ -1,8 +1,15 @@
 from collections.abc import Callable
 from collections.abc import Coroutine
+from datetime import date
 from typing import TYPE_CHECKING
 from typing import Concatenate
 from typing import ParamSpec
+
+from discord.ext.commands import FlagConverter
+from discord.ext.commands import flag
+
+from src.constants import ChooseStyle
+from src.constants import DayOfWeek
 
 if TYPE_CHECKING:
     from discord.ext.commands import Context
@@ -22,3 +29,8 @@ if TYPE_CHECKING:
     ]
 else:
     CommandRegisterType = Callable
+
+
+class RandomChoiceFlag(FlagConverter):
+    style: ChooseStyle = ChooseStyle.RANDOM
+    day_of_week: DayOfWeek = flag(default=lambda _: DayOfWeek(date.today().weekday()))

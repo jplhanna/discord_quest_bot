@@ -18,8 +18,8 @@ from src.bot.controllers import get_tavern_menu
 from src.bot.controllers import remove_from_tavern_menu
 from src.bot.controllers import select_from_tavern_menu
 from src.bot.controllers import upsert_tavern_menu
+from src.bot.typeshed import RandomChoiceFlag
 from src.config import DISCORD_OWNER_ID
-from src.constants import ChooseStyle
 from src.constants import DayOfWeek
 
 default_intent = Intents.default()
@@ -101,11 +101,9 @@ async def tavern_menu_remove(ctx: Context, *, menu_item: str, day_of_week: DayOf
 
 @tavern_menu.command(name="choose")
 @guild_only()
-async def tavern_menu_choose(
-    ctx: Context, *, style: ChooseStyle = ChooseStyle.RANDOM, day_of_week: DayOfWeek | None
-) -> None:
-    if not day_of_week:
-        day_of_week = DayOfWeek(date.today().weekday())
-    food = await select_from_tavern_menu(cast(Guild, ctx.guild), style, day_of_week)
+async def tavern_menu_choose(ctx: Context, *, flags: RandomChoiceFlag) -> None:
+    if not flags.day_of_week:
+        flags.day_of_week = DayOfWeek(date.today().weekday())
+    food = await select_from_tavern_menu(cast(Guild, ctx.guild), flags.style, flags.day_of_week)
     await ctx.send("Order up!")
-    await ctx.send(f"/gif {food}")
+    await ctx.send(food.title())
