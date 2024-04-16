@@ -30,10 +30,8 @@ wire_to = ["src.bot.controllers"]
 
 
 @pytest.fixture(params=[True, False])
-def mock_container_if_user_exists(mock_container, mocked_user, request):
-    mocked_user_service = AsyncMock(
-        get_user_by_discord_id=AsyncMock(return_value=mocked_user if request.param else None)
-    )
+def mock_container_if_user_exists(mock_container, user, request):
+    mocked_user_service = AsyncMock(get_user_by_discord_id=AsyncMock(return_value=user if request.param else None))
     mock_container.user_service.override(mocked_user_service)
     mock_container.wire(wire_to)
     return mock_container, mocked_user_service, request.param
@@ -182,9 +180,8 @@ class TestUpsertTavernMenu:
         menu = tavern_service.create_menu_for_week.return_value
         tavern_service.insert_menu_item.assert_called_with(menu, "New item", DayOfWeek.MONDAY)
 
-    async def test_with_pre_existing_menu(self, mocked_ctx, mock_container, faker):
+    async def test_with_pre_existing_menu(self, mocked_ctx, mock_container, menu):
         # Arrange
-        menu = Menu(start_date=faker.date_object(), server_id=mocked_ctx.guild.id)
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
         mock_container.tavern_service.override(tavern_service)
         mock_container.wire(wire_to)

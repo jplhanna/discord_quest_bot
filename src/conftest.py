@@ -5,17 +5,20 @@ from collections.abc import Generator
 from copy import copy
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
-from unittest.mock import Mock
 from unittest.mock import sentinel
 
 import pytest
 
+from pytest_factoryboy import register
+from sqlalchemy import create_engine
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config import Settings
 from src.containers import Container
+from src.helpers.factories import factory_classes
+from src.helpers.factories.base_factories import test_session
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.repositories import BaseRepository
@@ -28,6 +31,13 @@ def test_config_obj():
     return Settings()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def setup_factory_session(test_config_obj):
+    engine = create_engine(test_config_obj.db.database_uri)
+    test_session.configure(bind=engine)
+    return test_session
+
+
 @pytest.fixture()
 def mock_container() -> Generator[Container, None, None]:
     mocked_container = copy(base_mock_container)
@@ -35,11 +45,6 @@ def mock_container() -> Generator[Container, None, None]:
     mocked_container.init_resources()
     yield mocked_container
     mocked_container.unwire()
-
-
-@pytest.fixture(scope="session")
-def mocked_user() -> User:
-    return Mock(spec=User, discord_id=sentinel.discord_id, id=sentinel.user_id, _sa_instance_state=MagicMock())
 
 
 @pytest.fixture()
@@ -119,3 +124,7 @@ async def db_user(db_session):
     if not inspect(user).was_deleted:
         await db_session.delete(user)
         await db_session.flush()
+
+
+for cls in factory_classes:
+    register(cls)
