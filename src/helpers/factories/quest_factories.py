@@ -45,14 +45,3 @@ class ExperienceTransactionFactory(BaseFactory):
     quest = factory.SubFactory(QuestFactory)
     experience = factory.SelfAttribute("quest.experience")
     user = factory.SubFactory(UserFactory)
-
-
-@register
-class UserWithQuestFactory(UserFactory):
-    quest = factory.RelatedFactory(UserQuestFactory, factory_related_name="user")
-    experience = factory.Maybe(
-        "quest__is_completed",
-        yes_declaration=factory.RelatedFactory(
-            ExperienceTransactionFactory, factory_related_name="user", quest=factory.SelfAttribute("quest")
-        ),
-    )
