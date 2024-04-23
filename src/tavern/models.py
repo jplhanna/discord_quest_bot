@@ -9,6 +9,7 @@ from sqlmodel import Relationship
 from src.constants import DayOfWeek
 from src.helpers.sqlalchemy_helpers import EnumColumn
 from src.models import CoreModelMixin
+from src.models import Theme
 
 
 class Menu(CoreModelMixin, table=True):
@@ -33,3 +34,11 @@ class MenuItem(CoreModelMixin, table=True):
 
     # relationships
     menu: Menu = Relationship(back_populates="items")
+
+
+class BardTale(CoreModelMixin, table=True):
+    story: str
+
+    theme_id: int = Field(foreign_key="theme.id", repr=False)
+
+    theme: Theme

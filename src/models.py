@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 class CoreModelMixin(BaseModel):
     __abstract__ = True
-    model_config = ConfigDict(str_strip_whitespace=True)  # type: ignore[assignment]
+    model_config = ConfigDict(str_strip_whitespace=True, str_to_lower=True)  # type: ignore[assignment]
 
     @declared_attr  # type: ignore[override, arg-type]
     def __tablename__(self) -> str:
@@ -57,3 +57,7 @@ class UserResourceMixin(BaseModel):
         user_mixin_data: MixinData = MixinData()
 
     user_id: int = Field(foreign_key="user.id", repr=False, index=Meta.user_mixin_data.index)
+
+
+class Theme(CoreModelMixin, table=True):
+    name: str
