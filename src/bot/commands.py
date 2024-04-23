@@ -1,3 +1,7 @@
+from datetime import date
+from typing import cast
+
+from discord import Guild
 from discord import Intents
 from discord.ext.commands import Bot
 from discord.ext.commands import Context
@@ -12,7 +16,9 @@ from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_quest_list_text
 from src.bot.controllers import get_tavern_menu
 from src.bot.controllers import remove_from_tavern_menu
+from src.bot.controllers import select_from_tavern_menu
 from src.bot.controllers import upsert_tavern_menu
+from src.bot.typeshed import RandomChoiceFlag
 from src.config import DISCORD_OWNER_ID
 from src.constants import DayOfWeek
 
@@ -90,4 +96,13 @@ async def tavern_menu_add(ctx: Context, *, day_of_week: DayOfWeek, menu_item: st
 @guild_only()
 async def tavern_menu_remove(ctx: Context, *, menu_item: str, day_of_week: DayOfWeek | None) -> None:
     res = await remove_from_tavern_menu(ctx, menu_item, day_of_week)
+    await ctx.send(res)
+
+
+@tavern_menu.command(name="choose")
+@guild_only()
+async def tavern_menu_choose(ctx: Context, *, flags: RandomChoiceFlag) -> None:
+    if not flags.day_of_week:
+        flags.day_of_week = DayOfWeek(date.today().weekday())
+    res = await select_from_tavern_menu(cast(Guild, ctx.guild), flags.style, flags.day_of_week)
     await ctx.send(res)
