@@ -42,6 +42,7 @@ def setup_factory_session(test_config_obj):
 def mock_container() -> Generator[Container, None, None]:
     mocked_container = copy(base_mock_container)
     mocked_container.db_client = MagicMock()
+    mocked_container.repository_factory = MagicMock()
     mocked_container.init_resources()
     yield mocked_container
     mocked_container.unwire()

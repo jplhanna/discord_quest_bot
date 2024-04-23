@@ -1,4 +1,5 @@
 from unittest.mock import AsyncMock
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -22,8 +23,7 @@ class TestDeleteMenuItem:
     )
     async def test_no_items_found(self, faker, menu_items, item_name, day_of_week):
         # Arrange
-        menu_item_repo = AsyncMock()
-        tavern_service = TavernService(menu_item_repository=menu_item_repo)
+        tavern_service = TavernService(repository_factory=AsyncMock(), menu_item_model=MagicMock())
         menu = Menu(
             server_id=faker.random_number(digits=10, fix_len=True), start_date=faker.date_object(), items=menu_items
         )
@@ -36,7 +36,8 @@ class TestDeleteMenuItem:
     async def test_item_deleted(self, faker, day_of_week):
         # Arrange
         menu_item_repository = AsyncMock(delete=AsyncMock())
-        tavern_service = TavernService(menu_item_repository=menu_item_repository)
+        mock_repository_factory = MagicMock(return_value=menu_item_repository)
+        tavern_service = TavernService(repository_factory=mock_repository_factory, menu_item_model=MagicMock())
         menu_item = MenuItem(food="Food", day_of_the_week=DayOfWeek.MONDAY)
         menu = Menu(
             server_id=faker.random_number(digits=10, fix_len=True), start_date=faker.date_object(), items=[menu_item]

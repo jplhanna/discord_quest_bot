@@ -1,3 +1,4 @@
+from collections.abc import Callable
 from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
@@ -66,6 +67,10 @@ class MixinData(BaseModel):
 
 
 class RepositoryHandler:
-    def __init__(self, **repositories: "BaseRepository") -> None:
-        for key, repository in repositories.items():
-            setattr(self, key.removesuffix("_repository"), repository)
+    def __init__(
+        self,
+        repository_factory: Callable[[type[BaseModelType]], "BaseRepository[BaseModelType]"],
+        **models: type[BaseModelType]
+    ) -> None:
+        for key, model in models.items():
+            setattr(self, key.removesuffix("_model"), repository_factory(model))
