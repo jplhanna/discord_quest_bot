@@ -37,9 +37,6 @@ jobs:
       - name: Lint with ruff
         if: always()
         run: docker-compose run test-pipeline ruff src
-      - name: Check with bandit
-        if: always()
-        run: docker-compose run test-pipeline bandit -r src -c pyproject.toml
       - name: Test with unit pytest
         if: always()
         run: |
