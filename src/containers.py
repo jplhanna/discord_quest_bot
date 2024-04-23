@@ -5,6 +5,7 @@ from logging import getLogger
 from logging.config import dictConfig
 
 from dependency_injector.containers import DeclarativeContainer
+from dependency_injector.providers import Callable
 from dependency_injector.providers import Configuration
 from dependency_injector.providers import Factory
 from dependency_injector.providers import Resource
@@ -73,19 +74,18 @@ class Container(DeclarativeContainer):
     logging = Resource(dictConfig, config=config.logger)
 
     db_client = Singleton(Database, db_url=config.db.async_database_uri)
+    repository_factory = Callable(BaseRepository, session_factory=db_client.provided.get_session)
 
-    user_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=User)
-    user_service = Factory(UserService, repository=user_repository)
+    user_service = Factory(UserService, repository_factory=repository_factory, model=User)
 
-    quest_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=Quest)
-    user_quest_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=UserQuest)
     quest_service = Factory(
-        QuestService, quest_repository=quest_repository, user_quest_repository=user_quest_repository
+        QuestService, repository_factory=repository_factory, quest_model=Quest, user_quest_model=UserQuest
     )
 
-    xp_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=ExperienceTransaction)
-    xp_service = Factory(ExperienceTransactionService, repository=xp_repository)
+    xp_service = Factory(
+        ExperienceTransactionService, repository_factory=repository_factory, model=ExperienceTransaction
+    )
 
-    menu_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=Menu)
-    menu_item_repository = Factory(BaseRepository, session_factory=db_client.provided.get_session, model=MenuItem)
-    tavern_service = Factory(TavernService, menu_repository=menu_repository, menu_item_repository=menu_item_repository)
+    tavern_service = Factory(
+        TavernService, repository_factory=repository_factory, menu_model=Menu, menu_item_model=MenuItem
+    )

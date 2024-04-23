@@ -1,9 +1,11 @@
+from collections.abc import Callable
 from logging import Logger
 from logging import getLogger
 
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.models import User
 from src.repositories import BaseRepository
+from src.typeshed import BaseModelType
 from src.typeshed import RepositoryHandler
 
 
@@ -17,17 +19,25 @@ class BaseService:
 class SingleRepoService(BaseService):
     _repository: BaseRepository
 
-    def __init__(self, repository: BaseRepository) -> None:
+    def __init__(
+        self,
+        repository_factory: Callable[[type[BaseModelType]], BaseRepository[BaseModelType]],
+        model: type[BaseModelType],
+    ) -> None:
         super().__init__()
-        self._repository = repository
+        self._repository = repository_factory(model)
 
 
 class MultiRepoService(BaseService):
     _repositories: RepositoryHandler
 
-    def __init__(self, **repositories: BaseRepository) -> None:
+    def __init__(
+        self,
+        repository_factory: Callable[[type[BaseModelType]], BaseRepository[BaseModelType]],
+        **models: type[BaseModelType],
+    ) -> None:
         super().__init__()
-        self._repositories = RepositoryHandler(**repositories)
+        self._repositories = RepositoryHandler(repository_factory, **models)
 
 
 class UserService(SingleRepoService):
