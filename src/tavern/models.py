@@ -41,4 +41,4 @@ class BardTale(CoreModelMixin, table=True):
 
     theme_id: int = Field(foreign_key="theme.id", repr=False)
 
-    theme: Theme
+    theme: Theme = Relationship()
