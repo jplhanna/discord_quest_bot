@@ -7,6 +7,7 @@ import pytest
 
 from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
+from src.bot.constants import NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
 from src.bot.constants import NO_MENU_THIS_WEEK_MESSAGE
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
@@ -15,8 +16,10 @@ from src.bot.controllers import check_and_register_user
 from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_tavern_menu
 from src.bot.controllers import remove_from_tavern_menu
+from src.bot.controllers import select_from_tavern_menu
 from src.bot.controllers import upsert_tavern_menu
 from src.constants import QUEST_DOES_NOT_EXIST
+from src.constants import ChooseStyle
 from src.constants import DayOfWeek
 from src.quests.exceptions import QuestDNE
 from src.tavern import Menu
@@ -27,10 +30,8 @@ wire_to = ["src.bot.controllers"]
 
 
 @pytest.fixture(params=[True, False])
-def mock_container_if_user_exists(mock_container, mocked_user, request):
-    mocked_user_service = AsyncMock(
-        get_user_by_discord_id=AsyncMock(return_value=mocked_user if request.param else None)
-    )
+def mock_container_if_user_exists(mock_container, user, request):
+    mocked_user_service = AsyncMock(get_user_by_discord_id=AsyncMock(return_value=user if request.param else None))
     mock_container.user_service.override(mocked_user_service)
     mock_container.wire(wire_to)
     return mock_container, mocked_user_service, request.param
@@ -179,9 +180,8 @@ class TestUpsertTavernMenu:
         menu = tavern_service.create_menu_for_week.return_value
         tavern_service.insert_menu_item.assert_called_with(menu, "New item", DayOfWeek.MONDAY)
 
-    async def test_with_pre_existing_menu(self, mocked_ctx, mock_container, faker):
+    async def test_with_pre_existing_menu(self, mocked_ctx, mock_container, menu):
         # Arrange
-        menu = Menu(start_date=faker.date_object(), server_id=mocked_ctx.guild.id)
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
         mock_container.tavern_service.override(tavern_service)
         mock_container.wire(wire_to)
@@ -235,3 +235,55 @@ class TestRemoveTavernMenu:
         res = await remove_from_tavern_menu(mocked_ctx, "Not food", day_of_week)
         # Assert
         assert res == error_text
+
+
+class TestSelectFromTavernMenu:
+    async def test_no_menu(self, mocked_guild, mock_container):
+        # Arrange
+        tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
+        mock_container.tavern_service.override(tavern_service)
+        mock_container.wire(wire_to)
+        # Act
+        res = await select_from_tavern_menu(mocked_guild, ChooseStyle.RANDOM, DayOfWeek.MONDAY)
+        # Assert
+        assert res == NO_MENU_THIS_WEEK_MESSAGE
+
+    async def test_no_items_for_selected_day(self, mocked_guild, mock_container, faker):
+        # Arrange
+        menu = Menu(start_date=faker.date_object(), server_id=mocked_guild.id)
+        tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
+        mock_container.tavern_service.override(tavern_service)
+        mock_container.wire(wire_to)
+        # Act
+        res = await select_from_tavern_menu(mocked_guild, ChooseStyle.RANDOM, DayOfWeek.MONDAY)
+        # Assert
+        assert res == NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
+
+    async def test_select_first(self, mocked_guild, mock_container, faker):
+        # Arrange
+        menu_item_1 = MenuItem(food="First food", day_of_the_week=DayOfWeek.MONDAY)
+        menu_item_2 = MenuItem(food="Second food", day_of_the_week=DayOfWeek.MONDAY)
+        menu = Menu(start_date=faker.date_object(), server_id=mocked_guild.id, items=[menu_item_1, menu_item_2])
+        tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
+        mock_container.tavern_service.override(tavern_service)
+        mock_container.wire(wire_to)
+        # Act
+        res = await select_from_tavern_menu(mocked_guild, ChooseStyle.FIRST, DayOfWeek.MONDAY)
+        # Assert
+        assert res == f"Order Up!\n{menu_item_1.food.title()}"
+
+    async def test_select_random(self, mocked_guild, mock_container, faker, mocker):
+        # Arrange
+        random_choice = mocker.patch("src.bot.controllers.random.choice")
+        menu_item_1 = MenuItem(food="First food", day_of_the_week=DayOfWeek.MONDAY)
+        menu_item_2 = MenuItem(food="Second food", day_of_the_week=DayOfWeek.MONDAY)
+        menu = Menu(start_date=faker.date_object(), server_id=mocked_guild.id, items=[menu_item_1, menu_item_2])
+        random_choice.return_value = menu_item_2
+        tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
+        mock_container.tavern_service.override(tavern_service)
+        mock_container.wire(wire_to)
+        # Act
+        res = await select_from_tavern_menu(mocked_guild, ChooseStyle.RANDOM, DayOfWeek.MONDAY)
+        # Assert
+        assert res == f"Order Up!\n{menu_item_2.food.title()}"
+        random_choice.assert_called_with([menu_item_1, menu_item_2])

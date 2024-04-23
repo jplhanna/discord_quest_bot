@@ -1,5 +1,7 @@
 # Message Strings
+from enum import Enum
 from enum import IntEnum
+from enum import auto
 
 GOOD_LUCK_ADVENTURER = "You have accepted {}! Good luck adventurer"
 QUEST_ALREADY_ACCEPTED = "You have already accepted this request"
@@ -15,3 +17,8 @@ class DayOfWeek(IntEnum):
     THURSDAY = 5
     FRIDAY = 6
     SATURDAY = 7
+
+
+class ChooseStyle(Enum):
+    RANDOM = auto()
+    FIRST = auto()

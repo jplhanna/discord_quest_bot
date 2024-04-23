@@ -48,8 +48,8 @@ class Database:
         )
 
     async def create_database(self) -> None:
-        current_session = self.get_session()
-        await current_session.run_sync(BaseModel.metadata.create_all)
+        async with self._async_engine.begin() as conn:
+            await conn.run_sync(BaseModel.metadata.create_all)
 
     def get_session(self) -> AsyncSession:
         return self._session_factory()
