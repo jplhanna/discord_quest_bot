@@ -57,16 +57,6 @@ repos:
         exclude: alembic
         args: [--fix, --exit-non-zero-on-fix]
 
-  - repo: local
-    hooks:
-      - id: bandit
-        name: bandit
-        entry: bandit
-        language: system
-        types: [ python ]
-        exclude: alembic|test_.*|conftest.py
-        args: [ -c, pyproject.toml ]
-
   - repo: https://github.com/radix-ai/auto-smart-commit
     rev: v1.0.3
     hooks:

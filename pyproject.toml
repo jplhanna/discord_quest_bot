@@ -2,9 +2,6 @@
 build-backend = "poetry.core.masonry.api"
 requires = ["poetry-core"]
 
-[tool.bandit]
-exclude_dirs = ["test"]
-
 [tool.black]
 line-length = 120
 
@@ -74,7 +71,6 @@ sqlmodel = "^0.0.14"
 typing-extensions = "^4.9.0"
 
 [tool.poetry.group.dev.dependencies]
-bandit = {extras = ["toml"], version = "^1.7.4"}
 black = "*"
 coverage = {extras = ["toml"], version = "^6.4.4"}
 factory-boy = "^3.3.0"
@@ -114,6 +110,7 @@ select = [
   "C",
   "PT",
   "I",
+  "S",
   "RSE",
   "RET501",
   "RET502",
@@ -141,3 +138,4 @@ max-complexity = 10
 [tool.ruff.lint.per-file-ignores]
 "src/helpers/factories/*" = ["FBT001"]
 "src/model_hub.py" = ["F401"]
+"src/tests/*" = ["S"]

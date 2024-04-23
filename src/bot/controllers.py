@@ -150,5 +150,5 @@ async def select_from_tavern_menu(
         return NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
     food_text = food_items[0].food.title()
     if style == ChooseStyle.RANDOM:
-        food_text = random.choice(food_items).food.title()  # nosec
+        food_text = random.choice(food_items).food.title()  # noqa: S311
     return f"Order Up!\n{food_text}"
