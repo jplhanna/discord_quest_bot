@@ -74,7 +74,11 @@ async def sync_bot_commands(_: Context) -> None:
 
 @bot.hybrid_group(name="tavern", fallback="help")
 async def tavern_group(ctx: Context) -> None:
-    await ctx.send("Available commands: \n - menu [List out all menu items for this week]")
+    await ctx.send(
+        "Available commands: "
+        "\n - menu [List out all menu items for this week]"
+        "\n - bard [List out what you may ask of the bard]"
+    )
 
 
 @tavern_group.group(name="menu", fallback="please")
@@ -106,3 +110,13 @@ async def tavern_menu_choose(ctx: Context, *, flags: RandomChoiceFlag) -> None:
         flags.day_of_week = DayOfWeek(date.today().weekday())
     res = await select_from_tavern_menu(cast(Guild, ctx.guild), flags.style, flags.day_of_week)
     await ctx.send(res)
+
+
+@tavern_group.group(name="bard", fallback="help")
+async def tavern_bard(ctx: Context) -> None:
+    await ctx.send("Available Requests: " "\n - story")
+
+
+@tavern_bard.command(name="story")
+async def tavern_bard_story(ctx: Context) -> None:
+    await ctx.send("This is a story about how my life got flipped, turned upside down.")
