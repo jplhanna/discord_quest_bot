@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from dataclasses import field
 from enum import IntEnum
 from typing import Any
+from typing import override
 
 from sqlalchemy import Column
 from sqlalchemy import Dialect
@@ -13,7 +14,6 @@ from sqlalchemy import Table
 from sqlalchemy import TypeDecorator
 from sqlalchemy import func
 from sqlalchemy.orm import InstrumentedAttribute
-from sqlalchemy.sql import FromClause
 from sqlalchemy.sql.base import ExecutableOption
 from sqlalchemy.sql.elements import UnaryExpression
 from sqlmodel import SQLModel
@@ -49,7 +49,8 @@ class _QueryHandler:
 class _JoinQueryHandler(_QueryHandler):
     func_data: JoinListType | None
 
-    def update_query(self, query: FromClause) -> Select:  # type: ignore[override]
+    @override
+    def update_query(self, query: Select) -> Select:
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
@@ -60,7 +61,7 @@ class _JoinQueryHandler(_QueryHandler):
                     query = getattr(query, join_func)(*join_data)
                 else:
                     query = query.join(join_on)
-        return query  # type: ignore[return-value]
+        return query
 
 
 class _EagerOptionsHandler(_QueryHandler):
