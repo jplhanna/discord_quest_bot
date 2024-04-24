@@ -1,4 +1,4 @@
-FROM python:3.11.4-slim as base
+FROM python:3.12.3-slim as base
 MAINTAINER JP Hanna "jpl.hanna@gmail.com"
 WORKDIR /app/
 COPY . /app/
