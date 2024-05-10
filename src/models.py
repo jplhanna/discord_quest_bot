@@ -34,10 +34,12 @@ class CoreModelMixin(BaseModel):
 
 class User(CoreModelMixin, table=True):
     """
-    Representation of a registered discord user
+    Representation of a registered discord user.
 
     ...
+
     Attributes
+    ----------
     __________
     discord_id: int
         The discord side id
