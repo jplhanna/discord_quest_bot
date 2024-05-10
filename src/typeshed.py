@@ -70,7 +70,7 @@ class RepositoryHandler:
     def __init__(
         self,
         repository_factory: Callable[[type[BaseModelType]], "BaseRepository[BaseModelType]"],
-        **models: type[BaseModelType]
+        **models: type[BaseModelType],
     ) -> None:
         for key, model in models.items():
             setattr(self, key.removesuffix("_model"), repository_factory(model))

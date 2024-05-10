@@ -101,7 +101,6 @@ async def db_session(sqla_engine):
     Fixture that returns a SQLAlchemy session with a SAVEPOINT, and the rollback to it
     after the test completes.
     """
-
     connection = await sqla_engine.connect()
     trans = await connection.begin()
 

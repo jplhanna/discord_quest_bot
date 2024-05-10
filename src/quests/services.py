@@ -44,8 +44,8 @@ class QuestService(MultiRepoService):
 
     async def accept_quest_if_available(self, user: User, quest_name: str) -> str:
         """
-        Attempts to find a quest the provided name and add it to the list of currently accepted quests
-        for the user
+        Attempt to find a quest the provided name and add it to the list of currently accepted quests
+        for the user.
 
         Parameters
         ----------
@@ -74,7 +74,7 @@ class QuestService(MultiRepoService):
 
     async def complete_quest_if_available(self, user: User, quest_name: str) -> Quest:
         """
-        Attempt to retrieve a quest for a quest and check that a user can complete it
+        Attempt to retrieve a quest for a quest and check that a user can complete it.
 
         Parameters
         ----------

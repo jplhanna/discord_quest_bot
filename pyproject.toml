@@ -71,7 +71,6 @@ sqlmodel = "^0.0.14"
 typing-extensions = "^4.9.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "*"
 coverage = {extras = ["toml"], version = "^6.4.4"}
 factory-boy = "^3.3.0"
 faker = "*"
@@ -85,7 +84,7 @@ pytest-cov = "*"
 pytest-factoryboy = "^2.7.0"
 pytest-mock = "^3.12.0"
 pytest-randomly = "*"
-ruff = "^0.2.0"
+ruff = "^0.4.4"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
@@ -101,8 +100,12 @@ exclude = ["alembic"]
 line-length = 120
 target-version = "py312"
 
+[tool.ruff.format]
+docstring-code-format = true
+
 [tool.ruff.lint]
 fixable = ["ALL"]
+ignore = ["D1", "D205"]
 select = [
   "E",
   "F",
@@ -111,6 +114,7 @@ select = [
   "PT",
   "I",
   "S",
+  "D",
   "RSE",
   "RET501",
   "RET502",
@@ -139,3 +143,6 @@ max-complexity = 10
 "src/helpers/factories/*" = ["FBT001"]
 "src/model_hub.py" = ["F401"]
 "src/tests/*" = ["S"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

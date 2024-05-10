@@ -76,6 +76,7 @@ services:
       target: install-dev
     depends_on:
       - "test-db"
+    command: tail -F /dev/null
 
 networks:
   network:

@@ -12,7 +12,7 @@ from src.typeshed import NonEmptyString
 
 class Quest(CoreModelMixin, table=True):
     """
-    A representation of an event(quest) a user can take part in
+    A representation of an event(quest) a user can take part in.
 
     Attributes
     ----------
@@ -57,9 +57,10 @@ class UserQuest(CoreModelMixin, UserResourceMixin, table=True):
 
 class ExperienceTransaction(CoreModelMixin, UserResourceMixin, table=True):
     """
-    Representation of an instance of a user earning experience
+    Representation of an instance of a user earning experience.
 
     Attributes
+    ----------
     __________
     user_id: int
         ID for user who earned this experience

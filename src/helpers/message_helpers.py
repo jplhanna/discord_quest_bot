@@ -18,12 +18,18 @@ def _create_single_quest_line(first_column: str, second_column: str, line_length
 
 def format_quest_board(quests: Sequence[Quest]) -> str:
     """
-    This function formats a list of quests to look like a quest board
+    Format a list of quests to look like a quest board.
+
     The formatting is normalized so that all quest names and XP values start at the same char position
     Since Quests is len 6 and XP is len 2 the minimum line length is 18, and each column has minimum length 6 and 2.
 
-    :param quests: List of quests to represent.
-    :return: A code block of text which represents a list of quest names and how much XP that quest is worth.
+    Parameters
+    ----------
+    quests: List of quest to represent
+
+    Returns
+    -------
+    A code block of text which represents a list of quest names and how much XP that quest is worth.
     """
     if not quests:
         return "No available quests"

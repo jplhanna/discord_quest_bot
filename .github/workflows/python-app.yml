@@ -23,25 +23,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4.1.1
+      - uses: actions/checkout@v4.1.4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Build Docker images
         run: |
-          docker-compose build test-pipeline
-          docker-compose up -d test-db
+          docker compose build test-pipeline
+          docker compose up -d test-pipeline
+      - name: Check format with ruff
+        if: always()
+        run: docker compose exec test-pipeline ruff format --check
       - name: Check type hints
         if: always()
-        run: docker-compose run test-pipeline mypy src
+        run: docker compose exec test-pipeline mypy src
       - name: Lint with ruff
         if: always()
-        run: docker-compose run test-pipeline ruff src
+        run: docker compose exec test-pipeline ruff check src
       - name: Test with unit pytest
         if: always()
         run: |
-          docker-compose run test-pipeline pytest -m "not integration" --cov-report=xml --cov=.
-      - name: Test with integration pytest
-        if: always()
-        run: |
-          docker-compose run test-pipeline pytest -m integration --cov-report=xml --cov=. --cov-append
+          docker compose exec test-pipeline pytest --cov-report=xml --cov=.
