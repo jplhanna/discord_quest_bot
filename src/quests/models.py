@@ -7,6 +7,7 @@ from src.models import CoreModelMixin
 from src.models import User
 from src.models import UserResourceMixin
 from src.typeshed import MixinData
+from src.typeshed import NonEmptyString
 
 
 class Quest(CoreModelMixin, table=True):
@@ -26,7 +27,7 @@ class Quest(CoreModelMixin, table=True):
     """
 
     # Columns
-    name: str
+    name: NonEmptyString
     experience: int
     max_completion_count: int | None = Field(default=None)
 

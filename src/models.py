@@ -10,6 +10,7 @@ from sqlmodel import Relationship
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.helpers.sqlalchemy_helpers import snake_case_table_name
 from src.typeshed import MixinData
+from src.typeshed import NonEmptyString
 
 if TYPE_CHECKING:
     from src.quests import ExperienceTransaction
@@ -60,4 +61,4 @@ class UserResourceMixin(BaseModel):
 
 
 class Theme(CoreModelMixin, table=True):
-    name: str
+    name: NonEmptyString
