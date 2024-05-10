@@ -1,3 +1,4 @@
+from datetime import UTC
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -26,9 +27,9 @@ class CoreModelMixin(BaseModel):
         return snake_case_table_name(self.__name__)
 
     id: int | None = Field(primary_key=True, default=None)
-    datetime_created: datetime = Field(default_factory=datetime.utcnow, repr=False)
+    datetime_created: datetime = Field(default_factory=lambda: datetime.now(UTC), repr=False)
     datetime_edited: datetime = Field(
-        default_factory=datetime.utcnow, repr=False, sa_column_kwargs={"onupdate": datetime.utcnow}
+        default_factory=lambda: datetime.now(UTC), repr=False, sa_column_kwargs={"onupdate": datetime.utcnow}
     )
 
 
@@ -40,7 +41,6 @@ class User(CoreModelMixin, table=True):
 
     Attributes
     ----------
-    __________
     discord_id: int
         The discord side id
     quests: list[Quest]

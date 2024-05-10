@@ -17,6 +17,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config import Settings
 from src.helpers.sqlalchemy_helpers import BaseModel
+from src.models import Theme
 from src.models import User
 from src.quests import ExperienceTransaction
 from src.quests import ExperienceTransactionService
@@ -24,7 +25,9 @@ from src.quests import Quest
 from src.quests import QuestService
 from src.quests import UserQuest
 from src.repositories import BaseRepository
+from src.services import ThemeService
 from src.services import UserService
+from src.tavern import BardTale
 from src.tavern import Menu
 from src.tavern import TavernService
 from src.tavern.models import MenuItem
@@ -77,6 +80,7 @@ class Container(DeclarativeContainer):
     repository_factory = Callable(BaseRepository, session_factory=db_client.provided.get_session)
 
     user_service = Factory(UserService, repository_factory=repository_factory, model=User)
+    theme_service = Factory(ThemeService, repository_factory=repository_factory, model=Theme)
 
     quest_service = Factory(
         QuestService, repository_factory=repository_factory, quest_model=Quest, user_quest_model=UserQuest
@@ -87,5 +91,9 @@ class Container(DeclarativeContainer):
     )
 
     tavern_service = Factory(
-        TavernService, repository_factory=repository_factory, menu_model=Menu, menu_item_model=MenuItem
+        TavernService,
+        repository_factory=repository_factory,
+        menu_model=Menu,
+        menu_item_model=MenuItem,
+        bard_tale_model=BardTale,
     )

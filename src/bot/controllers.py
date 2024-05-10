@@ -4,6 +4,8 @@ from dependency_injector.wiring import Provide
 from dependency_injector.wiring import inject
 from discord import Guild
 from discord.ext.commands import Context
+from sqlalchemy.exc import MultipleResultsFound
+from sqlalchemy.exc import NoResultFound
 
 from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
@@ -21,7 +23,9 @@ from src.quests import QuestService
 from src.quests.exceptions import BaseQuestException
 from src.quests.exceptions import QuestAlreadyAccepted
 from src.quests.exceptions import QuestDNE
+from src.services import ThemeService
 from src.services import UserService
+from src.tavern import BardTale
 from src.tavern import TavernService
 from src.tavern.exceptions import NoMenuItemFoundError
 
@@ -152,3 +156,32 @@ async def select_from_tavern_menu(
     if style == ChooseStyle.RANDOM:
         food_text = random.choice(food_items).food.title()  # noqa: S311
     return f"Order Up!\n{food_text}"
+
+
+@inject
+async def tell_bard_tale(
+    story: str,
+    theme_name: str,
+    tavern_service: TavernService = Provide[Container.tavern_service],
+    theme_service: ThemeService = Provide[Container.theme_service],
+) -> str:
+    try:
+        theme = await theme_service.get_theme_by_name(theme_name)
+    except (NoResultFound, MultipleResultsFound):
+        return "Unable to record story, no such theme exists"
+    await tavern_service.create_bard_tale(story, theme)
+    return "Tale has been added to the book of stories"
+
+
+async def request_story_by_theme(
+    theme_name: str,
+    tavern_service: TavernService = Provide[Container.tavern_service],
+    theme_service: ThemeService = Provide[Container.theme_service],
+) -> str:
+    try:
+        theme = await theme_service.get_theme_by_name(theme_name)
+    except (NoResultFound, MultipleResultsFound):
+        return "Unable to request story, no such theme exists"
+    tales = await tavern_service.get_tales_by_theme(theme)
+    tale: BardTale = random.choice(tales)  # noqa: S311
+    return tale.story
