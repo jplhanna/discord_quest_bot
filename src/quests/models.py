@@ -1,3 +1,4 @@
+from datetime import UTC
 from datetime import datetime
 
 from sqlmodel import Field
@@ -44,15 +45,15 @@ class UserQuest(CoreModelMixin, UserResourceMixin, table=True):
     date_completed: datetime | None = Field(default=None)
 
     # Relationships
-    quest: Quest = Relationship()
-    user: User = Relationship()
+    quest: Quest = Relationship(back_populates="users")
+    user: User = Relationship(back_populates="quests")
 
     @property
     def completed(self) -> bool:
         return self.date_completed is not None
 
     def mark_complete(self) -> None:
-        self.date_completed = datetime.utcnow()
+        self.date_completed = datetime.now(UTC)
 
 
 class ExperienceTransaction(CoreModelMixin, UserResourceMixin, table=True):

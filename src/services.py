@@ -2,7 +2,10 @@ from collections.abc import Callable
 from logging import Logger
 from logging import getLogger
 
+from sqlalchemy import func
+
 from src.helpers.sqlalchemy_helpers import QueryArgs
+from src.models import Theme
 from src.models import User
 from src.repositories import BaseRepository
 from src.typeshed import BaseModelType
@@ -53,3 +56,10 @@ class UserService(SingleRepoService):
         user = User(discord_id=discord_id)
         await self._repository.add(user)
         return user
+
+
+class ThemeService(SingleRepoService):
+    _repository: BaseRepository[Theme]
+
+    async def get_theme_by_name(self, theme_name: str) -> Theme:
+        return await self._repository.get_one(QueryArgs(filter_list=[func.ilike(Theme.name, theme_name)]))
