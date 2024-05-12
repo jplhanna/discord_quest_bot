@@ -11,8 +11,10 @@ from src.bot.constants import ALREADY_REGISTERED_MESSAGE
 from src.bot.constants import NEW_USER_MESSAGE
 from src.bot.constants import NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
 from src.bot.constants import NO_MENU_THIS_WEEK_MESSAGE
+from src.bot.constants import NO_SUCH_THEME_EXISTS
 from src.bot.constants import REGISTER_FIRST_MESSAGE
 from src.bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
+from src.bot.constants import STORY_HAS_BEEN_RECORDED
 from src.constants import ChooseStyle
 from src.constants import DayOfWeek
 from src.containers import Container
@@ -168,9 +170,9 @@ async def tell_bard_tale(
     try:
         theme = await theme_service.get_theme_by_name(theme_name)
     except (NoResultFound, MultipleResultsFound):
-        return "Unable to record story, no such theme exists"
+        return NO_SUCH_THEME_EXISTS
     await tavern_service.create_bard_tale(story, theme)
-    return "Tale has been added to the book of stories"
+    return STORY_HAS_BEEN_RECORDED
 
 
 async def request_story_by_theme(
@@ -181,7 +183,7 @@ async def request_story_by_theme(
     try:
         theme = await theme_service.get_theme_by_name(theme_name)
     except (NoResultFound, MultipleResultsFound):
-        return "Unable to request story, no such theme exists"
+        return NO_SUCH_THEME_EXISTS
     tales = await tavern_service.get_tales_by_theme(theme)
     tale: BardTale = random.choice(tales)  # noqa: S311
     return tale.story
