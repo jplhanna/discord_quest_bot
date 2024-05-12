@@ -20,10 +20,10 @@ repos:
       - id: pretty-format-toml
         args: [--autofix]
 
-  - repo: https://gitlab.com/smop/pre-commit-hooks
-    rev: v1.0.0
+  - repo: https://github.com/python-poetry/poetry
+    rev: '1.7.0'
     hooks:
-      - id: check-poetry
+      - id: poetry-check
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -57,16 +57,9 @@ repos:
         exclude: alembic
         args: [--fix, --exit-non-zero-on-fix]
 
-  - repo: https://github.com/radix-ai/auto-smart-commit
-    rev: v1.0.3
+  - repo: https://github.com/avilaton/add-msg-issue-prefix-hook
+    rev: v0.0.11
     hooks:
-      - id: auto-smart-commit
+      - id: add-msg-issue-prefix
         stages:
           - prepare-commit-msg
-
-  - repo: https://github.com/jorisroovers/gitlint
-    rev: v0.19.1
-    hooks:
-      - id: gitlint
-        stages:
-          - commit-msg
