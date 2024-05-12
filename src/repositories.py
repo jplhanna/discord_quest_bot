@@ -10,6 +10,7 @@ from typing import cast
 from sqlalchemy import ColumnElement
 from sqlalchemy import ScalarResult
 from sqlalchemy import func
+from sqlmodel import Session
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select
@@ -17,16 +18,17 @@ from sqlmodel.sql.expression import Select
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.typeshed import BaseModelType
 from src.typeshed import EntitiesType
+from src.typeshed import SessionType
 
 
 @dataclass
-class BaseRepository(ABC, Generic[BaseModelType]):
-    session_factory: Callable[..., AsyncSession]
+class BaseRepository(ABC, Generic[SessionType, BaseModelType]):
+    session_factory: Callable[..., SessionType]
     model: type[BaseModelType]
-    _session: AsyncSession | None = field(default=None, init=False)
+    _session: SessionType | None
 
     @property
-    def session(self) -> AsyncSession:
+    def session(self) -> SessionType:
         if not self._session:
             self._session = self.session_factory()
         return self._session
@@ -38,6 +40,13 @@ class BaseRepository(ABC, Generic[BaseModelType]):
         for query_handler in query_handlers:
             query = query_handler.update_query(query)
         return query
+
+
+@dataclass
+class AsyncRepository(BaseRepository[AsyncSession, BaseModelType]):
+    session_factory: Callable[..., AsyncSession]
+    model: type[BaseModelType]
+    _session: AsyncSession | None = field(default=None, init=False)
 
     async def get_query(self, query_args: QueryArgs | None = None) -> ScalarResult:
         query = self._query(query_args)
@@ -106,3 +115,72 @@ class BaseRepository(ABC, Generic[BaseModelType]):
     async def delete(self, obj: BaseModelType) -> None:
         await self.session.delete(obj)
         await self.session.commit()
+
+
+@dataclass
+class SyncRepository(BaseRepository[Session, BaseModelType]):
+    session_factory: Callable[..., Session]
+    model: type[BaseModelType]
+    _session: Session | None = field(default=None, init=False)
+
+    def get_query(self, query_args: QueryArgs | None = None) -> ScalarResult:
+        query = self._query(query_args)
+        return cast(ScalarResult, self.session.exec(query))
+
+    def get_query_with_entities(
+        self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None
+    ) -> ScalarResult:
+        query = self._query(query_args, to_select=entities_list)
+        return cast(ScalarResult, self.session.exec(query))
+
+    def get_all(self, query_args: QueryArgs | None = None) -> Sequence[BaseModelType]:
+        query = self.get_query(query_args)
+        res: Sequence[BaseModelType] = query.all()
+        return res
+
+    def get_all_with_entities(
+        self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None
+    ) -> Sequence[tuple]:
+        query = self.get_query_with_entities(entities_list, query_args)
+        res: Sequence[tuple] = query.all()
+        return res
+
+    def get_count(self, query_args: QueryArgs | None = None) -> int:
+        query = self.get_query_with_entities(
+            entities_list=[func.count(cast(ColumnElement, self.model.id))],
+            query_args=query_args,
+        )
+        return cast(int, query.first())
+
+    def get_first(self, query_args: QueryArgs | None = None) -> BaseModelType | None:
+        if not query_args:
+            query_args = QueryArgs()
+        query_args = replace(query_args, limit=1)
+        query = self.get_query(query_args)
+        result: BaseModelType | None = query.first()
+        return result
+
+    def get_first_with_entities(
+        self, entities_list: list[EntitiesType], query_args: QueryArgs | None = None
+    ) -> tuple | None:
+        if not query_args:
+            query_args = QueryArgs()
+        query_args = replace(query_args, limit=1)
+        query = self.get_query_with_entities(entities_list, query_args)
+        result: tuple | None = query.first()
+        return result
+
+    def get_one(self, query_args: QueryArgs | None = None) -> BaseModelType:
+        query = self.get_query(query_args)
+        result: BaseModelType = query.one()
+        return result
+
+    def get_by_id(self, id_: int) -> BaseModelType | None:
+        return self.session.get(self.model, id_)
+
+    def update(self) -> None:
+        self.session.commit()
+
+    def delete(self, obj: BaseModelType) -> None:
+        self.session.delete(obj)
+        self.session.commit()
