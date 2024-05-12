@@ -21,7 +21,7 @@ from src.helpers.factories import factory_classes
 from src.helpers.factories.base_factories import test_session
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
-from src.repositories import BaseRepository
+from src.repositories import AsyncRepository
 
 base_mock_container = Container(logging=MagicMock())
 
@@ -41,8 +41,8 @@ def setup_factory_session(test_config_obj):
 @pytest.fixture()
 def mock_container() -> Generator[Container, None, None]:
     mocked_container = copy(base_mock_container)
-    mocked_container.db_client = MagicMock()
-    mocked_container.repository_factory = MagicMock()
+    mocked_container.async_db_client = MagicMock()
+    mocked_container.async_repository_factory = MagicMock()
     mocked_container.init_resources()
     yield mocked_container
     mocked_container.unwire()
@@ -59,8 +59,8 @@ def mocked_ctx(mocked_guild) -> MagicMock:
 
 
 @pytest.fixture()
-def mock_user_repository() -> BaseRepository[User]:
-    return BaseRepository(MagicMock(session=AsyncMock()), User)
+def mock_user_repository() -> AsyncRepository[User]:
+    return AsyncRepository(MagicMock(session=AsyncMock()), User)
 
 
 @pytest.fixture()

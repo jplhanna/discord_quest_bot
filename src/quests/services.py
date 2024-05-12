@@ -16,15 +16,15 @@ from src.quests.exceptions import QuestAlreadyAccepted
 from src.quests.exceptions import QuestDNE
 from src.quests.exceptions import QuestNotAccepted
 from src.quests.models import UserQuest
-from src.repositories import BaseRepository
+from src.repositories import AsyncRepository
 from src.services import MultiRepoService
 from src.services import SingleRepoService
 from src.typeshed import RepositoryHandler
 
 
 class QuestRepositoryHandler(RepositoryHandler):
-    quest: BaseRepository[Quest]
-    user_quest: BaseRepository[UserQuest]
+    quest: AsyncRepository[Quest]
+    user_quest: AsyncRepository[UserQuest]
 
 
 class QuestService(MultiRepoService):
@@ -119,7 +119,7 @@ class QuestService(MultiRepoService):
 
 
 class ExperienceTransactionService(SingleRepoService):
-    _repository: BaseRepository[ExperienceTransaction]
+    _repository: AsyncRepository[ExperienceTransaction]
 
     async def earn_xp_for_quest(self, user: User, quest: Quest) -> ExperienceTransaction:
         xp_transaction = ExperienceTransaction(user=user, quest=quest)

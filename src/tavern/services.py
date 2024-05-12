@@ -12,7 +12,7 @@ from sqlmodel import desc
 from src.constants import DayOfWeek
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.models import Theme
-from src.repositories import BaseRepository
+from src.repositories import AsyncRepository
 from src.services import MultiRepoService
 from src.tavern import BardTale
 from src.tavern.exceptions import NoMenuItemFoundError
@@ -22,9 +22,9 @@ from src.typeshed import RepositoryHandler
 
 
 class TavernRepositoryHandler(RepositoryHandler):
-    menu: BaseRepository[Menu]
-    menu_item: BaseRepository[MenuItem]
-    bard_tale: BaseRepository[BardTale]
+    menu: AsyncRepository[Menu]
+    menu_item: AsyncRepository[MenuItem]
+    bard_tale: AsyncRepository[BardTale]
 
 
 class TavernService(MultiRepoService):
