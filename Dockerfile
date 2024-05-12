@@ -21,7 +21,7 @@ RUN pip install --upgrade pip \
     && pipx install poetry==$POETRY_VERSION
 
 # Install python dependencies
-RUN poetry install --no-root --no-ansi --no-interaction --only=main --no-directory
+RUN poetry install --no-root --no-ansi --no-interaction --only=main,api --no-directory
 
 # Install application into container
 ENV PYTHONPATH "$PYTHONPATH:/app/"
