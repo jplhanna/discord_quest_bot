@@ -10,6 +10,7 @@ from dependency_injector.providers import Configuration
 from dependency_injector.providers import Factory
 from dependency_injector.providers import Resource
 from dependency_injector.providers import Singleton
+from litestar import Litestar
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import async_scoped_session
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -19,6 +20,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from src.api.endpoints import BASE_ROUTE
+from src.api.exceptions import BaseResponseError
+from src.api.exceptions import response_exception_handler
 from src.config import Settings
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import Theme
@@ -94,6 +98,12 @@ class Container(DeclarativeContainer):
     async_db_client = Singleton(AsyncDatabase, db_url=config.db.async_database_uri)
     sync_repository_factory = Callable(SyncRepository, session_factory=sync_db_client.provided.get_session)
     async_repository_factory = Callable(AsyncRepository, session_factory=async_db_client.provided.get_session)
+
+    litestar_app = Singleton(
+        Litestar,
+        path=BASE_ROUTE,
+        exception_handlers={BaseResponseError: response_exception_handler},
+    )
 
     user_service = Factory(UserService, repository_factory=async_repository_factory, model=User)
     theme_service = Factory(ThemeService, repository_factory=async_repository_factory, model=Theme)
