@@ -2,7 +2,10 @@ from datetime import UTC
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from pydantic import UUID4
 from pydantic import ConfigDict
+from pydantic import EmailStr
+from pydantic import SecretStr
 from sqlalchemy import BigInteger
 from sqlalchemy.orm import declared_attr
 from sqlmodel import Field
@@ -41,14 +44,20 @@ class User(CoreModelMixin, table=True):
 
     Attributes
     ----------
+    server_uuid: UUID
+        The unique ID for litestar user management.
     discord_id: int
-        The discord side id
+        The discord side id.
     quests: list[Quest]
-        List of quests that a user has accepted
+        List of quests that a user has accepted.
     """
 
     # Columns
-    discord_id: int = Field(sa_type=BigInteger, unique=True)
+    discord_id: int | None = Field(sa_type=BigInteger, unique=True)
+    server_uuid: UUID4 = Field(default_factory=UUID4)
+    email: EmailStr | None = Field(unique=True)
+    username: NonEmptyString | None = Field(unique=True)
+    password: SecretStr | None = Field(default=None)
 
     # Relationships
     quests: list["Quest"] = Relationship(sa_relationship_args=["user_quest"], back_populates="users")

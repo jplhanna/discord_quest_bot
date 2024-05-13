@@ -1,6 +1,7 @@
 from collections.abc import Callable
 from logging import Logger
 from logging import getLogger
+from uuid import UUID
 
 from sqlalchemy import func
 
@@ -49,11 +50,18 @@ class UserService(SingleRepoService):
     async def get_user_by_id(self, user_id: int) -> User | None:
         return await self._repository.get_by_id(user_id)
 
+    async def get_user_by_uuid(self, user_uuid: UUID) -> User | None:
+        return await self._repository.get_first(QueryArgs(filter_dict={"server_uuid": user_uuid}))
+
     async def get_user_by_discord_id(self, discord_id: int) -> User | None:
         return await self._repository.get_first(QueryArgs(filter_dict={"discord_id": discord_id}))
 
-    async def create_user(self, discord_id: int) -> User:
+    async def create_discord_user(self, discord_id: int) -> User:
         user = User(discord_id=discord_id)
+        await self._repository.add(user)
+        return user
+
+    async def create_litestar_user(self, user: User) -> User:
         await self._repository.add(user)
         return user
 

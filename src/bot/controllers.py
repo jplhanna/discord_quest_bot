@@ -39,7 +39,7 @@ async def check_and_register_user(ctx: Context, user_service: UserService = Prov
         raise NoIDProvided
     if await user_service.get_user_by_discord_id(discord_id):
         return ALREADY_REGISTERED_MESSAGE
-    await user_service.create_user(discord_id=discord_id)
+    await user_service.create_discord_user(discord_id=discord_id)
     return NEW_USER_MESSAGE
 
 
