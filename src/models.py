@@ -1,4 +1,3 @@
-from datetime import UTC
 from datetime import datetime
 from typing import TYPE_CHECKING
 
@@ -15,7 +14,7 @@ from src.typeshed import NonEmptyString
 
 if TYPE_CHECKING:
     from src.quests import ExperienceTransaction
-    from src.quests import Quest
+    from src.quests import UserQuest
 
 
 class CoreModelMixin(BaseModel):
@@ -27,9 +26,9 @@ class CoreModelMixin(BaseModel):
         return snake_case_table_name(self.__name__)
 
     id: int | None = Field(primary_key=True, default=None)
-    datetime_created: datetime = Field(default_factory=lambda: datetime.now(UTC), repr=False)
+    datetime_created: datetime = Field(default_factory=lambda: datetime.now(), repr=False)
     datetime_edited: datetime = Field(
-        default_factory=lambda: datetime.now(UTC), repr=False, sa_column_kwargs={"onupdate": datetime.utcnow}
+        default_factory=lambda: datetime.now(), repr=False, sa_column_kwargs={"onupdate": datetime.now}
     )
 
 
@@ -51,7 +50,7 @@ class User(CoreModelMixin, table=True):
     discord_id: int = Field(sa_type=BigInteger, unique=True)
 
     # Relationships
-    quests: list["Quest"] = Relationship(sa_relationship_args=["user_quest"], back_populates="users")
+    quests: list["UserQuest"] = Relationship(back_populates="user")
     experience: list["ExperienceTransaction"] = Relationship(back_populates="user")
 
 

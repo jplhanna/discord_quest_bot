@@ -33,7 +33,7 @@ class Quest(CoreModelMixin, table=True):
     max_completion_count: int | None = Field(default=None)
 
     # Relationships
-    users: list[User] = Relationship(sa_relationship_args=["user_quest"], back_populates="quests")
+    users: list["UserQuest"] = Relationship(back_populates="quest")
 
 
 class UserQuest(CoreModelMixin, UserResourceMixin, table=True):
