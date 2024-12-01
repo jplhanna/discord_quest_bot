@@ -32,7 +32,7 @@ services:
   postgres:
     container_name: postgres-${IMAGE_TAG-latest}
     hostname: "postgres"
-    image: postgres:14
+    image: postgres:17
     command: [ "postgres", "-c", "listen_addresses=*", "-c", "log_statement=all" ]
     restart: always
     environment:
