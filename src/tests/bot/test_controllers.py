@@ -26,14 +26,14 @@ from src.tavern import Menu
 from src.tavern.exceptions import NoMenuItemFoundError
 from src.tavern.models import MenuItem
 
-wire_to = ["src.bot.controllers"]
+TEST_WIRE_TO = ["src.bot.controllers"]
 
 
 @pytest.fixture(params=[True, False])
 def mock_container_if_user_exists(mock_container, user, request):
     mocked_user_service = AsyncMock(get_user_by_discord_id=AsyncMock(return_value=user if request.param else None))
     mock_container.user_service.override(mocked_user_service)
-    mock_container.wire(wire_to)
+    mock_container.wire(TEST_WIRE_TO)
     return mock_container, mocked_user_service, request.param
 
 
@@ -59,7 +59,7 @@ class TestAddQuestToUser:
         ctx = MagicMock(author=MagicMock(id=sentinel.discord_id))
         mocked_quest_service = AsyncMock()
         mock_container.quest_service.override(mocked_quest_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await add_quest_to_user(ctx, sentinel.quest_name)
         # Assert
@@ -76,7 +76,7 @@ class TestCompleteQuestForUser:
         mocked_xp_service = AsyncMock()
         mock_container.quest_service.override(mocked_quest_service)
         mock_container.xp_service.override(mocked_xp_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
 
         # Act
         res = await complete_quest_for_user(mocked_ctx, sentinel.quest_name)
@@ -94,7 +94,8 @@ class TestCompleteQuestForUser:
         )
         mock_container, _, _ = mock_container_if_user_exists
         mock_container.quest_service.override(mocked_quest_service)
-        mock_container.wire(wire_to)
+        # mock_container.xp_service.override(AsyncMock())
+        mock_container.wire(TEST_WIRE_TO)
 
         # Act
         res = await complete_quest_for_user(mocked_ctx, sentinel.quest_name)
@@ -117,7 +118,7 @@ class TestGetTavernMenu:
         # Arrange
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
 
         # Act
         res = await get_tavern_menu(mocked_ctx)
@@ -134,7 +135,7 @@ class TestGetTavernMenu:
             )
         )
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await get_tavern_menu(mocked_ctx)
         # Assert
@@ -171,7 +172,7 @@ class TestUpsertTavernMenu:
         # Arrange
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await upsert_tavern_menu(mocked_ctx, "New item", DayOfWeek.MONDAY)
         # Assert
@@ -184,7 +185,7 @@ class TestUpsertTavernMenu:
         # Arrange
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await upsert_tavern_menu(mocked_ctx, "New item", DayOfWeek.MONDAY)
         # Assert
@@ -207,7 +208,7 @@ class TestRemoveTavernMenu:
         # Arrange
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await remove_from_tavern_menu(mocked_ctx, "New item", DayOfWeek.MONDAY)
         # Assert
@@ -230,7 +231,7 @@ class TestRemoveTavernMenu:
             delete_menu_item=AsyncMock(side_effect=NoMenuItemFoundError("Not food")),
         )
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await remove_from_tavern_menu(mocked_ctx, "Not food", day_of_week)
         # Assert
@@ -242,7 +243,7 @@ class TestSelectFromTavernMenu:
         # Arrange
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=None))
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await select_from_tavern_menu(mocked_guild, ChooseStyle.RANDOM, DayOfWeek.MONDAY)
         # Assert
@@ -253,7 +254,7 @@ class TestSelectFromTavernMenu:
         menu = Menu(start_date=faker.date_object(), server_id=mocked_guild.id)
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await select_from_tavern_menu(mocked_guild, ChooseStyle.RANDOM, DayOfWeek.MONDAY)
         # Assert
@@ -266,7 +267,7 @@ class TestSelectFromTavernMenu:
         menu = Menu(start_date=faker.date_object(), server_id=mocked_guild.id, items=[menu_item_1, menu_item_2])
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await select_from_tavern_menu(mocked_guild, ChooseStyle.FIRST, DayOfWeek.MONDAY)
         # Assert
@@ -281,7 +282,7 @@ class TestSelectFromTavernMenu:
         random_choice.return_value = menu_item_2
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
         mock_container.tavern_service.override(tavern_service)
-        mock_container.wire(wire_to)
+        mock_container.wire(TEST_WIRE_TO)
         # Act
         res = await select_from_tavern_menu(mocked_guild, ChooseStyle.RANDOM, DayOfWeek.MONDAY)
         # Assert
