@@ -38,7 +38,7 @@ def setup_factory_session(test_config_obj):
     return test_session
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_container() -> Generator[Container, None, None]:
     mocked_container = copy(base_mock_container)
     mocked_container.async_db_client = MagicMock()
@@ -48,22 +48,22 @@ def mock_container() -> Generator[Container, None, None]:
     mocked_container.unwire()
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_guild() -> MagicMock:
     return MagicMock(id=sentinel.guild_id)
 
 
-@pytest.fixture()
+@pytest.fixture
 def mocked_ctx(mocked_guild) -> MagicMock:
     return MagicMock(author=MagicMock(id=sentinel.discord_id), guild=mocked_guild)
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_user_repository() -> AsyncRepository[User]:
     return AsyncRepository(MagicMock(session=AsyncMock()), User)
 
 
-@pytest.fixture()
+@pytest.fixture
 def mock_user_with_db_repository(mock_user_repository, db_session):
     mock_user_repository.session_factory.return_value = db_session
     return mock_user_repository
@@ -86,7 +86,7 @@ async def event_loop() -> Generator[AbstractEventLoop, None, None]:
 
 
 @pytest.fixture(scope="session")
-async def _database_url(test_config_obj) -> str:  # noqa: PT005
+async def _database_url(test_config_obj) -> str:
     return test_config_obj.db.async_database_uri
 
 
@@ -95,7 +95,7 @@ async def init_database() -> Callable:
     return BaseModel.metadata.create_all
 
 
-@pytest.fixture()
+@pytest.fixture
 async def db_session(sqla_engine):
     """
     Fixture that returns a SQLAlchemy session with a SAVEPOINT, and the rollback to it
@@ -115,7 +115,7 @@ async def db_session(sqla_engine):
         await connection.close()
 
 
-@pytest.fixture()
+@pytest.fixture
 async def db_user(db_session):
     user = User(discord_id=1234567890)
     db_session.add(user)

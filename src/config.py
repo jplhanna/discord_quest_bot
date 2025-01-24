@@ -40,7 +40,7 @@ class DBSettings(BaseSettings):
     database_password: NonEmptyString
     database_port: str = Field(default="5432")
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def database_uri(self) -> str:
         return cast(
@@ -55,7 +55,7 @@ class DBSettings(BaseSettings):
             ).url,
         )
 
-    @computed_field  # type: ignore[misc]
+    @computed_field  # type: ignore[prop-decorator]
     @property
     def async_database_uri(self) -> str:
         return cast(

@@ -38,6 +38,7 @@ class MenuItem(CoreModelMixin, table=True):
 
 
 class BardTale(CoreModelMixin, table=True):
+    name: NonEmptyString
     story: NonEmptyString
 
     theme_id: int = Field(foreign_key="theme.id", repr=False)

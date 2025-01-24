@@ -187,3 +187,11 @@ async def request_story_by_theme(
     tales = await tavern_service.get_tales_by_theme(theme)
     tale: BardTale = random.choice(tales)  # noqa: S311
     return tale.story
+
+
+async def request_story_by_name(
+    story_name: str,
+    tavern_service: TavernService = Provide[Container.tavern_service],
+) -> str:
+    await tavern_service.get_tales_by_name(story_name)
+    return ""

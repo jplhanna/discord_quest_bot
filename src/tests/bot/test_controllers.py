@@ -38,7 +38,7 @@ def mock_container_if_user_exists(mock_container, user, request):
 
 
 class TestCheckAndRegisterUser:
-    @pytest.mark.asyncio()
+    @pytest.mark.asyncio
     async def test_account_already_exists(self, mock_container_if_user_exists):
         # Arrange
         _, mocked_user_service, user_exists = mock_container_if_user_exists
@@ -51,7 +51,7 @@ class TestCheckAndRegisterUser:
         assert res == expected_result_mapping[user_exists]
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 class TestAddQuestToUser:
     async def test_if_registered(self, mock_container_if_user_exists):
         # Arrange
@@ -67,7 +67,7 @@ class TestAddQuestToUser:
         assert mocked_quest_service.accept_quest_if_available.called is user_exists
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 class TestCompleteQuestForUser:
     async def test_if_registered(self, mock_container_if_user_exists, mocked_ctx):
         # Arrange

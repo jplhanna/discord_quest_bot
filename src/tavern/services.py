@@ -68,3 +68,8 @@ class TavernService(MultiRepoService):
 
     async def get_tales_by_theme(self, theme: Theme) -> Sequence[BardTale]:
         return await self._repositories.bard_tale.get_all(QueryArgs(filter_dict={"theme": theme}))
+
+    async def get_tales_by_name(self, search_name: str) -> Sequence[BardTale]:
+        return await self._repositories.bard_tale.get_all(
+            QueryArgs(filter_list=[BardTale.name.ilike(f"%{search_name}%")])  # type: ignore[attr-defined]
+        )
