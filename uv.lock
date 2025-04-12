@@ -235,7 +235,7 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.5.3,<3" },
     { name = "pydantic-settings", specifier = ">=2.1.0,<3" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.25,<3" },
-    { name = "sqlmodel", specifier = ">=0.0.14,<0.0.15" },
+    { name = "sqlmodel", specifier = ">=0.0.24,<0.0.25" },
     { name = "typing-extensions", specifier = ">=4.9.0,<5" },
 ]
 
@@ -975,15 +975,15 @@ asyncio = [
 
 [[package]]
 name = "sqlmodel"
-version = "0.0.14"
+version = "0.0.24"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic" },
     { name = "sqlalchemy" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0d/a8/afa989b8dc9f87b47f75bd11ecde0627b236b698900cee59ac304eb92403/sqlmodel-0.0.14.tar.gz", hash = "sha256:0bff8fc94af86b44925aa813f56cf6aabdd7f156b73259f2f60692c6a64ac90e", size = 25842 }
+sdist = { url = "https://files.pythonhosted.org/packages/86/4b/c2ad0496f5bdc6073d9b4cef52be9c04f2b37a5773441cc6600b1857648b/sqlmodel-0.0.24.tar.gz", hash = "sha256:cc5c7613c1a5533c9c7867e1aab2fd489a76c9e8a061984da11b4e613c182423", size = 116780 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/55/b2/ea0c31d2bb8d22dffd83f43028d8d1b18301702725d6b918ac15f99b6de7/sqlmodel-0.0.14-py3-none-any.whl", hash = "sha256:accea3ff5d878e41ac439b11e78613ed61ce300cfcb860e87a2d73d4884cbee4", size = 25947 },
+    { url = "https://files.pythonhosted.org/packages/16/91/484cd2d05569892b7fef7f5ceab3bc89fb0f8a8c0cde1030d383dbc5449c/sqlmodel-0.0.24-py3-none-any.whl", hash = "sha256:6778852f09370908985b667d6a3ab92910d0d5ec88adcaf23dbc242715ff7193", size = 28622 },
 ]
 
 [[package]]

@@ -19,7 +19,9 @@ if TYPE_CHECKING:
 
 class CoreModelMixin(BaseModel):
     __abstract__ = True
-    model_config = ConfigDict(str_strip_whitespace=True, str_to_lower=True)  # type: ignore[assignment]
+    model_config = ConfigDict(  # type: ignore[assignment]
+        str_strip_whitespace=True, str_to_lower=True, from_attributes=True
+    )
 
     @declared_attr  # type: ignore[override, arg-type]
     def __tablename__(self) -> str:
