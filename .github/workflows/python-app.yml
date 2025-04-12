@@ -24,16 +24,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4.1.4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
       - name: Build Docker images
         run: |
           docker compose build test-pipeline
           docker compose up -d test-pipeline
       - name: Check format with ruff
         if: always()
-        run: docker compose exec test-pipeline ruff format --check
+        run: docker compose exec test-pipeline ruff format --check src
       - name: Check type hints
         if: always()
         run: docker compose exec test-pipeline mypy src

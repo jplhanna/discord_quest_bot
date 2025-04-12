@@ -94,7 +94,7 @@ class TestCompleteQuestForUser:
         )
         mock_container, _, _ = mock_container_if_user_exists
         mock_container.quest_service.override(mocked_quest_service)
-        # mock_container.xp_service.override(AsyncMock())
+        mock_container.xp_service.override(AsyncMock())
         mock_container.wire(TEST_WIRE_TO)
 
         # Act

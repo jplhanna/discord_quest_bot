@@ -17,7 +17,7 @@ services:
       DATABASE_HOST: 'postgres'
       DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
     volumes:
-      - .:/app
+      - ./src:/app/src
     networks:
       - network
     build:
@@ -66,7 +66,7 @@ services:
       LOGGER__HANDLERS__BASIC_HANDLER__FORMATTER: 'simple_formatter'
       LOGGER__HANDLERS__BASIC_HANDLER__STREAM: 'ext://sys.stdout'
     volumes:
-      - .:/app
+      - ./src:/app/src
     networks:
       - network
     build:

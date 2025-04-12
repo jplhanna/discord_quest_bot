@@ -16,5 +16,9 @@ RUN uv sync --frozen --no-install-project --no-dev
 # Install application into container
 ENV PYTHONPATH "$PYTHONPATH:/app/"
 
+# Make Logs directory
+RUN mkdir /app/logs
+RUN touch /app/logs/discord.log
+
 FROM install-uv-packages AS install-dev
 RUN uv sync --frozen --no-install-project --only-dev
