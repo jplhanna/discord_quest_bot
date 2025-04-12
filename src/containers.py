@@ -87,7 +87,7 @@ class SyncDatabase:
 
 class Container(DeclarativeContainer):
     config = Configuration("configuration")
-    config.from_dict(Settings().model_dump(mode="json", by_alias=True), required=True)
+    config.from_pydantic(Settings(), required=True, by_alias=True)
     logging = Resource(dictConfig, config=config.logger)
 
     sync_db_client = Singleton(SyncDatabase, db_url=config.db.sync_database_uri)
