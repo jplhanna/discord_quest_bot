@@ -27,7 +27,6 @@ from src.quests.exceptions import QuestAlreadyAccepted
 from src.quests.exceptions import QuestDNE
 from src.services import ThemeService
 from src.services import UserService
-from src.tavern import BardTale
 from src.tavern import TavernService
 from src.tavern.exceptions import NoMenuItemFoundError
 
@@ -184,8 +183,9 @@ async def request_story_by_theme(
         theme = await theme_service.get_theme_by_name(theme_name)
     except (NoResultFound, MultipleResultsFound):
         return NO_SUCH_THEME_EXISTS
-    tales = await tavern_service.get_tales_by_theme(theme)
-    tale: BardTale = random.choice(tales)  # noqa: S311
+    tale = await tavern_service.get_random_tale_by_theme(theme)
+    if not tale:
+        return "No stories exist under this theme"
     return tale.story
 
 

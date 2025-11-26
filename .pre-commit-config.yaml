@@ -46,7 +46,7 @@ repos:
         entry: mypy
         language: system
         types: [ python ]
-        exclude: alembic|test_.*|conftest\.py
+        exclude: alembic|test_.*|conftest\.py|factories
       - id: ruff lint
         name: ruff lint
         entry: ruff check

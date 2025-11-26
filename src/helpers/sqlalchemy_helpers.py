@@ -16,6 +16,7 @@ from sqlalchemy import func
 from sqlalchemy.orm import InstrumentedAttribute
 from sqlalchemy.sql.base import ExecutableOption
 from sqlalchemy.sql.elements import UnaryExpression
+from sqlalchemy.sql.functions import random
 from sqlmodel import SQLModel
 from sqlmodel.sql.expression import Select
 
@@ -79,7 +80,7 @@ class QueryArgs:
     filter_list: list[SQLLogicType] | None = None
     filter_dict: dict[str, Any] | None = None
     eager_options: list | None = None
-    order_by: list[Column | UnaryExpression | InstrumentedAttribute] | None = None
+    order_by: list[Column | UnaryExpression | InstrumentedAttribute | random] | None = None
     join_on: JoinListType | None = None
     distinct_on: list[Column | None] | None = None
     group_by: list[Column] | None = None

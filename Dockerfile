@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:python3.12-alpine AS base
+FROM ghcr.io/astral-sh/uv:python3.13-alpine AS base
 LABEL org.opencontainers.image.authors="jpl.hanna@gmail.com"
 WORKDIR /app/
 COPY . /app/
@@ -23,4 +23,4 @@ RUN touch /app/logs/discord.log
 
 FROM install-uv-packages AS install-dev
 RUN --mount=type=cache,target=$UV_CACHE_DIR \
-    uv sync --no-install-project --only-dev
+    uv sync --no-install-project --group dev

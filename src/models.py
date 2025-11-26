@@ -23,7 +23,7 @@ class CoreModelMixin(BaseModel):
         str_strip_whitespace=True, str_to_lower=True, from_attributes=True
     )
 
-    @declared_attr  # type: ignore[override, arg-type]
+    @declared_attr  # type: ignore[arg-type]
     def __tablename__(self) -> str:
         return snake_case_table_name(self.__name__)
 

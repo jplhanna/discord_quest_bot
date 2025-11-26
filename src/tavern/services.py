@@ -5,6 +5,7 @@ from typing import cast
 
 from sqlalchemy import Date
 from sqlalchemy import cast as sql_cast
+from sqlalchemy import func
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.orm import selectinload
 from sqlmodel import desc
@@ -68,6 +69,11 @@ class TavernService(MultiRepoService):
 
     async def get_tales_by_theme(self, theme: Theme) -> Sequence[BardTale]:
         return await self._repositories.bard_tale.get_all(QueryArgs(filter_dict={"theme": theme}))
+
+    async def get_random_tale_by_theme(self, theme: Theme) -> BardTale | None:
+        return await self._repositories.bard_tale.get_first(
+            QueryArgs(filter_dict={"theme": theme}, order_by=[func.random()])
+        )
 
     async def get_tales_by_name(self, search_name: str) -> Sequence[BardTale]:
         return await self._repositories.bard_tale.get_all(

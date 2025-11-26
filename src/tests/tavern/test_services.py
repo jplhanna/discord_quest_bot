@@ -4,6 +4,8 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.constants import DayOfWeek
+from src.repositories import AsyncRepository
+from src.tavern import BardTale
 from src.tavern import Menu
 from src.tavern import TavernService
 from src.tavern.exceptions import NoMenuItemFoundError
@@ -46,3 +48,19 @@ class TestDeleteMenuItem:
         await tavern_service.delete_menu_item(menu, "Food", day_of_week)
         # Assert
         menu_item_repository.delete.assert_called_with(menu_item)
+
+
+class TestGetRandomTaleByTheme:
+    @pytest.fixture
+    def mocked_tavern_service(self, db_session):
+        bard_tale_repo = AsyncRepository(MagicMock(return_value=db_session), BardTale)
+        return TavernService(MagicMock(return_value=bard_tale_repo), bard_tale=BardTale)
+
+    @pytest.mark.integration
+    def test_no_stories_in_theme(self, mocked_tavern_service, theme, db_session):
+        # TODO db_session and test_session which is used by factory boy are different sessions and do not work together
+        # Arrange
+        db_session.add(theme)
+        db_session.commit()
+        # Act && Assert
+        assert not mocked_tavern_service.get_random_tale_by_theme(theme)
