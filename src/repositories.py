@@ -4,7 +4,6 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from dataclasses import field
 from dataclasses import replace
-from typing import Generic
 from typing import cast
 
 from sqlalchemy import ColumnElement
@@ -18,11 +17,10 @@ from sqlmodel.sql.expression import Select
 from src.helpers.sqlalchemy_helpers import QueryArgs
 from src.typeshed import BaseModelType
 from src.typeshed import EntitiesType
-from src.typeshed import SessionType
 
 
 @dataclass
-class BaseRepository(ABC, Generic[SessionType, BaseModelType]):
+class BaseRepository[SessionType, BaseModelType](ABC):
     session_factory: Callable[..., SessionType]
     model: type[BaseModelType]
     _session: SessionType | None

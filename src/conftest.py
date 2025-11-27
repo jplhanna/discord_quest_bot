@@ -8,6 +8,7 @@ from unittest.mock import MagicMock
 from unittest.mock import sentinel
 
 import pytest
+import pytest_asyncio
 
 from pytest_factoryboy import register
 from sqlalchemy import create_engine
@@ -17,7 +18,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config import Settings
 from src.containers import Container
-from src.helpers.factories import factory_classes
+from src.helpers.factories import FACTORY_CLASSES
 from src.helpers.factories.base_factories import test_session
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
@@ -95,7 +96,7 @@ async def init_database() -> Callable:
     return BaseModel.metadata.create_all
 
 
-@pytest.fixture
+@pytest_asyncio.fixture(loop_scope="function")
 async def db_session(sqla_engine):
     """
     Fixture that returns a SQLAlchemy session with a SAVEPOINT, and the rollback to it
@@ -115,7 +116,7 @@ async def db_session(sqla_engine):
         await connection.close()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture(loop_scope="function")
 async def db_user(db_session):
     user = User(discord_id=1234567890)
     db_session.add(user)
@@ -126,5 +127,5 @@ async def db_user(db_session):
         await db_session.flush()
 
 
-for cls in factory_classes:
+for cls in FACTORY_CLASSES:
     register(cls)

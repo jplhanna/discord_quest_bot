@@ -59,8 +59,8 @@ JoinListType = Sequence[
     | InstrumentedAttribute
 ]
 
-EntitiesType = Mapped | Label | type["CoreModelMixin"] | Function
 BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")
+EntitiesType = Mapped | Label | type["CoreModelMixin"] | Function | type[BaseModelType]
 SessionType = TypeVar("SessionType", AsyncSession, Session)
 
 

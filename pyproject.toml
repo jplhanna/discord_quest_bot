@@ -7,7 +7,6 @@ dev = [
   "coverage[toml]>=6.4.4,<7",
   "factory-boy>=3.3.0,<4",
   "faker",
-  "flake8-pytest-style>=1.6.0,<2",
   "mypy",
   "pre-commit",
   "pytest",
@@ -17,7 +16,7 @@ dev = [
   "pytest-factoryboy>=2.7.0,<3",
   "pytest-mock>=3.12.0,<4",
   "pytest-randomly",
-  "ruff>=0.8.1,<0.9"
+  "ruff>=0.14.6"
 ]
 
 [project]
@@ -99,6 +98,7 @@ module = "factory.*"
 url = "http://127.0.0.1:4200/api"
 
 [tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "session"
 asyncio_mode = "auto"
 filterwarnings = [
   "ignore::DeprecationWarning"
@@ -117,7 +117,7 @@ docstring-code-format = true
 
 [tool.ruff.lint]
 fixable = ["ALL"]
-ignore = ["D1", "D205"]
+ignore = ["D1", "D205", "TC006"]
 select = [
   "E",
   "F",

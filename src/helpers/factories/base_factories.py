@@ -12,4 +12,3 @@ test_session = scoped_session(sessionmaker())
 class BaseFactory(SQLAlchemyModelFactory):
     class Meta:
         abstract = True
-        sqlalchemy_session = test_session
