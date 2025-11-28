@@ -7,6 +7,7 @@ dev = [
   "coverage[toml]>=6.4.4,<7",
   "factory-boy>=3.3.0,<4",
   "faker",
+  "import-linter>=2.7",
   "mypy",
   "pre-commit",
   "pytest",
@@ -62,6 +63,56 @@ include = ["local_server"]
 [tool.hatch.build.targets.wheel]
 include = ["local_server"]
 
+[tool.importlinter]
+exclude_type_checking_imports = true
+include_external_packages = true
+root_package = "src"
+
+[[tool.importlinter.contracts]]
+containers = ["src"]
+exhaustive = true
+layers = [
+  "tests",
+  "conftest",
+  "factories",
+  "run | model_hub",
+  "bot",
+  "containers",
+  "quests | tavern",
+  "services",
+  "repositories",
+  "models",
+  "helpers",
+  "exceptions",
+  "config",
+  "constants",
+  "typeshed"
+]
+name = "Source layers"
+type = "layers"
+
+[[tool.importlinter.contracts]]
+containers = ["src.bot"]
+layers = [
+  "commands",
+  "controllers",
+  "typeshed",
+  "constants"
+]
+name = "Bot layers"
+type = "layers"
+
+[[tool.importlinter.contracts]]
+containers = ["src.quests", "src.tavern"]
+exhaustive = true
+layers = [
+  "services",
+  "exceptions",
+  "models"
+]
+name = "Source Submodule layers"
+type = "layers"
+
 [tool.mypy]
 cache_fine_grained = true
 disallow_incomplete_defs = true
@@ -110,7 +161,7 @@ markers = [
 [tool.ruff]
 exclude = ["alembic"]
 line-length = 120
-target-version = "py312"
+target-version = "py313"
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -152,7 +203,7 @@ lines-between-types = 1
 max-complexity = 10
 
 [tool.ruff.lint.per-file-ignores]
-"src/helpers/factories/*" = ["FBT001"]
+"src/factories/*" = ["FBT001"]
 "src/model_hub.py" = ["F401"]
 "src/tests/*" = ["S"]
 

@@ -5,7 +5,7 @@ import factory
 from pytest_factoryboy import register
 
 from src.constants import DayOfWeek
-from src.helpers.factories.base_factories import BaseFactory
+from src.factories.base_factories import BaseFactory
 from src.models import Theme
 from src.tavern import Menu
 from src.tavern.models import MenuItem

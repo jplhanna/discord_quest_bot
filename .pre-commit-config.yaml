@@ -54,6 +54,13 @@ repos:
         types: [ python ]
         exclude: alembic
         args: [--fix, --exit-non-zero-on-fix]
+      - id: import lint
+        name: import_linter
+        entry: lint-imports
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
 
   - repo: https://github.com/avilaton/add-msg-issue-prefix-hook
     rev: v0.0.11

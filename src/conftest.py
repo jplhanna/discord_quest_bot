@@ -18,7 +18,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config import Settings
 from src.containers import Container
-from src.helpers.factories import FACTORY_CLASSES
+from src.factories import FACTORY_CLASSES
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.repositories import AsyncRepository
@@ -32,7 +32,7 @@ def test_config_obj():
 
 
 @pytest.fixture
-def mock_container() -> Generator[Container, None, None]:
+def mock_container() -> Generator[Container]:
     mocked_container = copy(base_mock_container)
     mocked_container.async_db_client = MagicMock()
     mocked_container.async_repository_factory = MagicMock()
@@ -63,7 +63,7 @@ def mock_user_with_db_repository(mock_user_repository, db_session):
 
 
 @pytest.fixture(scope="session")
-def container_for_testing(test_config_obj) -> Generator[Container, None, None]:
+def container_for_testing(test_config_obj) -> Generator[Container]:
     testing_container = copy(base_mock_container)
     testing_container.config.from_pydantic(test_config_obj)
     testing_container.init_resources()
@@ -72,7 +72,7 @@ def container_for_testing(test_config_obj) -> Generator[Container, None, None]:
 
 
 @pytest.fixture(scope="session")
-async def event_loop() -> Generator[AbstractEventLoop, None, None]:
+async def event_loop() -> Generator[AbstractEventLoop]:
     loop = new_event_loop()
     asyncio.set_event_loop(loop)
     yield loop

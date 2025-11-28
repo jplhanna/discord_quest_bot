@@ -2,7 +2,7 @@ import factory
 
 from pytest_factoryboy import register
 
-from src.helpers.factories.base_factories import BaseFactory
+from src.factories.base_factories import BaseFactory
 from src.models import User
 
 

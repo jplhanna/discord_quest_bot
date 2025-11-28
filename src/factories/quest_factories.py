@@ -4,8 +4,8 @@ import factory
 
 from pytest_factoryboy import register
 
-from src.helpers.factories.base_factories import BaseFactory
-from src.helpers.factories.user_factories import UserFactory
+from src.factories.base_factories import BaseFactory
+from src.factories.user_factories import UserFactory
 from src.quests import ExperienceTransaction
 from src.quests import Quest
 from src.quests import UserQuest

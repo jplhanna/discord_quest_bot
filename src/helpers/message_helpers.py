@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from src.helpers.constants import BLOCK_POST_TEXT
 from src.helpers.constants import BLOCK_PRE_TEXT
@@ -8,7 +9,9 @@ from src.helpers.constants import EXPERIENCE_COLUMN_NAME
 from src.helpers.constants import MINIMUM_SPACING
 from src.helpers.constants import QUEST_COLUMN_NAME
 from src.helpers.constants import WRAPPER_TEXT_LEN
-from src.quests.models import Quest
+
+if TYPE_CHECKING:
+    from src.quests.models import Quest
 
 
 def _create_single_quest_line(first_column: str, second_column: str, line_length: int) -> str:
@@ -16,7 +19,7 @@ def _create_single_quest_line(first_column: str, second_column: str, line_length
     return "".join([BLOCK_PRE_TEXT, first_column, " " * num_spaces_needed, second_column, BLOCK_POST_TEXT])
 
 
-def format_quest_board(quests: Sequence[Quest]) -> str:
+def format_quest_board(quests: Sequence["Quest"]) -> str:
     """
     Format a list of quests to look like a quest board.
 
