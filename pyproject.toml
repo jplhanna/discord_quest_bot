@@ -41,9 +41,6 @@ readme = "README.md"
 requires-python = ">=3.12"
 version = "0.1.1"
 
-[tool.black]
-line-length = 120
-
 [tool.coverage.report]
 skip_empty = true
 
@@ -145,9 +142,6 @@ module = "furl"
 ignore_missing_imports = true
 module = "factory.*"
 
-[tool.prefect.api]
-url = "http://127.0.0.1:4200/api"
-
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "session"
 asyncio_mode = "auto"
@@ -162,6 +156,10 @@ markers = [
 exclude = ["alembic"]
 line-length = 120
 target-version = "py313"
+
+[tool.ruff.analyze]
+# Exclude type-checking-only imports from the graph
+type-checking-imports = false
 
 [tool.ruff.format]
 docstring-code-format = true
