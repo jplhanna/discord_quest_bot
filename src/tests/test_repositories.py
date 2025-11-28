@@ -72,7 +72,7 @@ def get_user_data_for_query(usr):
 
 
 @pytest.mark.integration
-@pytest.mark.asyncio
+@pytest.mark.asyncio(loop_scope="session")
 class TestBaseRepositoryIntegration:
     async def test_create_user(self, mock_user_with_db_repository, faker):
         # Arrange

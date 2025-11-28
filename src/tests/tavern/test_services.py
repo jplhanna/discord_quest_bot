@@ -57,6 +57,7 @@ class TestGetRandomTaleByTheme:
         return TavernService(MagicMock(return_value=bard_tale_repo), bard_tale=BardTale)
 
     @pytest.mark.integration
+    @pytest.mark.asyncio(loop_scope="session")
     async def test_no_stories_in_theme(self, mocked_tavern_service, db_session, theme):
         # Arrange
         db_session.add(theme)
