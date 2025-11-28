@@ -1,3 +1,5 @@
+import asyncio
+
 from asyncio import AbstractEventLoop
 from asyncio import new_event_loop
 from collections.abc import Callable
@@ -8,10 +10,8 @@ from unittest.mock import MagicMock
 from unittest.mock import sentinel
 
 import pytest
-import pytest_asyncio
 
 from pytest_factoryboy import register
-from sqlalchemy import create_engine
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -19,7 +19,6 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from src.config import Settings
 from src.containers import Container
 from src.helpers.factories import FACTORY_CLASSES
-from src.helpers.factories.base_factories import test_session
 from src.helpers.sqlalchemy_helpers import BaseModel
 from src.models import User
 from src.repositories import AsyncRepository
@@ -30,13 +29,6 @@ base_mock_container = Container(logging=MagicMock())
 @pytest.fixture(scope="session")
 def test_config_obj():
     return Settings()
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup_factory_session(test_config_obj):
-    engine = create_engine(test_config_obj.db.database_uri)
-    test_session.configure(bind=engine)
-    return test_session
 
 
 @pytest.fixture
@@ -82,6 +74,7 @@ def container_for_testing(test_config_obj) -> Generator[Container, None, None]:
 @pytest.fixture(scope="session")
 async def event_loop() -> Generator[AbstractEventLoop, None, None]:
     loop = new_event_loop()
+    asyncio.set_event_loop(loop)
     yield loop
     loop.close()
 
@@ -96,7 +89,7 @@ async def init_database() -> Callable:
     return BaseModel.metadata.create_all
 
 
-@pytest_asyncio.fixture(loop_scope="function")
+@pytest.fixture
 async def db_session(sqla_engine):
     """
     Fixture that returns a SQLAlchemy session with a SAVEPOINT, and the rollback to it
@@ -116,7 +109,7 @@ async def db_session(sqla_engine):
         await connection.close()
 
 
-@pytest_asyncio.fixture(loop_scope="function")
+@pytest.fixture
 async def db_user(db_session):
     user = User(discord_id=1234567890)
     db_session.add(user)
