@@ -7,6 +7,12 @@ default_stages:
 repos:
   - repo: local
     hooks:
+      - id: fixit
+        name: fixit
+        entry: fixit fix
+        language: system
+        types: [python]
+        args: [ -a ]
       - id: ruff format
         name: ruff format
         entry: ruff format

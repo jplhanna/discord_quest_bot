@@ -1,3 +1,5 @@
+from typing import Final
+
 from fixit import InvalidTestCase
 from fixit import LintRule
 from fixit import ValidTestCase
@@ -18,8 +20,8 @@ from libcst import matchers as m
 
 
 class ConstantsTypedWithFinalRule(LintRule):
-    AUTOFIX = True
-    VALID = [
+    AUTOFIX: Final = True
+    VALID: list = [
         ValidTestCase('CONSTANT: Final[str] = "constant"'),
         ValidTestCase("CONSTANT: Final[int] = 1"),
         ValidTestCase("CONSTANT: Final = 2.5"),
@@ -27,12 +29,12 @@ class ConstantsTypedWithFinalRule(LintRule):
         ValidTestCase("CONSTANTS: Final[dict] = {}"),
     ]
 
-    INVALID = [
+    INVALID: list = [
         InvalidTestCase('CONSTANT = "constant"'),
         InvalidTestCase("CONSTANT = 1"),
     ]
 
-    MESSAGE = "Capitalized variables are intended as constants, and should be annotated with Final"
+    MESSAGE: Final = "Capitalized variables are intended as constants, and should be annotated with Final"
 
     def __init__(self):
         super().__init__()
@@ -86,7 +88,7 @@ class ConstantsTypedWithFinalRule(LintRule):
             node.target,
             m.SaveMatchedNode(m.Name(m.DoNotCare()), "name") | m.Attribute(attr=m.SaveMatchedNode(m.Name(), "name")),
         )
-        if attr and attr["name"].value.isupper():
+        if attr and attr["name"].value.isupper() and len(attr["name"].value) > 1:
             self.is_constant = True
 
     def leave_Assign(self, original_node: "Assign") -> None:
