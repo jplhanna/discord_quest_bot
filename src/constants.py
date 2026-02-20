@@ -2,10 +2,12 @@
 from enum import Enum
 from enum import IntEnum
 from enum import auto
+from typing import Final
 
-GOOD_LUCK_ADVENTURER = "You have accepted {}! Good luck adventurer"
-QUEST_ALREADY_ACCEPTED = "You have already accepted this request"
-QUEST_DOES_NOT_EXIST = "This quest does not exist"
+GOOD_LUCK_ADVENTURER: Final = "You have accepted {}! Good luck adventurer"
+QUEST_ALREADY_ACCEPTED: Final[str] = "You have already accepted this request"
+QUEST_DOES_NOT_EXIST: Final = "This quest does not exist"
+TEMP_CONST: Final[str] = "temp"
 
 
 # Enums

@@ -7,6 +7,7 @@ dev = [
   "coverage[toml]>=6.4.4,<7",
   "factory-boy>=3.3.0,<4",
   "faker",
+  "fixit>=2.2.1",
   "import-linter>=2.7",
   "mypy",
   "pre-commit",
@@ -53,6 +54,11 @@ omit = [
   "conftest.py",
   "constants.py"
 ]
+
+[tool.fixit]
+disable = ["fixit.rules"]
+enable = [".linting_rules"]
+root = true
 
 [tool.hatch.build.targets.sdist]
 include = ["local_server"]
@@ -117,7 +123,8 @@ disallow_untyped_defs = true
 exclude = [
   "test",
   "alembic",
-  "factories"
+  "factories",
+  "rule"
 ]
 local_partial_types = true
 namespace_packages = true

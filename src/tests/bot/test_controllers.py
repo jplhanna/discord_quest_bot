@@ -26,7 +26,7 @@ from src.tavern import Menu
 from src.tavern.exceptions import NoMenuItemFoundError
 from src.tavern.models import MenuItem
 
-TEST_WIRE_TO = ["src.bot.controllers"]
+TEST_WIRE_TO: list[str] = ["src.bot.controllers"]
 
 
 @pytest.fixture(params=[True, False])

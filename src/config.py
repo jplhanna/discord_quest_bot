@@ -3,6 +3,7 @@ import os
 from logging import DEBUG
 from logging import INFO
 from logging import NOTSET
+from typing import Final
 from typing import cast
 
 from furl import furl
@@ -15,14 +16,14 @@ from src.typeshed import NonEmptyString
 
 ASYNC_PSQL_SCHEME = "postgresql+asyncpg"
 
-discord_owner_id_str = os.environ.get("DISCORD_OWNER_ID")
-DISCORD_OWNER_ID = int(discord_owner_id_str) if discord_owner_id_str else None
+_DISCORD_OWNER_ID_STR: Final[str | None] = os.environ.get("DISCORD_OWNER_ID")
+DISCORD_OWNER_ID: Final = int(_DISCORD_OWNER_ID_STR) if _DISCORD_OWNER_ID_STR else None
 
-DATABASE_NAME = os.environ.get("DATABASE_NAME")
-DATABASE_USER = os.environ.get("DATABASE_USER")
-DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
-DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD")
-PSQL_SCHEME = "postgresql"
+DATABASE_NAME: Final = os.environ.get("DATABASE_NAME")
+DATABASE_USER: Final = os.environ.get("DATABASE_USER")
+DATABASE_HOST: Final = os.environ.get("DATABASE_HOST", "localhost")
+DATABASE_PASSWORD: Final = os.environ.get("DATABASE_PASSWORD")
+PSQL_SCHEME: Final = "postgresql"
 
 database_furl = furl(
     scheme=PSQL_SCHEME,
