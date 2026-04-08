@@ -32,6 +32,7 @@ class ConstantsTypedWithFinalRule(LintRule):
     INVALID: list = [
         InvalidTestCase('CONSTANT = "constant"'),
         InvalidTestCase("CONSTANT = 1"),
+        InvalidTestCase("CONSTANT: int = 1"),
     ]
 
     MESSAGE: Final = "Capitalized variables are intended as constants, and should be annotated with Final"
