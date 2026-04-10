@@ -1,3 +1,4 @@
+from datetime import UTC
 from datetime import datetime
 
 from sqlmodel import Field
@@ -7,11 +8,12 @@ from src.models import CoreModelMixin
 from src.models import User
 from src.models import UserResourceMixin
 from src.typeshed import MixinData
+from src.typeshed import NonEmptyString
 
 
 class Quest(CoreModelMixin, table=True):
     """
-    A representation of an event(quest) a user can take part in
+    A representation of an event(quest) a user can take part in.
 
     Attributes
     ----------
@@ -26,12 +28,12 @@ class Quest(CoreModelMixin, table=True):
     """
 
     # Columns
-    name: str
+    name: NonEmptyString
     experience: int
     max_completion_count: int | None = Field(default=None)
 
     # Relationships
-    users: list[User] = Relationship(sa_relationship_args=["user_quest"], back_populates="quests")
+    users: list["UserQuest"] = Relationship(back_populates="quest")
 
 
 class UserQuest(CoreModelMixin, UserResourceMixin, table=True):
@@ -43,22 +45,23 @@ class UserQuest(CoreModelMixin, UserResourceMixin, table=True):
     date_completed: datetime | None = Field(default=None)
 
     # Relationships
-    quest: Quest = Relationship()
-    user: User = Relationship()
+    quest: Quest = Relationship(back_populates="users")
+    user: User = Relationship(back_populates="quests")
 
     @property
     def completed(self) -> bool:
         return self.date_completed is not None
 
     def mark_complete(self) -> None:
-        self.date_completed = datetime.utcnow()
+        self.date_completed = datetime.now(UTC)
 
 
 class ExperienceTransaction(CoreModelMixin, UserResourceMixin, table=True):
     """
-    Representation of an instance of a user earning experience
+    Representation of an instance of a user earning experience.
 
     Attributes
+    ----------
     __________
     user_id: int
         ID for user who earned this experience

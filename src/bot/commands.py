@@ -16,7 +16,9 @@ from src.bot.controllers import complete_quest_for_user
 from src.bot.controllers import get_quest_list_text
 from src.bot.controllers import get_tavern_menu
 from src.bot.controllers import remove_from_tavern_menu
+from src.bot.controllers import request_story_by_theme
 from src.bot.controllers import select_from_tavern_menu
+from src.bot.controllers import tell_bard_tale
 from src.bot.controllers import upsert_tavern_menu
 from src.bot.typeshed import RandomChoiceFlag
 from src.config import DISCORD_OWNER_ID
@@ -74,7 +76,11 @@ async def sync_bot_commands(_: Context) -> None:
 
 @bot.hybrid_group(name="tavern", fallback="help")
 async def tavern_group(ctx: Context) -> None:
-    await ctx.send("Available commands: \n - menu [List out all menu items for this week]")
+    await ctx.send(
+        "Available commands: "
+        "\n - menu [List out all menu items for this week]"
+        "\n - bard [List out what you may ask of the bard]"
+    )
 
 
 @tavern_group.group(name="menu", fallback="please")
@@ -106,3 +112,20 @@ async def tavern_menu_choose(ctx: Context, *, flags: RandomChoiceFlag) -> None:
         flags.day_of_week = DayOfWeek(date.today().weekday())
     res = await select_from_tavern_menu(cast(Guild, ctx.guild), flags.style, flags.day_of_week)
     await ctx.send(res)
+
+
+@tavern_group.group(name="bard", fallback="help")
+async def tavern_bard(ctx: Context) -> None:
+    await ctx.send("Available Requests: \n - story\n - retell")
+
+
+@tavern_bard.command(name="story")
+async def tavern_bard_story(ctx: Context, *, theme_name: str, story: str) -> None:
+    res = await tell_bard_tale(story, theme_name)
+    await ctx.send(res)
+
+
+@tavern_bard.command(name="retell")
+async def tavern_bard_retell_story(ctx: Context, *, theme_name: str) -> None:
+    story_text = await request_story_by_theme(theme_name)
+    await ctx.send(story_text)

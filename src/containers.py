@@ -10,21 +10,29 @@ from dependency_injector.providers import Configuration
 from dependency_injector.providers import Factory
 from dependency_injector.providers import Resource
 from dependency_injector.providers import Singleton
+from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import async_scoped_session
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import scoped_session
+from sqlalchemy.orm import sessionmaker
+from sqlmodel import Session
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from src.config import Settings
 from src.helpers.sqlalchemy_helpers import BaseModel
+from src.models import Theme
 from src.models import User
 from src.quests import ExperienceTransaction
 from src.quests import ExperienceTransactionService
 from src.quests import Quest
 from src.quests import QuestService
 from src.quests import UserQuest
-from src.repositories import BaseRepository
+from src.repositories import AsyncRepository
+from src.repositories import SyncRepository
+from src.services import ThemeService
 from src.services import UserService
+from src.tavern import BardTale
 from src.tavern import Menu
 from src.tavern import TavernService
 from src.tavern.models import MenuItem
@@ -34,7 +42,7 @@ logger = getLogger(__name__)
 WIRE_TO: list[str] = []
 
 
-class Database:
+class AsyncDatabase:
     def __init__(self, db_url: str) -> None:
         self._async_engine = create_async_engine(db_url, echo=True)
         self._session_factory = async_scoped_session(
@@ -56,7 +64,7 @@ class Database:
         return self._session_factory()
 
     @asynccontextmanager
-    async def session(self) -> AsyncGenerator[AsyncSession, None]:
+    async def session(self) -> AsyncGenerator[AsyncSession]:
         session: AsyncSession = self._session_factory()
         try:
             yield session
@@ -68,24 +76,40 @@ class Database:
             await session.close()
 
 
+class SyncDatabase:
+    def __init__(self, db_url: str) -> None:
+        self._sync_engine = create_engine(db_url)
+        self._sync_factory = scoped_session(sessionmaker(self._sync_engine, expire_on_commit=False, class_=Session))
+
+    def get_session(self) -> Session:
+        return self._sync_factory()
+
+
 class Container(DeclarativeContainer):
     config = Configuration("configuration")
-    config.from_dict(Settings().model_dump(mode="json", by_alias=True), required=True)
+    config.from_pydantic(Settings(), required=True, by_alias=True)
     logging = Resource(dictConfig, config=config.logger)
 
-    db_client = Singleton(Database, db_url=config.db.async_database_uri)
-    repository_factory = Callable(BaseRepository, session_factory=db_client.provided.get_session)
+    sync_db_client = Singleton(SyncDatabase, db_url=config.db.sync_database_uri)
+    async_db_client = Singleton(AsyncDatabase, db_url=config.db.async_database_uri)
+    sync_repository_factory = Callable(SyncRepository, session_factory=sync_db_client.provided.get_session)
+    async_repository_factory = Callable(AsyncRepository, session_factory=async_db_client.provided.get_session)
 
-    user_service = Factory(UserService, repository_factory=repository_factory, model=User)
+    user_service = Factory(UserService, repository_factory=async_repository_factory, model=User)
+    theme_service = Factory(ThemeService, repository_factory=async_repository_factory, model=Theme)
 
     quest_service = Factory(
-        QuestService, repository_factory=repository_factory, quest_model=Quest, user_quest_model=UserQuest
+        QuestService, repository_factory=async_repository_factory, quest_model=Quest, user_quest_model=UserQuest
     )
 
     xp_service = Factory(
-        ExperienceTransactionService, repository_factory=repository_factory, model=ExperienceTransaction
+        ExperienceTransactionService, repository_factory=async_repository_factory, model=ExperienceTransaction
     )
 
     tavern_service = Factory(
-        TavernService, repository_factory=repository_factory, menu_model=Menu, menu_item_model=MenuItem
+        TavernService,
+        repository_factory=async_repository_factory,
+        menu_model=Menu,
+        menu_item_model=MenuItem,
+        bard_tale_model=BardTale,
     )

@@ -1,4 +1,5 @@
 from collections.abc import Sequence
+from typing import TYPE_CHECKING
 
 from src.helpers.constants import BLOCK_POST_TEXT
 from src.helpers.constants import BLOCK_PRE_TEXT
@@ -8,7 +9,9 @@ from src.helpers.constants import EXPERIENCE_COLUMN_NAME
 from src.helpers.constants import MINIMUM_SPACING
 from src.helpers.constants import QUEST_COLUMN_NAME
 from src.helpers.constants import WRAPPER_TEXT_LEN
-from src.quests.models import Quest
+
+if TYPE_CHECKING:
+    from src.quests.models import Quest
 
 
 def _create_single_quest_line(first_column: str, second_column: str, line_length: int) -> str:
@@ -16,14 +19,20 @@ def _create_single_quest_line(first_column: str, second_column: str, line_length
     return "".join([BLOCK_PRE_TEXT, first_column, " " * num_spaces_needed, second_column, BLOCK_POST_TEXT])
 
 
-def format_quest_board(quests: Sequence[Quest]) -> str:
+def format_quest_board(quests: Sequence["Quest"]) -> str:
     """
-    This function formats a list of quests to look like a quest board
+    Format a list of quests to look like a quest board.
+
     The formatting is normalized so that all quest names and XP values start at the same char position
     Since Quests is len 6 and XP is len 2 the minimum line length is 18, and each column has minimum length 6 and 2.
 
-    :param quests: List of quests to represent.
-    :return: A code block of text which represents a list of quest names and how much XP that quest is worth.
+    Parameters
+    ----------
+    quests: List of quest to represent
+
+    Returns
+    -------
+    A code block of text which represents a list of quest names and how much XP that quest is worth.
     """
     if not quests:
         return "No available quests"

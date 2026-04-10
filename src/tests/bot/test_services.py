@@ -11,7 +11,7 @@ from src.quests.exceptions import QuestNotAccepted
 from src.quests.services import QuestService
 
 
-@pytest.mark.asyncio()
+@pytest.mark.asyncio
 @pytest.mark.usefixtures("mock_container")
 class TestQuestService:
     async def test_accept_quest_if_available(self, user):

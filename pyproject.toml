@@ -1,9 +1,46 @@
 [build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core"]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
 
-[tool.black]
-line-length = 120
+[dependency-groups]
+dev = [
+  "coverage[toml]>=6.4.4,<7",
+  "factory-boy>=3.3.0,<4",
+  "faker",
+  "fixit>=2.2.1",
+  "import-linter>=2.7",
+  "mypy",
+  "pre-commit",
+  "pytest",
+  "pytest-async-sqlalchemy",
+  "pytest-asyncio",
+  "pytest-cov",
+  "pytest-factoryboy>=2.7.0,<3",
+  "pytest-mock>=3.12.0,<4",
+  "pytest-randomly",
+  "ruff>=0.14.6"
+]
+
+[project]
+authors = [{name = "jplhanna", email = "jpl.hanna@gmail.com"}]
+dependencies = [
+  "SQLAlchemy[asyncio]>=2.0.25,<3",
+  "alembic~=1.8",
+  "asyncpg>=0.30.0,<0.32",
+  "dependency-injector>=4.46.0,<5",
+  "discord.py>=2.0.1,<3",
+  "furl>=2.1.3,<3",
+  "psycopg2-binary>=2.9.6,<3",
+  "pydantic>=2.5.3,<3",
+  "pydantic-settings>=2.1.0,<3",
+  "sqlmodel>=0.0.24,<0.1",
+  "typing-extensions>=4.9.0,<5"
+]
+description = "Discord bot for tracking and rewarding tasks"
+name = "discord-quest-bot"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "0.1.1"
 
 [tool.coverage.report]
 skip_empty = true
@@ -18,17 +55,81 @@ omit = [
   "constants.py"
 ]
 
+[tool.fixit]
+disable = ["fixit.rules"]
+enable = [".linting_rules"]
+root = true
+
+[tool.hatch.build.targets.sdist]
+include = ["local_server"]
+
+[tool.hatch.build.targets.wheel]
+include = ["local_server"]
+
+[tool.importlinter]
+exclude_type_checking_imports = true
+include_external_packages = true
+root_package = "src"
+
+[[tool.importlinter.contracts]]
+containers = ["src"]
+exhaustive = true
+layers = [
+  "tests",
+  "conftest",
+  "factories",
+  "run | model_hub",
+  "bot",
+  "containers",
+  "quests | tavern",
+  "services",
+  "repositories",
+  "models",
+  "helpers",
+  "exceptions",
+  "config",
+  "constants",
+  "typeshed"
+]
+name = "Source layers"
+type = "layers"
+
+[[tool.importlinter.contracts]]
+containers = ["src.bot"]
+layers = [
+  "commands",
+  "controllers",
+  "typeshed",
+  "constants"
+]
+name = "Bot layers"
+type = "layers"
+
+[[tool.importlinter.contracts]]
+containers = ["src.quests", "src.tavern"]
+exhaustive = true
+layers = [
+  "services",
+  "exceptions",
+  "models"
+]
+name = "Source Submodule layers"
+type = "layers"
+
 [tool.mypy]
+cache_fine_grained = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
 exclude = [
   "test",
-  "alembic"
+  "alembic",
+  "factories",
+  "rule"
 ]
 local_partial_types = true
 namespace_packages = true
 plugins = ["sqlalchemy.ext.mypy.plugin", "pydantic.mypy"]
-python_version = "3.11"
+python_version = "3.12"
 show_error_codes = true
 warn_redundant_casts = true
 warn_return_any = true
@@ -48,61 +149,31 @@ module = "furl"
 ignore_missing_imports = true
 module = "factory.*"
 
-[tool.poetry]
-authors = ["jplhanna <jpl.hanna@gmail.com>"]
-description = "Discord bot for tracking and rewarding tasks"
-name = "discord-quest-bot"
-packages = [{include = "local_server"}]
-readme = "README.md"
-version = "0.1.1"
-
-[tool.poetry.dependencies]
-SQLAlchemy = {extras = ["asyncio"], version = "^2.0.25"}
-alembic = "^1.8"
-asyncpg = "0.29.0"
-dependency-injector = ">=4, <5"
-"discord.py" = "^2.0.1"
-furl = "^2.1.3"
-psycopg2-binary = "^2.9.6"
-pydantic = "^2.5.3"
-pydantic-settings = "^2.1.0"
-python = "^3.11"
-sqlmodel = "^0.0.14"
-typing-extensions = "^4.9.0"
-
-[tool.poetry.group.dev.dependencies]
-black = "*"
-coverage = {extras = ["toml"], version = "^6.4.4"}
-factory-boy = "^3.3.0"
-faker = "*"
-flake8-pytest-style = "^1.6.0"
-mypy = "*"
-pre-commit = "*"
-pytest = "<=7.4.4"
-pytest-async-sqlalchemy = "*"
-pytest-asyncio = "*"
-pytest-cov = "*"
-pytest-factoryboy = "^2.7.0"
-pytest-mock = "^3.12.0"
-pytest-randomly = "*"
-ruff = "^0.2.0"
-
 [tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "session"
 asyncio_mode = "auto"
 filterwarnings = [
   "ignore::DeprecationWarning"
 ]
 markers = [
-  "integration"
+  "integration: tests which connect to a db"
 ]
 
 [tool.ruff]
 exclude = ["alembic"]
 line-length = 120
-target-version = "py311"
+target-version = "py313"
+
+[tool.ruff.analyze]
+# Exclude type-checking-only imports from the graph
+type-checking-imports = false
+
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.ruff.lint]
 fixable = ["ALL"]
+ignore = ["D1", "D205", "TC006"]
 select = [
   "E",
   "F",
@@ -111,6 +182,7 @@ select = [
   "PT",
   "I",
   "S",
+  "D",
   "RSE",
   "RET501",
   "RET502",
@@ -136,6 +208,9 @@ lines-between-types = 1
 max-complexity = 10
 
 [tool.ruff.lint.per-file-ignores]
-"src/helpers/factories/*" = ["FBT001"]
+"src/factories/*" = ["FBT001"]
 "src/model_hub.py" = ["F401"]
 "src/tests/*" = ["S"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

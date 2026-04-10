@@ -5,7 +5,8 @@ import factory
 from pytest_factoryboy import register
 
 from src.constants import DayOfWeek
-from src.helpers.factories.base_factories import BaseFactory
+from src.factories.base_factories import BaseFactory
+from src.models import Theme
 from src.tavern import Menu
 from src.tavern.models import MenuItem
 
@@ -28,3 +29,11 @@ class MenuFactory(BaseFactory):
     server_id = sentinel.guild_id
     start_date = factory.Faker("date_object")
     items = factory.RelatedFactoryList(MenuItemFactory, factory_related_name="menu")
+
+
+@register
+class ThemeFactory(BaseFactory):
+    class Meta:
+        model = Theme
+
+    name = factory.Sequence(lambda n: f"Test Theme {n}")

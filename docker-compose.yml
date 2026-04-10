@@ -1,4 +1,3 @@
-version: "3.7"
 x-common-variables: &common-variables
   DATABASE_NAME: ${DATABASE_NAME}
   DATABASE_USER: ${DATABASE_USER}
@@ -18,13 +17,13 @@ services:
       DATABASE_HOST: 'postgres'
       DISCORD_OWNER_ID: ${DISCORD_OWNER_ID}
     volumes:
-      - .:/app
+      - ./src:/app/src
     networks:
       - network
     build:
       context: .
       dockerfile: Dockerfile
-      target: install-poetry
+      target: install-uv-packages
     depends_on:
       - "postgres"
     command: python src/run.py
@@ -32,7 +31,7 @@ services:
   postgres:
     container_name: postgres-${IMAGE_TAG-latest}
     hostname: "postgres"
-    image: postgres:14
+    image: postgres:17
     command: [ "postgres", "-c", "listen_addresses=*", "-c", "log_statement=all" ]
     restart: always
     environment:
@@ -67,7 +66,7 @@ services:
       LOGGER__HANDLERS__BASIC_HANDLER__FORMATTER: 'simple_formatter'
       LOGGER__HANDLERS__BASIC_HANDLER__STREAM: 'ext://sys.stdout'
     volumes:
-      - .:/app
+      - ./src:/app/src
     networks:
       - network
     build:
@@ -76,6 +75,7 @@ services:
       target: install-dev
     depends_on:
       - "test-db"
+    command: tail -F /dev/null
 
 networks:
   network:

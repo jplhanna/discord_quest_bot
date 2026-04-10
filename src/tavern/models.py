@@ -9,6 +9,8 @@ from sqlmodel import Relationship
 from src.constants import DayOfWeek
 from src.helpers.sqlalchemy_helpers import EnumColumn
 from src.models import CoreModelMixin
+from src.models import Theme
+from src.typeshed import NonEmptyString
 
 
 class Menu(CoreModelMixin, table=True):
@@ -26,10 +28,19 @@ class Menu(CoreModelMixin, table=True):
 
 class MenuItem(CoreModelMixin, table=True):
     # Columns
-    food: str
+    food: NonEmptyString
     day_of_the_week: DayOfWeek = Field(sa_column=Column(EnumColumn(DayOfWeek)))
 
     menu_id: int = Field(foreign_key="menu.id", repr=False)
 
     # relationships
     menu: Menu = Relationship(back_populates="items")
+
+
+class BardTale(CoreModelMixin, table=True):
+    name: NonEmptyString
+    story: NonEmptyString
+
+    theme_id: int = Field(foreign_key="theme.id", repr=False)
+
+    theme: Theme = Relationship()

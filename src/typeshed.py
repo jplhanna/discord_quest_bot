@@ -20,6 +20,8 @@ from sqlalchemy.sql.elements import BooleanClauseList
 from sqlalchemy.sql.elements import Label
 from sqlalchemy.sql.functions import Function
 from sqlalchemy.sql.selectable import CTE
+from sqlmodel import Session
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 if TYPE_CHECKING:
     from src.models import CoreModelMixin
@@ -57,8 +59,9 @@ JoinListType = Sequence[
     | InstrumentedAttribute
 ]
 
-EntitiesType = Mapped | Label | type["CoreModelMixin"] | Function
 BaseModelType = TypeVar("BaseModelType", bound="CoreModelMixin")
+EntitiesType = Mapped | Label | type["CoreModelMixin"] | Function | type[BaseModelType]
+SessionType = TypeVar("SessionType", AsyncSession, Session)
 
 
 class MixinData(BaseModel):
@@ -69,8 +72,8 @@ class MixinData(BaseModel):
 class RepositoryHandler:
     def __init__(
         self,
-        repository_factory: Callable[[type[BaseModelType]], "BaseRepository[BaseModelType]"],
-        **models: type[BaseModelType]
+        repository_factory: Callable[[type[BaseModelType]], "BaseRepository[SessionType, BaseModelType]"],
+        **models: type[BaseModelType],
     ) -> None:
         for key, model in models.items():
             setattr(self, key.removesuffix("_model"), repository_factory(model))

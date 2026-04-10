@@ -7,23 +7,30 @@ default_stages:
 repos:
   - repo: local
     hooks:
-      - id: black
-        name: black
-        entry: black
+      - id: fixit
+        name: fixit
+        entry: fixit fix
+        language: system
+        types: [python]
+        args: [ -a ]
+      - id: ruff format
+        name: ruff format
+        entry: ruff format
         language: system
         types: [ python ]
         args: [ --line-length=120 ]
+      - id: uv check
+        name: uv check
+        entry: uv lock --check
+        language: system
+        files: pyproject|uv
+        pass_filenames: false
 
   - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
     rev: v2.12.0
     hooks:
       - id: pretty-format-toml
         args: [--autofix]
-
-  - repo: https://gitlab.com/smop/pre-commit-hooks
-    rev: v1.0.0
-    hooks:
-      - id: check-poetry
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -45,28 +52,25 @@ repos:
         entry: mypy
         language: system
         types: [ python ]
-        exclude: alembic|test_.*|conftest\.py
-
-  - repo: local
-    hooks:
-      - id: ruff
-        name: ruff
-        entry: ruff
+        exclude: alembic|test_.*|conftest\.py|factories|linting_rules
+      - id: ruff lint
+        name: ruff lint
+        entry: ruff check
         language: system
         types: [ python ]
         exclude: alembic
         args: [--fix, --exit-non-zero-on-fix]
+      - id: import lint
+        name: import_linter
+        entry: lint-imports
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true
 
-  - repo: https://github.com/radix-ai/auto-smart-commit
-    rev: v1.0.3
+  - repo: https://github.com/avilaton/add-msg-issue-prefix-hook
+    rev: v0.0.11
     hooks:
-      - id: auto-smart-commit
+      - id: add-msg-issue-prefix
         stages:
           - prepare-commit-msg
-
-  - repo: https://github.com/jorisroovers/gitlint
-    rev: v0.19.1
-    hooks:
-      - id: gitlint
-        stages:
-          - commit-msg

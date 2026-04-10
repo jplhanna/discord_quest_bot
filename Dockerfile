@@ -1,30 +1,26 @@
-FROM python:3.11.4-slim as base
-MAINTAINER JP Hanna "jpl.hanna@gmail.com"
+FROM ghcr.io/astral-sh/uv:python3.13-alpine AS base
+LABEL org.opencontainers.image.authors="jpl.hanna@gmail.com"
 WORKDIR /app/
 COPY . /app/
 
-FROM base as install-poetry
+FROM base AS install-uv-packages
 
-# Set env variables
-ENV PIPX_BIN_DIR="/opt/pipx" \
-    POETRY_NO_INTERACTION=true \
-    POETRY_VIRTUALENVS_CREATE=false \
-    POETRY_VIRTUALENVS_IN_PROJECT=false \
-    POETRY_CACHE_DIR="/opt/poetry" \
-    POETRY_VERSION=1.7.0 \
-    PATH="/root/.local/share/pipx/venvs/poetry/bin:$PATH"
-ENV PATH="$POETRY_VIRTUALENVS_PATH/bin:$PIPX_BIN_DIR:$PATH"
-
-# Install poetry
-RUN pip install --upgrade pip \
-    && pip install pipx \
-    && pipx install poetry==$POETRY_VERSION
+ENV PATH="/app/.venv/bin:$PATH" \
+    UV_FROZEN=True \
+    UV_LINK_MODE=copy \
+    UV_CACHE_DIR=/opt/uv-cache/
 
 # Install python dependencies
-RUN poetry install --no-root --no-ansi --no-interaction --only=main --no-directory
+RUN --mount=type=cache,target=$UV_CACHE_DIR \
+    uv sync --no-install-project --no-dev
 
 # Install application into container
 ENV PYTHONPATH "$PYTHONPATH:/app/"
 
-FROM install-poetry as install-dev
-RUN poetry install --no-root --no-ansi --no-interaction --only=dev --no-directory
+# Make Logs directory
+RUN mkdir /app/logs
+RUN touch /app/logs/discord.log
+
+FROM install-uv-packages AS install-dev
+RUN --mount=type=cache,target=$UV_CACHE_DIR \
+    uv sync --no-install-project --group dev
