@@ -24,9 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4.1.4
       - name: Build Docker images
-        run: |
-          docker compose build test-pipeline
-          docker compose up -d test-pipeline
+        run: docker compose up --build -d test-pipeline
       - name: Check format with ruff
         if: always()
         run: docker compose exec test-pipeline ruff format --check src
