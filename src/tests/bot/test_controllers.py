@@ -21,6 +21,7 @@ from src.bot.controllers import upsert_tavern_menu
 from src.constants import QUEST_DOES_NOT_EXIST
 from src.constants import ChooseStyle
 from src.constants import DayOfWeek
+from src.factories import MenuPolyFactory
 from src.quests.exceptions import QuestDNE
 from src.tavern import Menu
 from src.tavern.exceptions import NoMenuItemFoundError
@@ -183,6 +184,7 @@ class TestUpsertTavernMenu:
 
     async def test_with_pre_existing_menu(self, mocked_ctx, mock_container, menu):
         # Arrange
+        menu = MenuPolyFactory.build()
         tavern_service = AsyncMock(get_this_weeks_menu=AsyncMock(return_value=menu))
         mock_container.tavern_service.override(tavern_service)
         mock_container.wire(TEST_WIRE_TO)

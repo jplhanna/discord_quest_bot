@@ -10,6 +10,7 @@ dev = [
   "fixit>=2.2.1",
   "import-linter>=2.7",
   "mypy",
+  "polyfactory>=3.3.0",
   "pre-commit",
   "pytest",
   "pytest-async-sqlalchemy",
