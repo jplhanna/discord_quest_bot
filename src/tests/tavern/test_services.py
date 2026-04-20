@@ -59,9 +59,9 @@ class TestGetRandomTaleByTheme:
 
     @pytest.mark.integration
     @pytest.mark.asyncio(loop_scope="session")
-    async def test_no_stories_in_theme(self, mocked_tavern_service, db_session):
+    async def test_no_stories_in_theme(self, mocked_tavern_service, db_session, theme_factory: type[ThemeFactory]):
         # Arrange
-        theme = ThemeFactory.build()
+        theme = theme_factory.build()
         db_session.add(theme)
         db_session.commit()
         # Act && Assert
