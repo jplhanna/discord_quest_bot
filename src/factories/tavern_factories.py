@@ -1,39 +1,22 @@
 from unittest.mock import sentinel
 
-import factory
-
-from pytest_factoryboy import register
-
-from src.constants import DayOfWeek
 from src.factories.base_factories import BaseFactory
 from src.models import Theme
 from src.tavern import Menu
 from src.tavern.models import MenuItem
 
 
-@register
-class MenuItemFactory(BaseFactory):
-    class Meta:
-        model = MenuItem
-
-    food = factory.Sequence(lambda n: f"Test Food {n}")
-    day_of_the_week = factory.Iterator(DayOfWeek)
-    menu = None
+class MenuItemFactory(BaseFactory[MenuItem]):
+    __model__ = MenuItem
+    __set_as_default_factory_for_type__ = True
 
 
-@register
-class MenuFactory(BaseFactory):
-    class Meta:
-        model = Menu
-
+class MenuFactory(BaseFactory[Menu]):
+    __model__ = Menu
+    __set_as_default_factory_for_type__ = True
     server_id = sentinel.guild_id
-    start_date = factory.Faker("date_object")
-    items = factory.RelatedFactoryList(MenuItemFactory, factory_related_name="menu")
 
 
-@register
-class ThemeFactory(BaseFactory):
-    class Meta:
-        model = Theme
-
-    name = factory.Sequence(lambda n: f"Test Theme {n}")
+class ThemeFactory(BaseFactory[Theme]):
+    __model__ = Theme
+    __set_as_default_factory_for_type__ = True

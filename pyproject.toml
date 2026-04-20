@@ -5,11 +5,11 @@ requires = ["hatchling"]
 [dependency-groups]
 dev = [
   "coverage[toml]>=6.4.4,<7",
-  "factory-boy>=3.3.0,<4",
   "faker",
   "fixit>=2.2.1",
   "import-linter>=2.7",
   "mypy",
+  "polyfactory>=3.3.0",
   "pre-commit",
   "pytest",
   "pytest-async-sqlalchemy",

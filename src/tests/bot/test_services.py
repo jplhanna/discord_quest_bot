@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.constants import GOOD_LUCK_ADVENTURER
+from src.factories import UserFactory
 from src.quests.exceptions import MaxQuestCompletionReached
 from src.quests.exceptions import QuestAlreadyAccepted
 from src.quests.exceptions import QuestDNE
@@ -14,8 +15,9 @@ from src.quests.services import QuestService
 @pytest.mark.asyncio
 @pytest.mark.usefixtures("mock_container")
 class TestQuestService:
-    async def test_accept_quest_if_available(self, user):
+    async def test_accept_quest_if_available(self, user_factory: type[UserFactory]):
         # Arrange
+        user = user_factory.build()
         mock_quest_repository = AsyncMock(
             get_first=AsyncMock(return_value=MagicMock(users=[])), session=AsyncMock(commit=AsyncMock())
         )
@@ -30,8 +32,9 @@ class TestQuestService:
         assert res == GOOD_LUCK_ADVENTURER.format("Quest title")
         mock_user_quest_repo.add.assert_called()
 
-    async def test_quest_dne(self, user):
+    async def test_quest_dne(self, user_factory: type[UserFactory]):
         # Arrange
+        user = user_factory.build()
         mock_quest_repository = AsyncMock(get_first=AsyncMock(return_value=None))
         mock_repository_factory = MagicMock(side_effect=[mock_quest_repository, AsyncMock()])
         quest_service = QuestService(
@@ -41,8 +44,9 @@ class TestQuestService:
         with pytest.raises(QuestDNE):
             await quest_service.accept_quest_if_available(user, "Quest title")
 
-    async def test_quest_already_accepted(self, user):
+    async def test_quest_already_accepted(self, user_factory: type[UserFactory]):
         # Arrange
+        user = user_factory.build()
         quest = MagicMock(users=[user])
         mock_quest_repository = AsyncMock(
             get_first=AsyncMock(return_value=quest), session=AsyncMock(commit=AsyncMock())
@@ -57,8 +61,9 @@ class TestQuestService:
             await quest_service.accept_quest_if_available(user, "Quest title")
 
     @pytest.mark.parametrize("max_completion_count", [None, 2])
-    async def test_quest_completed(self, user, max_completion_count):
+    async def test_quest_completed(self, user_factory: type[UserFactory], max_completion_count):
         # Arrange
+        user = user_factory.build()
         quest = MagicMock(users=[user], max_completion_count=max_completion_count)
         mock_quest_repository = AsyncMock(
             get_first=AsyncMock(return_value=quest), session=AsyncMock(commit=AsyncMock())
@@ -76,8 +81,9 @@ class TestQuestService:
         # Assert
         assert res == quest
 
-    async def test_cannot_complete_nonexistent_quest(self, user):
+    async def test_cannot_complete_nonexistent_quest(self, user_factory: type[UserFactory]):
         # Arrange
+        user = user_factory.build()
         mock_quest_repository = AsyncMock(get_first=AsyncMock(return_value=None))
         mock_repository_factory = MagicMock(side_effect=[mock_quest_repository, AsyncMock()])
         quest_service = QuestService(
@@ -87,8 +93,9 @@ class TestQuestService:
         with pytest.raises(QuestDNE):
             await quest_service.complete_quest_if_available(user, "Quest Title")
 
-    async def test_cannot_complete_unaccepted_quest(self, user):
+    async def test_cannot_complete_unaccepted_quest(self, user_factory: type[UserFactory]):
         # Arrange
+        user = user_factory.build()
         mock_quest_repository = AsyncMock(
             get_first=AsyncMock(return_value=MagicMock()), session=AsyncMock(commit=AsyncMock())
         )
@@ -101,8 +108,9 @@ class TestQuestService:
         with pytest.raises(QuestNotAccepted):
             await quest_service.complete_quest_if_available(user, "Quest Title")
 
-    async def test_max_completion_count_reached(self, user):
+    async def test_max_completion_count_reached(self, user_factory: type[UserFactory]):
         # Arrange
+        user = user_factory.build()
         quest = MagicMock(users=[user], max_completion_count=1, completed_users=[user])
         mock_quest_repository = AsyncMock(
             get_first=AsyncMock(return_value=quest), session=AsyncMock(commit=AsyncMock())
