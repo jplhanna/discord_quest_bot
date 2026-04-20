@@ -330,7 +330,6 @@ version = "0.1.1"
 [package.dev-dependencies]
 dev = [
   {name = "coverage"},
-  {name = "factory-boy"},
   {name = "faker"},
   {name = "fixit"},
   {name = "import-linter"},
@@ -365,7 +364,6 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
   {name = "coverage", extras = ["toml"], specifier = ">=6.4.4,<7"},
-  {name = "factory-boy", specifier = ">=3.3.0,<4"},
   {name = "faker"},
   {name = "fixit", specifier = ">=2.2.1"},
   {name = "import-linter", specifier = ">=2.7"},
