@@ -1,4 +1,5 @@
 from datetime import date
+from unittest.mock import sentinel
 
 from polyfactory.decorators import post_generated
 
@@ -16,6 +17,7 @@ class MenuItemFactory(BaseFactory[MenuItem]):
 class MenuFactory(BaseFactory[Menu]):
     __model__ = Menu
     __set_as_default_factory_for_type__ = True
+    server_id = sentinel.guild_id
 
     @post_generated
     @classmethod
