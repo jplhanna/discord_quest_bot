@@ -4,6 +4,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from src.constants import DayOfWeek
+from src.factories import ThemeFactory
 from src.repositories import AsyncRepository
 from src.tavern import BardTale
 from src.tavern import Menu
@@ -58,8 +59,9 @@ class TestGetRandomTaleByTheme:
 
     @pytest.mark.integration
     @pytest.mark.asyncio(loop_scope="session")
-    async def test_no_stories_in_theme(self, mocked_tavern_service, db_session, theme):
+    async def test_no_stories_in_theme(self, mocked_tavern_service, db_session):
         # Arrange
+        theme = ThemeFactory.build()
         db_session.add(theme)
         db_session.commit()
         # Act && Assert

@@ -11,7 +11,7 @@ from unittest.mock import sentinel
 
 import pytest
 
-from pytest_factoryboy import register
+from polyfactory.pytest_plugin import register_fixture
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -121,4 +121,4 @@ async def db_user(db_session):
 
 
 for cls in FACTORY_CLASSES:
-    register(cls)
+    register_fixture(cls)
