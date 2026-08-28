@@ -7,6 +7,8 @@ from discord.ext.commands import Context
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.exc import NoResultFound
 
+from services import ThemeService
+from services import UserService
 from bot.constants import ALREADY_REGISTERED_MESSAGE
 from bot.constants import NEW_USER_MESSAGE
 from bot.constants import NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
@@ -25,8 +27,6 @@ from quests import QuestService
 from quests.exceptions import BaseQuestException
 from quests.exceptions import QuestAlreadyAccepted
 from quests.exceptions import QuestDNE
-from services import ThemeService
-from services import UserService
 from tavern import TavernService
 from tavern.exceptions import NoMenuItemFoundError
 

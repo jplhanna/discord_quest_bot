@@ -17,7 +17,9 @@ from typeshed import NonEmptyString
 ASYNC_PSQL_SCHEME = "postgresql+asyncpg"
 
 _DISCORD_OWNER_ID_STR: Final[str | None] = os.environ.get("DISCORD_OWNER_ID")
-DISCORD_OWNER_ID: Final[int | None] = int(_DISCORD_OWNER_ID_STR) if _DISCORD_OWNER_ID_STR and _DISCORD_OWNER_ID_STR.isdigit() else None
+DISCORD_OWNER_ID: Final[int | None] = (
+    int(_DISCORD_OWNER_ID_STR) if _DISCORD_OWNER_ID_STR and _DISCORD_OWNER_ID_STR.isdigit() else None
+)
 
 DATABASE_NAME: Final[str | None] = os.environ.get("DATABASE_NAME")
 DATABASE_USER: Final[str | None] = os.environ.get("DATABASE_USER")

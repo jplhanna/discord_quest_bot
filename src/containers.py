@@ -19,6 +19,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlmodel import Session
 from sqlmodel.ext.asyncio.session import AsyncSession
 
+from services import ThemeService
+from services import UserService
 from config import Settings
 from helpers.sqlalchemy_helpers import BaseModel
 from models import Theme
@@ -30,8 +32,6 @@ from quests import QuestService
 from quests import UserQuest
 from repositories import AsyncRepository
 from repositories import SyncRepository
-from services import ThemeService
-from services import UserService
 from tavern import BardTale
 from tavern import Menu
 from tavern import TavernService

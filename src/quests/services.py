@@ -5,6 +5,8 @@ from typing import cast
 from sqlalchemy.orm import QueryableAttribute
 from sqlalchemy.orm import selectinload
 
+from services import MultiRepoService
+from services import SingleRepoService
 from constants import GOOD_LUCK_ADVENTURER
 from helpers.sqlalchemy_helpers import QueryArgs
 from helpers.sqlalchemy_helpers import case_insensitive_str_compare
@@ -17,8 +19,6 @@ from quests.exceptions import QuestDNE
 from quests.exceptions import QuestNotAccepted
 from quests.models import UserQuest
 from repositories import AsyncRepository
-from services import MultiRepoService
-from services import SingleRepoService
 from typeshed import RepositoryHandler
 
 
