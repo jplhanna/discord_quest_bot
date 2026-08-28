@@ -16,12 +16,12 @@ from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-from src.config import Settings
-from src.containers import Container
-from src.factories import FACTORY_CLASSES
-from src.helpers.sqlalchemy_helpers import BaseModel
-from src.models import User
-from src.repositories import AsyncRepository
+from config import Settings
+from containers import Container
+from factories import FACTORY_CLASSES
+from helpers.sqlalchemy_helpers import BaseModel
+from models import User
+from repositories import AsyncRepository
 
 base_mock_container = Container(logging=MagicMock())
 

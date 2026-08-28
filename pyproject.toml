@@ -4,13 +4,14 @@ requires = ["hatchling"]
 
 [dependency-groups]
 dev = [
-  "coverage[toml]>=6.4.4,<7",
+  "coverage[toml]",
   "faker",
   "fixit>=2.2.1",
   "import-linter>=2.7",
   "mypy",
   "polyfactory>=3.3.0",
   "pre-commit",
+  "pyrefly",
   "pytest",
   "pytest-async-sqlalchemy",
   "pytest-asyncio",
@@ -34,7 +35,7 @@ dependencies = [
   "pydantic>=2.5.3,<3",
   "pydantic-settings>=2.1.0,<3",
   "sqlmodel>=0.0.24,<0.1",
-  "typing-extensions>=4.9.0,<5"
+  "typing-extensions>=4.9.0,<5",
 ]
 description = "Discord bot for tracking and rewarding tasks"
 name = "discord-quest-bot"

@@ -1,9 +1,9 @@
 from unittest.mock import sentinel
 
-from src.factories.base_factories import BaseFactory
-from src.models import Theme
-from src.tavern import Menu
-from src.tavern.models import MenuItem
+from factories.base_factories import BaseFactory
+from models import Theme
+from tavern import Menu
+from tavern.models import MenuItem
 
 
 class MenuItemFactory(BaseFactory[MenuItem]):

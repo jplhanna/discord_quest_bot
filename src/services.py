@@ -4,12 +4,12 @@ from logging import getLogger
 
 from sqlalchemy import func
 
-from src.helpers.sqlalchemy_helpers import QueryArgs
-from src.models import Theme
-from src.models import User
-from src.repositories import AsyncRepository
-from src.typeshed import BaseModelType
-from src.typeshed import RepositoryHandler
+from helpers.sqlalchemy_helpers import QueryArgs
+from models import Theme
+from models import User
+from repositories import AsyncRepository
+from typeshed import BaseModelType
+from typeshed import RepositoryHandler
 
 
 class BaseService:

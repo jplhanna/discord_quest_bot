@@ -7,14 +7,14 @@ from sqlalchemy.orm import declared_attr
 from sqlmodel import Field
 from sqlmodel import Relationship
 
-from src.helpers.sqlalchemy_helpers import BaseModel
-from src.helpers.sqlalchemy_helpers import snake_case_table_name
-from src.typeshed import MixinData
-from src.typeshed import NonEmptyString
+from helpers.sqlalchemy_helpers import BaseModel
+from helpers.sqlalchemy_helpers import snake_case_table_name
+from typeshed import MixinData
+from typeshed import NonEmptyString
 
 if TYPE_CHECKING:
-    from src.quests import ExperienceTransaction
-    from src.quests import UserQuest
+    from quests import ExperienceTransaction
+    from quests import UserQuest
 
 
 class CoreModelMixin(BaseModel):

@@ -2,9 +2,9 @@ from datetime import date
 
 import pytest
 
-from src.constants import DayOfWeek
-from src.tavern import Menu
-from src.tavern.models import MenuItem
+from constants import DayOfWeek
+from tavern import Menu
+from tavern.models import MenuItem
 
 
 class TestMenu:

@@ -1,17 +1,17 @@
 from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
-from src.helpers.constants import BLOCK_POST_TEXT
-from src.helpers.constants import BLOCK_PRE_TEXT
-from src.helpers.constants import BOX_VERTICAL_CHAR
-from src.helpers.constants import CODE_BLOCK
-from src.helpers.constants import EXPERIENCE_COLUMN_NAME
-from src.helpers.constants import MINIMUM_SPACING
-from src.helpers.constants import QUEST_COLUMN_NAME
-from src.helpers.constants import WRAPPER_TEXT_LEN
+from helpers.constants import BLOCK_POST_TEXT
+from helpers.constants import BLOCK_PRE_TEXT
+from helpers.constants import BOX_VERTICAL_CHAR
+from helpers.constants import CODE_BLOCK
+from helpers.constants import EXPERIENCE_COLUMN_NAME
+from helpers.constants import MINIMUM_SPACING
+from helpers.constants import QUEST_COLUMN_NAME
+from helpers.constants import WRAPPER_TEXT_LEN
 
 if TYPE_CHECKING:
-    from src.quests.models import Quest
+    from quests.models import Quest
 
 
 def _create_single_quest_line(first_column: str, second_column: str, line_length: int) -> str:

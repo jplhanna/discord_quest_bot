@@ -6,11 +6,11 @@ from sqlalchemy import Column
 from sqlmodel import Field
 from sqlmodel import Relationship
 
-from src.constants import DayOfWeek
-from src.helpers.sqlalchemy_helpers import EnumColumn
-from src.models import CoreModelMixin
-from src.models import Theme
-from src.typeshed import NonEmptyString
+from constants import DayOfWeek
+from helpers.sqlalchemy_helpers import EnumColumn
+from models import CoreModelMixin
+from models import Theme
+from typeshed import NonEmptyString
 
 
 class Menu(CoreModelMixin, table=True):

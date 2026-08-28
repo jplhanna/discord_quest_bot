@@ -1,7 +1,7 @@
 import pytest
 
-from src.helpers.message_helpers import format_quest_board
-from src.quests.models import Quest
+from helpers.message_helpers import format_quest_board
+from quests.models import Quest
 
 
 class TestFormatQuestBoard:

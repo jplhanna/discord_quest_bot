@@ -10,8 +10,8 @@ from alembic import op
 import sqlalchemy as sa
 import sqlmodel
 
-from src.constants import DayOfWeek
-from src.helpers.sqlalchemy_helpers import EnumColumn
+from constants import DayOfWeek
+from helpers.sqlalchemy_helpers import EnumColumn
 
 # revision identifiers, used by Alembic.
 revision = "4232a8d67776"

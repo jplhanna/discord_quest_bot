@@ -7,28 +7,28 @@ from discord.ext.commands import Context
 from sqlalchemy.exc import MultipleResultsFound
 from sqlalchemy.exc import NoResultFound
 
-from src.bot.constants import ALREADY_REGISTERED_MESSAGE
-from src.bot.constants import NEW_USER_MESSAGE
-from src.bot.constants import NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
-from src.bot.constants import NO_MENU_THIS_WEEK_MESSAGE
-from src.bot.constants import NO_SUCH_THEME_EXISTS
-from src.bot.constants import REGISTER_FIRST_MESSAGE
-from src.bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
-from src.bot.constants import STORY_HAS_BEEN_RECORDED
-from src.constants import ChooseStyle
-from src.constants import DayOfWeek
-from src.containers import Container
-from src.exceptions import NoIDProvided
-from src.helpers.message_helpers import format_quest_board
-from src.quests import ExperienceTransactionService
-from src.quests import QuestService
-from src.quests.exceptions import BaseQuestException
-from src.quests.exceptions import QuestAlreadyAccepted
-from src.quests.exceptions import QuestDNE
-from src.services import ThemeService
-from src.services import UserService
-from src.tavern import TavernService
-from src.tavern.exceptions import NoMenuItemFoundError
+from bot.constants import ALREADY_REGISTERED_MESSAGE
+from bot.constants import NEW_USER_MESSAGE
+from bot.constants import NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
+from bot.constants import NO_MENU_THIS_WEEK_MESSAGE
+from bot.constants import NO_SUCH_THEME_EXISTS
+from bot.constants import REGISTER_FIRST_MESSAGE
+from bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
+from bot.constants import STORY_HAS_BEEN_RECORDED
+from constants import ChooseStyle
+from constants import DayOfWeek
+from containers import Container
+from exceptions import NoIDProvided
+from helpers.message_helpers import format_quest_board
+from quests import ExperienceTransactionService
+from quests import QuestService
+from quests.exceptions import BaseQuestException
+from quests.exceptions import QuestAlreadyAccepted
+from quests.exceptions import QuestDNE
+from services import ThemeService
+from services import UserService
+from tavern import TavernService
+from tavern.exceptions import NoMenuItemFoundError
 
 
 @inject

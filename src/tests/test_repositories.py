@@ -2,9 +2,9 @@ import pytest
 
 from sqlalchemy import inspect
 
-from src.helpers.sqlalchemy_helpers import QueryArgs
-from src.models import User
-from src.quests import ExperienceTransaction
+from helpers.sqlalchemy_helpers import QueryArgs
+from models import User
+from quests import ExperienceTransaction
 
 
 class TestUserRepository:

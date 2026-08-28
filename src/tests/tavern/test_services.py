@@ -3,14 +3,14 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.constants import DayOfWeek
-from src.factories import ThemeFactory
-from src.repositories import AsyncRepository
-from src.tavern import BardTale
-from src.tavern import Menu
-from src.tavern import TavernService
-from src.tavern.exceptions import NoMenuItemFoundError
-from src.tavern.models import MenuItem
+from constants import DayOfWeek
+from factories import ThemeFactory
+from repositories import AsyncRepository
+from tavern import BardTale
+from tavern import Menu
+from tavern import TavernService
+from tavern.exceptions import NoMenuItemFoundError
+from tavern.models import MenuItem
 
 
 class TestDeleteMenuItem:

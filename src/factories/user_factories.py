@@ -1,5 +1,5 @@
-from src.factories.base_factories import BaseFactory
-from src.models import User
+from factories.base_factories import BaseFactory
+from models import User
 
 
 class UserFactory(BaseFactory[User]):

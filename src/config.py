@@ -12,18 +12,18 @@ from pydantic import computed_field
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
-from src.typeshed import NonEmptyString
+from typeshed import NonEmptyString
 
 ASYNC_PSQL_SCHEME = "postgresql+asyncpg"
 
 _DISCORD_OWNER_ID_STR: Final[str | None] = os.environ.get("DISCORD_OWNER_ID")
-DISCORD_OWNER_ID: Final = int(_DISCORD_OWNER_ID_STR) if _DISCORD_OWNER_ID_STR else None
+DISCORD_OWNER_ID: Final[int | None] = int(_DISCORD_OWNER_ID_STR) if _DISCORD_OWNER_ID_STR and _DISCORD_OWNER_ID_STR.isdigit() else None
 
-DATABASE_NAME: Final = os.environ.get("DATABASE_NAME")
-DATABASE_USER: Final = os.environ.get("DATABASE_USER")
-DATABASE_HOST: Final = os.environ.get("DATABASE_HOST", "localhost")
-DATABASE_PASSWORD: Final = os.environ.get("DATABASE_PASSWORD")
-PSQL_SCHEME: Final = "postgresql"
+DATABASE_NAME: Final[str | None] = os.environ.get("DATABASE_NAME")
+DATABASE_USER: Final[str | None] = os.environ.get("DATABASE_USER")
+DATABASE_HOST: Final[str] = os.environ.get("DATABASE_HOST", "localhost")
+DATABASE_PASSWORD: Final[str | None] = os.environ.get("DATABASE_PASSWORD")
+PSQL_SCHEME: Final[str] = "postgresql"
 
 database_furl = furl(
     scheme=PSQL_SCHEME,

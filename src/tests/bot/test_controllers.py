@@ -5,29 +5,29 @@ from unittest.mock import sentinel
 
 import pytest
 
-from src.bot.constants import ALREADY_REGISTERED_MESSAGE
-from src.bot.constants import NEW_USER_MESSAGE
-from src.bot.constants import NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
-from src.bot.constants import NO_MENU_THIS_WEEK_MESSAGE
-from src.bot.constants import REGISTER_FIRST_MESSAGE
-from src.bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
-from src.bot.controllers import add_quest_to_user
-from src.bot.controllers import check_and_register_user
-from src.bot.controllers import complete_quest_for_user
-from src.bot.controllers import get_tavern_menu
-from src.bot.controllers import remove_from_tavern_menu
-from src.bot.controllers import select_from_tavern_menu
-from src.bot.controllers import upsert_tavern_menu
-from src.constants import QUEST_DOES_NOT_EXIST
-from src.constants import ChooseStyle
-from src.constants import DayOfWeek
-from src.factories import MenuFactory
-from src.factories import MenuItemFactory
-from src.factories import UserFactory
-from src.quests.exceptions import QuestDNE
-from src.tavern import Menu
-from src.tavern.exceptions import NoMenuItemFoundError
-from src.tavern.models import MenuItem
+from bot.constants import ALREADY_REGISTERED_MESSAGE
+from bot.constants import NEW_USER_MESSAGE
+from bot.constants import NO_MENU_ITEMS_FOR_CHOSEN_DAY_MESSAGE
+from bot.constants import NO_MENU_THIS_WEEK_MESSAGE
+from bot.constants import REGISTER_FIRST_MESSAGE
+from bot.constants import SERVER_ONLY_BAD_REQUEST_MESSAGE
+from bot.controllers import add_quest_to_user
+from bot.controllers import check_and_register_user
+from bot.controllers import complete_quest_for_user
+from bot.controllers import get_tavern_menu
+from bot.controllers import remove_from_tavern_menu
+from bot.controllers import select_from_tavern_menu
+from bot.controllers import upsert_tavern_menu
+from constants import QUEST_DOES_NOT_EXIST
+from constants import ChooseStyle
+from constants import DayOfWeek
+from factories import MenuFactory
+from factories import MenuItemFactory
+from factories import UserFactory
+from quests.exceptions import QuestDNE
+from tavern import Menu
+from tavern.exceptions import NoMenuItemFoundError
+from tavern.models import MenuItem
 
 TEST_WIRE_TO: list[str] = ["src.bot.controllers"]
 

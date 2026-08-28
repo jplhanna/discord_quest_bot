@@ -4,11 +4,11 @@ from datetime import datetime
 from sqlmodel import Field
 from sqlmodel import Relationship
 
-from src.models import CoreModelMixin
-from src.models import User
-from src.models import UserResourceMixin
-from src.typeshed import MixinData
-from src.typeshed import NonEmptyString
+from models import CoreModelMixin
+from models import User
+from models import UserResourceMixin
+from typeshed import MixinData
+from typeshed import NonEmptyString
 
 
 class Quest(CoreModelMixin, table=True):

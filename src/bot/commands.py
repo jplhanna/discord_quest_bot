@@ -10,19 +10,19 @@ from discord.ext.commands import has_permissions
 from discord.ext.commands import is_owner
 from discord.ext.commands.errors import MissingRequiredArgument
 
-from src.bot.controllers import add_quest_to_user
-from src.bot.controllers import check_and_register_user
-from src.bot.controllers import complete_quest_for_user
-from src.bot.controllers import get_quest_list_text
-from src.bot.controllers import get_tavern_menu
-from src.bot.controllers import remove_from_tavern_menu
-from src.bot.controllers import request_story_by_theme
-from src.bot.controllers import select_from_tavern_menu
-from src.bot.controllers import tell_bard_tale
-from src.bot.controllers import upsert_tavern_menu
-from src.bot.typeshed import RandomChoiceFlag
-from src.config import DISCORD_OWNER_ID
-from src.constants import DayOfWeek
+from bot.controllers import add_quest_to_user
+from bot.controllers import check_and_register_user
+from bot.controllers import complete_quest_for_user
+from bot.controllers import get_quest_list_text
+from bot.controllers import get_tavern_menu
+from bot.controllers import remove_from_tavern_menu
+from bot.controllers import request_story_by_theme
+from bot.controllers import select_from_tavern_menu
+from bot.controllers import tell_bard_tale
+from bot.controllers import upsert_tavern_menu
+from bot.typeshed import RandomChoiceFlag
+from config import DISCORD_OWNER_ID
+from constants import DayOfWeek
 
 default_intent = Intents.default()
 default_intent.message_content = True

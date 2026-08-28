@@ -8,8 +8,8 @@ from typing import ParamSpec
 from discord.ext.commands import FlagConverter
 from discord.ext.commands import flag
 
-from src.constants import ChooseStyle
-from src.constants import DayOfWeek
+from constants import ChooseStyle
+from constants import DayOfWeek
 
 if TYPE_CHECKING:
     from discord.ext.commands import Context

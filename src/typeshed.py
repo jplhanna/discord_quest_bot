@@ -24,8 +24,8 @@ from sqlmodel import Session
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 if TYPE_CHECKING:
-    from src.models import CoreModelMixin
-    from src.repositories import BaseRepository
+    from models import CoreModelMixin
+    from repositories import BaseRepository
 
 
 NonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]

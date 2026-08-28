@@ -1,8 +1,8 @@
 from typing import Any
 
-from src.constants import QUEST_ALREADY_ACCEPTED
-from src.constants import QUEST_DOES_NOT_EXIST
-from src.quests.models import Quest
+from constants import QUEST_ALREADY_ACCEPTED
+from constants import QUEST_DOES_NOT_EXIST
+from quests.models import Quest
 
 
 class BaseQuestException(Exception):

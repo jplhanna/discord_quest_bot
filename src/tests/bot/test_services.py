@@ -3,13 +3,13 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.constants import GOOD_LUCK_ADVENTURER
-from src.factories import UserFactory
-from src.quests.exceptions import MaxQuestCompletionReached
-from src.quests.exceptions import QuestAlreadyAccepted
-from src.quests.exceptions import QuestDNE
-from src.quests.exceptions import QuestNotAccepted
-from src.quests.services import QuestService
+from constants import GOOD_LUCK_ADVENTURER
+from factories import UserFactory
+from quests.exceptions import MaxQuestCompletionReached
+from quests.exceptions import QuestAlreadyAccepted
+from quests.exceptions import QuestDNE
+from quests.exceptions import QuestNotAccepted
+from quests.services import QuestService
 
 
 @pytest.mark.asyncio

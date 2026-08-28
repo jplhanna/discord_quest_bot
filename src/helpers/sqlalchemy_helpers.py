@@ -20,9 +20,9 @@ from sqlalchemy.sql.functions import random
 from sqlmodel import SQLModel
 from sqlmodel.sql.expression import Select
 
-from src.typeshed import JoinListType
-from src.typeshed import JoinStruct
-from src.typeshed import SQLLogicType
+from typeshed import JoinListType
+from typeshed import JoinStruct
+from typeshed import SQLLogicType
 
 
 class BaseModel(SQLModel):

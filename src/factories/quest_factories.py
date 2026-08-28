@@ -1,9 +1,9 @@
 from polyfactory import PostGenerated
 
-from src.factories.base_factories import BaseFactory
-from src.quests import ExperienceTransaction
-from src.quests import Quest
-from src.quests import UserQuest
+from factories.base_factories import BaseFactory
+from quests import ExperienceTransaction
+from quests import Quest
+from quests import UserQuest
 
 
 class QuestFactory(BaseFactory[Quest]):

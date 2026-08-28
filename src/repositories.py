@@ -14,9 +14,9 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select
 
-from src.helpers.sqlalchemy_helpers import QueryArgs
-from src.typeshed import BaseModelType
-from src.typeshed import EntitiesType
+from helpers.sqlalchemy_helpers import QueryArgs
+from typeshed import BaseModelType
+from typeshed import EntitiesType
 
 
 @dataclass
