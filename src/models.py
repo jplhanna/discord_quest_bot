@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
+from typing import override
 
 from pydantic import ConfigDict
 from sqlalchemy import BigInteger
@@ -23,6 +24,7 @@ class CoreModelMixin(BaseModel):
         str_strip_whitespace=True, str_to_lower=True, from_attributes=True
     )
 
+    @override
     @declared_attr  # type: ignore[arg-type]
     def __tablename__(self) -> str:
         return snake_case_table_name(self.__name__)

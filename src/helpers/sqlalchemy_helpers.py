@@ -19,6 +19,7 @@ from sqlalchemy.sql.elements import UnaryExpression
 from sqlalchemy.sql.functions import random
 from sqlmodel import SQLModel
 from sqlmodel.sql.expression import Select
+from sqlmodel.sql.expression import SelectOfScalar
 
 from typeshed import JoinListType
 from typeshed import JoinStruct
@@ -35,7 +36,7 @@ class _QueryHandler:
     func_data: Any
     allow_empty_data: bool = field(default=False)
 
-    def update_query(self, query: Select) -> Select:
+    def update_query[T: Select | SelectOfScalar](self, query: T) -> T:
         if self.func_data or self.allow_empty_data and self.func_data is not None:
             query_method = getattr(query, self.func_str)
             if isinstance(self.func_data, list | tuple):
@@ -51,11 +52,11 @@ class _JoinQueryHandler(_QueryHandler):
     func_data: JoinListType | None
 
     @override
-    def update_query(self, query: Select) -> Select:
+    def update_query[T: Select | SelectOfScalar](self, query: T) -> T:
         if self.func_data:
             for join_on in self.func_data:
                 if isinstance(join_on, tuple):
-                    query = query.join(*join_on)
+                    query = query.join(*join_on)  # type: ignore[bad-argument-type]
                 elif isinstance(join_on, JoinStruct):
                     join_data = join_on.get_join_data()
                     join_func = join_on.get_join_func()
@@ -68,7 +69,8 @@ class _JoinQueryHandler(_QueryHandler):
 class _EagerOptionsHandler(_QueryHandler):
     func_data: list[ExecutableOption] | None
 
-    def update_query(self, query: Select) -> Select:
+    @override
+    def update_query[T: Select | SelectOfScalar](self, query: T) -> T:
         if self.func_data:
             query = query.options(*self.func_data)
 
@@ -136,6 +138,7 @@ class EnumColumn(TypeDecorator):
         self.python_type = enum_class
         super().__init__(*args, **kwargs)
 
+    @override
     def process_bind_param(self, value: IntEnum | int | None, _: Dialect) -> int | None:
         if value is None:
             return value
@@ -145,6 +148,7 @@ class EnumColumn(TypeDecorator):
             raise ValueError(f"{value} is not a supported day of the week.")
         return value
 
+    @override
     def process_result_value(self, value: int | None, _: Dialect) -> IntEnum | None:
         if value is None:
             return value

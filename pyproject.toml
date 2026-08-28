@@ -161,13 +161,18 @@ project-excludes = [
   "**/test*",
   "**/alembic*",
   "**/factories*",
-  "**/rule*"
+  "**/rule*",
+  "**/conftest*"
 ]
 python-version = "3.12.0"
+treat-all-caps-as-final = true
 
 [tool.pyrefly.errors]
+missing-override-decorator = "error"
 no-any-return = "error"
+potential-bad-keyword-argument = "error"
 redundant-cast = "warn"
+unused-ignore = "error"
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "session"

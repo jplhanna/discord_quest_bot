@@ -14,7 +14,7 @@ from pydantic_settings import SettingsConfigDict
 
 from typeshed import NonEmptyString
 
-ASYNC_PSQL_SCHEME = "postgresql+asyncpg"
+ASYNC_PSQL_SCHEME: Final[str] = "postgresql+asyncpg"
 
 _DISCORD_OWNER_ID_STR: Final[str | None] = os.environ.get("DISCORD_OWNER_ID")
 DISCORD_OWNER_ID: Final[int | None] = (
@@ -43,7 +43,7 @@ class DBSettings(BaseSettings):
     database_password: NonEmptyString
     database_port: str = Field(default="5432")
 
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def database_uri(self) -> str:
         return cast(
@@ -58,7 +58,7 @@ class DBSettings(BaseSettings):
             ).url,
         )
 
-    @computed_field  # type: ignore[prop-decorator]
+    @computed_field
     @property
     def async_database_uri(self) -> str:
         return cast(

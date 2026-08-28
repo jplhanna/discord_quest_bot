@@ -2,6 +2,7 @@ import asyncio
 
 from asyncio import AbstractEventLoop
 from asyncio import new_event_loop
+from collections.abc import AsyncGenerator
 from collections.abc import Callable
 from collections.abc import Generator
 from copy import copy
@@ -27,7 +28,7 @@ base_mock_container = Container(logging=MagicMock())
 
 
 @pytest.fixture(scope="session")
-def test_config_obj():
+def test_config_obj() -> Settings:
     return Settings()
 
 
@@ -63,7 +64,7 @@ def mock_user_with_db_repository(mock_user_repository, db_session):
 
 
 @pytest.fixture(scope="session")
-def container_for_testing(test_config_obj) -> Generator[Container]:
+def container_for_testing(test_config_obj: Settings) -> Generator[Container]:
     testing_container = copy(base_mock_container)
     testing_container.config.from_pydantic(test_config_obj)
     testing_container.init_resources()
@@ -72,7 +73,7 @@ def container_for_testing(test_config_obj) -> Generator[Container]:
 
 
 @pytest.fixture(scope="session")
-async def event_loop() -> Generator[AbstractEventLoop]:
+async def event_loop() -> AsyncGenerator[AbstractEventLoop]:
     loop = new_event_loop()
     asyncio.set_event_loop(loop)
     yield loop
@@ -80,7 +81,7 @@ async def event_loop() -> Generator[AbstractEventLoop]:
 
 
 @pytest.fixture(scope="session")
-async def _database_url(test_config_obj) -> str:
+async def _database_url(test_config_obj: Settings) -> str:
     return test_config_obj.db.async_database_uri
 
 

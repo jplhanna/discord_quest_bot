@@ -13,6 +13,7 @@ from sqlmodel import Session
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 from sqlmodel.sql.expression import Select
+from sqlmodel.sql.expression import SelectOfScalar
 
 from helpers.sqlalchemy_helpers import QueryArgs
 from typeshed import BaseModelType
@@ -31,10 +32,12 @@ class BaseRepository[SessionType, BaseModelType](ABC):
             self._session = self.session_factory()
         return self._session
 
-    def _query(self, query_args: QueryArgs | None, to_select: list[EntitiesType] | None = None) -> Select:
+    def _query(
+        self, query_args: QueryArgs | None, to_select: list[EntitiesType] | None = None
+    ) -> Select | SelectOfScalar:
         query_handlers = query_args.get_query_handlers() if query_args else []
         to_select = to_select or [self.model]
-        query: Select = select(*to_select)
+        query: Select | SelectOfScalar = select(*to_select)
         for query_handler in query_handlers:
             query = query_handler.update_query(query)
         return query

@@ -28,10 +28,10 @@ if TYPE_CHECKING:
     from repositories import BaseRepository
 
 
-NonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+type NonEmptyString = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
 
-SQLLogicType = BinaryExpression | BooleanClauseList | bool | ColumnElement["bool"]
-JoinOnType = type["CoreModelMixin"] | AliasedClass | RelationshipProperty
+type SQLLogicType = BinaryExpression | BooleanClauseList | bool | ColumnElement[bool]
+type JoinOnType = type["CoreModelMixin"] | AliasedClass | RelationshipProperty
 
 
 @dataclass
@@ -51,7 +51,7 @@ class JoinStruct:
         return "join"
 
 
-JoinListType = Sequence[
+type JoinListType = Sequence[
     FromClause
     | JoinStruct
     | tuple[JoinOnType, SQLLogicType | RelationshipProperty]

@@ -37,7 +37,7 @@ class Quest(CoreModelMixin, table=True):
 
 
 class UserQuest(CoreModelMixin, UserResourceMixin, table=True):
-    class Meta:
+    class Meta(UserResourceMixin.Meta):
         user_mixin_data = MixinData(back_populates="quests", index=True)
 
     # Columns
