@@ -30,7 +30,7 @@ jobs:
         run: docker compose exec test-pipeline ruff format --check src
       - name: Check type hints
         if: always()
-        run: docker compose exec test-pipeline mypy src
+        run: docker compose exec test-pipeline pyrefly check src
       - name: Lint with ruff
         if: always()
         run: docker compose exec test-pipeline ruff check src
